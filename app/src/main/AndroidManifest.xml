@@ -10,7 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShowProfileActivity">
         <activity android:name=".EditProfileActivity"></activity>
-        <activity android:name=".ProfileActivity" />
         <activity android:name=".ShowProfileActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
