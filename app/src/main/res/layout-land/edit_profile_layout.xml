@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            app:srcCompat="@drawable/default_image"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="-73dp"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageButton
+            android:id="@+id/imageButton1"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@android:drawable/ic_menu_camera"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/imageView1"
+            app:layout_constraintTop_toTopOf="@+id/imageView1"
+            app:srcCompat="@android:drawable/ic_menu_camera" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="275dp"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_weight="2"
+        android:paddingHorizontal="16dp"
+        android:layout_marginRight="16dp">
+
+        <EditText
+            android:id="@+id/editView1"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
+            android:inputType="textShortMessage"
+            android:hint="Full Name"
+            android:textColor="#9A9797"
+            android:textSize="25sp"/>
+
+        <EditText
+            android:id="@+id/editView2"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
+            android:hint="NickName"
+            android:textSize="15sp"
+            android:inputType="textShortMessage"
+            android:textColor="#9A9797"/>
+
+        <EditText
+            android:id="@+id/editView3"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
+            android:hint="Email@address"
+            android:textSize="15sp"
+            android:inputType="textEmailAddress"
+            android:textColor="#9A9797"/>
+
+        <EditText
+            android:id="@+id/editView4"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
+            android:hint="Location"
+            android:textSize="15sp"
+            android:inputType="textLongMessage"
+            android:textColor="#9A9797"/>
+
+        <EditText
+            android:id="@+id/editView5"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
+            android:hint="Birthday"
+            android:textSize="15sp"
+            android:inputType="datetime"
+            android:textColor="#9A9797"/>
+
+        <EditText
+            android:id="@+id/editView6"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:hint="PhoneNumber"
+            android:textSize="15sp"
+            android:inputType="phone"
+            android:textColor="#9A9797"/>
+
+    </LinearLayout>
+
+</LinearLayout>
