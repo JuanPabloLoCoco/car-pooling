@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">ShowProfileActivity</string>
+    <string name="Avatar">Avator</string>
+    <string name="fullName">Full Name</string>
+    <string name="nickName">NickName</string>
+    <string name="email">Email@Address</string>
+    <string name="location">Location</string>
+    <string name="birthday">Birthday</string>
+    <string name="phoneNumber">PhoneNumber</string>
+
 </resources>
