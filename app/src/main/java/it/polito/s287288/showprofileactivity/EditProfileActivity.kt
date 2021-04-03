@@ -16,10 +16,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
-import android.widget.AdapterView
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.IOException
@@ -34,12 +31,94 @@ class EditProfileActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_OPEN_GALLERY = 2
 
+    lateinit var editImageUri: String;
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.edit_profile_layout)
+
+        // profileImageView = findViewById(R.id.profileImageView)
+
+        // Instantiate each variable
+        var etFullName: TextView = findViewById(R.id.editViewFullName) as TextView;
+        var etNickname: TextView = findViewById(R.id.editViewNickName) as TextView;
+        var etEmail: TextView = findViewById(R.id.editViewEmail) as TextView;
+        var etLocation: TextView = findViewById(R.id.editViewLocation) as TextView;
+        var etBirthday: TextView = findViewById(R.id.editViewBirthday) as TextView;
+        var etPhoneNumber: TextView = findViewById(R.id.editViewPhoneNumber) as TextView;
+
+        var editPhotoView = findViewById<ImageView>(R.id.imageViewEditPhoto);
+
+        // Get the data from the intent
+        val fullName = this.intent.getStringExtra("group32.lab1.FULL_NAME")
+        val nickName = this.intent.getStringExtra("group32.lab1.NICK_NAME")
+        val email = this.intent.getStringExtra("group32.lab1.EMAIL")
+        val location = this.intent.getStringExtra("group32.lab1.LOCATION")
+        val birthday = this.intent.getStringExtra("group32.lab1.BIRTHDAY")
+        val phoneNumber = this.intent.getStringExtra("group32.lab1.PHONE_NUMBER")
+        val imageUri = this.intent.getStringExtra("group32.lab1.IMAGE_URI")
+
+        // Set Text
+        etFullName.text = fullName;
+        etNickname.text = nickName;
+        etEmail.text = email
+        etLocation.text = location
+        etBirthday.text = birthday
+        etPhoneNumber.text = phoneNumber
+
+        if (imageUri != null && imageUri.isNotEmpty()) {
+            editPhotoView.setImageURI(Uri.parse(imageUri))
+        }
+
         val imageButton = findViewById<ImageButton>(R.id.imageButton1)
         registerForContextMenu(imageButton)
-        profileImageView = findViewById(R.id.profileImageView)
+
+        imageButton?.setOnClickListener{
+            openContextMenu(imageButton)
+        }
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.edit_profile_option_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.saveItem -> {
+                //sendResults()
+                // Toast.makeText(this, "Save item", Toast.LENGTH_SHORT).show()
+                saveItems()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun saveItems () {
+        val intent = Intent()
+
+        // Get the values from the Edit Texts
+        val fullName = findViewById<TextView>(R.id.editViewFullName).text.toString()
+        val nickName = findViewById<TextView>(R.id.editViewNickName).text.toString()
+        val email = findViewById<TextView>(R.id.editViewEmail).text.toString()
+        val location = findViewById<TextView>(R.id.editViewLocation).text.toString()
+        val birthday = findViewById<TextView>(R.id.editViewBirthday).text.toString()
+        val phoneNumber = findViewById<TextView>(R.id.editViewPhoneNumber).text.toString()
+
+        // Populate the Intent
+        intent.putExtra("group32.lab1.FULL_NAME", fullName);
+        intent.putExtra("group32.lab1.NICK_NAME", nickName)
+        intent.putExtra("group32.lab1.EMAIL", email)
+        intent.putExtra("group32.lab1.LOCATION", location)
+        intent.putExtra("group32.lab1.BIRTHDAY", birthday)
+        intent.putExtra("group32.lab1.PHONE_NUMBER", phoneNumber)
+
+        setResult(RESULT_OK, intent)
+        finish()
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
@@ -200,11 +279,10 @@ class EditProfileActivity : AppCompatActivity() {
             profileImageView.setImageURI(data?.data)
         }
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_IMAGE_CAPTURE) {
-            val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
-            profileImageView.setImageBitmap(takenImage)
+            //val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
+            //profileImageView.setImageBitmap(takenImage)
         } else {
             super.onActivityResult(requestCode, resultCode, data)
-
         }
     }
 

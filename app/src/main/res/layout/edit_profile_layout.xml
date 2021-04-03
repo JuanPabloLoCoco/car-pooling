@@ -13,7 +13,7 @@
         android:layout_marginHorizontal="16dp">
 
         <ImageView
-            android:id="@+id/profileImageView"
+            android:id="@+id/imageViewEditPhoto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="16dp"
@@ -30,8 +30,8 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/profileImageView"
-            app:layout_constraintTop_toTopOf="@+id/profileImageView" />
+            app:layout_constraintStart_toStartOf="@+id/imageViewEditPhoto"
+            app:layout_constraintTop_toTopOf="@+id/imageViewEditPhoto" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
@@ -44,7 +44,7 @@
         android:paddingHorizontal="20dp">
 
         <EditText
-            android:id="@+id/editView1"
+            android:id="@+id/editViewFullName"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginBottom="5dp"
@@ -55,7 +55,7 @@
             android:textSize="30sp"/>
 
         <EditText
-            android:id="@+id/editView2"
+            android:id="@+id/editViewNickName"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
@@ -66,7 +66,7 @@
             android:textColor="#9A9797"/>
 
         <EditText
-            android:id="@+id/editView3"
+            android:id="@+id/editViewEmail"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
@@ -77,7 +77,7 @@
             android:textColor="#9A9797"/>
 
         <EditText
-            android:id="@+id/editView4"
+            android:id="@+id/editViewLocation"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
@@ -88,7 +88,7 @@
             android:textColor="#9A9797"/>
 
         <EditText
-            android:id="@+id/editView5"
+            android:id="@+id/editViewBirthday"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
@@ -99,7 +99,7 @@
             android:textColor="#9A9797"/>
 
         <EditText
-            android:id="@+id/editView6"
+            android:id="@+id/editViewPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center_vertical"
