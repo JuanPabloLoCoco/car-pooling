@@ -2,6 +2,7 @@ package it.polito.s287288.showprofileactivity
 
 import android.app.Activity
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -24,7 +25,7 @@ import java.util.*
 import java.util.jar.Manifest
 
 class EditProfileActivity : AppCompatActivity() {
-    var photo : Uri? = null
+    var photo: Uri? = null
     lateinit var profileImageView: ImageView;
     val FILE_NAME = "photo.jpg"
 
@@ -74,7 +75,7 @@ class EditProfileActivity : AppCompatActivity() {
         val imageButton = findViewById<ImageButton>(R.id.imageButton1)
         registerForContextMenu(imageButton)
 
-        imageButton?.setOnClickListener{
+        imageButton?.setOnClickListener {
             openContextMenu(imageButton)
         }
 
@@ -89,8 +90,6 @@ class EditProfileActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.saveItem -> {
-                //sendResults()
-                // Toast.makeText(this, "Save item", Toast.LENGTH_SHORT).show()
                 saveItems()
                 return true
             }
@@ -98,7 +97,7 @@ class EditProfileActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun saveItems () {
+    private fun saveItems() {
         val intent = Intent()
 
         // Get the values from the Edit Texts
@@ -117,6 +116,7 @@ class EditProfileActivity : AppCompatActivity() {
         intent.putExtra("group32.lab1.BIRTHDAY", birthday)
         intent.putExtra("group32.lab1.PHONE_NUMBER", phoneNumber)
 
+        writeSharedPreferences()
         setResult(RESULT_OK, intent)
         finish()
     }
@@ -126,18 +126,20 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreateContextMenu(menu, v, menuInfo)
     }
 
+
     override fun onContextItemSelected(item: MenuItem): Boolean {
         Log.d("POLITO_LOG", "Item Seleccionado -> ${item.itemId}")
 
         return when (item.itemId) {
             R.id.select_image -> {
+                Toast.makeText(this, "Show gallery", Toast.LENGTH_SHORT).show()
                 //showGallery_CLick()
                 return true
             }
             R.id.take_photo -> {
-                // Toast.makeText(this, "TAKE PHOTO", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "TAKE PHOTO", Toast.LENGTH_SHORT).show()
                 Log.d("POLITO_LOG", "Take phtoo")
-                openCameraClick()
+                //openCameraClick()
                 // openCameraClick2()
                 return true
                 //dispatchTakePictureIntent()
@@ -152,10 +154,29 @@ class EditProfileActivity : AppCompatActivity() {
 
     }
 
+
+    private fun writeSharedPreferences() {
+        val sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        with(sharedPreferences.edit()) {
+            putString( getString(R.string.KeyFullName), findViewById<TextView>(R.id.editViewFullName).text.toString())
+            putString( getString(R.string.KeyNickName), findViewById<TextView>(R.id.editViewNickName).text.toString())
+            putString( getString(R.string.KeyEmail), findViewById<TextView>(R.id.editViewEmail).text.toString())
+            putString( getString(R.string.KeyLocation), findViewById<TextView>(R.id.editViewLocation).text.toString())
+            putString( getString(R.string.KeyPhoneNumber), findViewById<TextView>(R.id.editViewPhoneNumber).text.toString())
+            putString( getString(R.string.KeyBirthday), findViewById<TextView>(R.id.editViewBirthday).text.toString())
+            commit()
+        }
+    }
+
+
+    /*
     private fun getPhotoFIle(fileName: String): File {
         val storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(fileName, ".jpg", storageDirectory)
     }
+     */
+}
 
     /*
     private fun openCameraClick2() {
@@ -172,6 +193,7 @@ class EditProfileActivity : AppCompatActivity() {
 
      */
 
+    /*
     private fun dispatchTakePictureIntent() {
         val value = ContentValues()
         value.put(MediaStore.Images.Media.TITLE, "newImage")
@@ -180,7 +202,7 @@ class EditProfileActivity : AppCompatActivity() {
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, myImage)
         startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 
-        /*
+
 
         Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 .also { takePictureIntent ->
@@ -188,9 +210,11 @@ class EditProfileActivity : AppCompatActivity() {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
             }
         }
-        */
-    }
 
+    }
+    */
+
+    /*
     private fun openCameraClick () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
@@ -216,8 +240,8 @@ class EditProfileActivity : AppCompatActivity() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photo)
         startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE)
+    }
 
-        /*
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         photoFile = getPhotoFIle(FILE_NAME)
         val fileProvider = FileProvider.getUriForFile(this, "it.polito.s287288.FileProvider", photoFile)
@@ -227,9 +251,10 @@ class EditProfileActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Unable to open camera", Toast.LENGTH_LONG).show()
         }
-        */
-    }
 
+    }
+    */
+    /*
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
@@ -251,6 +276,8 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+    */
+    /*
     private fun showGallery_CLick() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Ask for permisision
@@ -266,6 +293,8 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+     */
+    /*
     private fun showGallery () {
         Toast.makeText(applicationContext, "SHow gallery", Toast.LENGTH_LONG).show();
         val intentGallery = Intent(Intent.ACTION_PICK);
@@ -286,6 +315,8 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+     */
+
     /*
     @Throws(IOException::class)
     private fun createImageFile(): File {
@@ -303,6 +334,7 @@ class EditProfileActivity : AppCompatActivity() {
     }
      */
 
+    /*
     private fun setPic(imageView: ImageView, photoPath: String) {
         // Get the dimensions of the View
         val targetW: Int = imageView.width
@@ -327,5 +359,4 @@ class EditProfileActivity : AppCompatActivity() {
             imageView.setImageBitmap(bitmap)
         }
     }
-
-}
+    */
