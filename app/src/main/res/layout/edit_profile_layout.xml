@@ -50,7 +50,7 @@
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
             android:inputType="textShortMessage"
-            android:hint="Full Name"
+            android:hint="@string/fullName"
             android:textColor="#9A9797"
             android:textSize="30sp"/>
 
@@ -60,7 +60,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
-            android:hint="NickName"
+            android:hint="@string/nickName"
             android:textSize="20sp"
             android:inputType="textShortMessage"
             android:textColor="#9A9797"/>
@@ -71,7 +71,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
-            android:hint="Email@address"
+            android:hint="@string/email"
             android:textSize="20sp"
             android:inputType="textEmailAddress"
             android:textColor="#9A9797"/>
@@ -82,7 +82,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
-            android:hint="Location"
+            android:hint="@string/location"
             android:textSize="20sp"
             android:inputType="textLongMessage"
             android:textColor="#9A9797"/>
@@ -93,7 +93,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
-            android:hint="Birthday"
+            android:hint="@string/birthday"
             android:textSize="20sp"
             android:inputType="datetime"
             android:textColor="#9A9797"/>
@@ -103,7 +103,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center_vertical"
-            android:hint="PhoneNumber"
+            android:hint="@string/phoneNumber"
             android:textSize="20sp"
             android:inputType="phone"
             android:textColor="#9A9797"/>
