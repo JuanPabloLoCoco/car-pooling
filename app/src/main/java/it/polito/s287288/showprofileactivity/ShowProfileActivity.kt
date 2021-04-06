@@ -1,24 +1,25 @@
 package it.polito.s287288.showprofileactivity
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.media.Image
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 
 class ShowProfileActivity : AppCompatActivity() {
 
-    lateinit var imageUri: String;
+    private lateinit var imageUri: String
 
-    private val EDIT_PROFILE_CODE : Int = 1;
+    private val EDIT_PROFILE_CODE : Int = 1
 
+
+    // ----------------------------- Life Cycle methods --------------------------------
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile_layout)
@@ -26,10 +27,11 @@ class ShowProfileActivity : AppCompatActivity() {
 
         //image.setImageResource(R.drawable.default_image)
 
-        // Instantiate each variable
 
         imageUri = ""
-        readSharedPreferences();
+        readSharedPreferences()
+
+
         //name.text = "Song Tailai"
         //nickname.text = "Song's nickname"
         //email.text = "s287288@polito.it"
@@ -46,8 +48,31 @@ class ShowProfileActivity : AppCompatActivity() {
 
     }
 
-    //data class ProfileUser(val image:ImageView, val name:String, val nickname:String, val email:String, val location:String, val birthday:String, val phoneNumber:String){}
+    private fun readSharedPreferences () {
+        val sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
+        // Get stored data
+        val fullName = sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName))
+        val nickname = sharedPreferences.getString(getString(R.string.KeyNickName), getString(R.string.nickName))
+        val email = sharedPreferences.getString(getString(R.string.KeyEmail), getString(R.string.email))
+        val location = sharedPreferences.getString(getString(R.string.KeyLocation), getString(R.string.location))
+        val phoneNumber = sharedPreferences.getString(getString(R.string.KeyPhoneNumber), getString(R.string.phoneNumber))
+        val birthday = sharedPreferences.getString(getString(R.string.KeyBirthday), getString(R.string.birthday))
+        val storedImageUri =  sharedPreferences.getString(getString(R.string.KeyImage), getUriFromResource(R.drawable.default_image).toString())
+
+        // Set stored data
+        findViewById<TextView>(R.id.textViewFullName).text = fullName
+        findViewById<TextView>(R.id.textViewNickName).text = nickname
+        findViewById<TextView>(R.id.textViewEmail).text = email
+        findViewById<TextView>(R.id.textViewLocation).text = location
+        findViewById<TextView>(R.id.textViewPhoneNumber).text = phoneNumber
+        findViewById<TextView>(R.id.textViewBirthday).text = birthday
+        findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(storedImageUri))
+
+        imageUri = storedImageUri.toString()
+    }
+
+    // ----------------------------- Edit Profile Options --------------------------------
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.show_profile_menu, menu)
         return true
@@ -74,12 +99,12 @@ class ShowProfileActivity : AppCompatActivity() {
         val tvPhoneNumber = findViewById<TextView>(R.id.textViewPhoneNumber)
 
         // Get the data as string
-        val nameText : String = tvFullName.text.toString();
-        val nicknameText: String = tvNickname.text.toString();
-        val emailText: String = tvEmail.text.toString();
-        val locationText: String = tvLocation.text.toString();
-        val birthdayText: String = tvBirthday.text.toString();
-        val phonenumberText: String = tvPhoneNumber.text.toString();
+        val nameText : String = tvFullName.text.toString()
+        val nicknameText: String = tvNickname.text.toString()
+        val emailText: String = tvEmail.text.toString()
+        val locationText: String = tvLocation.text.toString()
+        val birthdayText: String = tvBirthday.text.toString()
+        val phonenumberText: String = tvPhoneNumber.text.toString()
 
 
         // Populate the Intent
@@ -92,9 +117,10 @@ class ShowProfileActivity : AppCompatActivity() {
         intent.putExtra("group32.lab1.IMAGE_URI", imageUri)
 
         // Start intent
-        startActivityForResult(intent,EDIT_PROFILE_CODE);
+        startActivityForResult(intent,EDIT_PROFILE_CODE)
     }
 
+    // ----------------------------- Activity Results --------------------------------
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EDIT_PROFILE_CODE && resultCode == RESULT_OK) {
             val tvFullName = findViewById<TextView>(R.id.textViewFullName)
@@ -131,21 +157,14 @@ class ShowProfileActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun readSharedPreferences () {
-        val sharedPreferences = this?.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
-        val fullName = sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName))
-        val nickname = sharedPreferences.getString(getString(R.string.KeyNickName), getString(R.string.nickName))
-        val email = sharedPreferences.getString(getString(R.string.KeyEmail), getString(R.string.email))
-        val location = sharedPreferences.getString(getString(R.string.KeyLocation), getString(R.string.location))
-        val phoneNumber = sharedPreferences.getString(getString(R.string.KeyPhoneNumber), getString(R.string.phoneNumber))
-        val birthday = sharedPreferences.getString(getString(R.string.KeyBirthday), getString(R.string.birthday))
-
-        findViewById<TextView>(R.id.textViewFullName).text = fullName
-        findViewById<TextView>(R.id.textViewNickName).text = nickname
-        findViewById<TextView>(R.id.textViewEmail).text = email
-        findViewById<TextView>(R.id.textViewLocation).text = location
-        findViewById<TextView>(R.id.textViewPhoneNumber).text = phoneNumber
-        findViewById<TextView>(R.id.textViewBirthday).text = birthday
+    // ----------------------------- Util functions ----------------------------------
+    private fun getUriFromResource (resourceId: Int): Uri {
+        return Uri.Builder()
+            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+            .authority(resources.getResourcePackageName(resourceId))
+            .appendPath(resources.getResourceTypeName(resourceId))
+            .appendPath(resources.getResourceEntryName(resourceId))
+            .build()
     }
+
 }
