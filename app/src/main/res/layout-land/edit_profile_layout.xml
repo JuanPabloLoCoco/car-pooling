@@ -30,8 +30,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/imageViewEditPhoto"
-            app:layout_constraintTop_toTopOf="@+id/imageViewEditPhoto"
-            app:srcCompat="@android:drawable/ic_menu_camera" />
+            app:layout_constraintTop_toTopOf="@+id/imageViewEditPhoto" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout

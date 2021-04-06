@@ -4,8 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.graphics.Matrix
 import android.icu.text.SimpleDateFormat
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -53,12 +57,12 @@ class EditProfileActivity : AppCompatActivity() {
         val dataImageUri = this.intent.getStringExtra("group32.lab1.IMAGE_URI")
 
         // Set Text
-        etFullName.text = fullName
-        etNickname.text = nickName
-        etEmail.text = email
-        etLocation.text = location
-        etBirthday.text = birthday
-        etPhoneNumber.text = phoneNumber
+        etFullName.text = if (fullName == getString(R.string.fullName)) "" else fullName
+        etNickname.text = if (nickName == getString(R.string.nickName)) "" else nickName
+        etEmail.text = if (email == getString(R.string.email)) "" else email
+        etLocation.text = if (location == getString(R.string.location)) "" else location
+        etBirthday.text = if (birthday == getString(R.string.birthday)) "" else birthday
+        etPhoneNumber.text = if (phoneNumber == getString(R.string.phoneNumber)) "" else phoneNumber
 
         if (dataImageUri != null && dataImageUri.isNotEmpty()) {
             imageUri = Uri.parse(dataImageUri)
@@ -286,10 +290,15 @@ class EditProfileActivity : AppCompatActivity() {
         }
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_OPEN_GALLERY) {
             imageUri = data?.data
+            Log.d("POLITO_ERRORS", "Image uri: " + imageUri.toString())
+            imageView.setImageURI(data?.data)
+
+            /*
             if (imageUri != null) {
                 setPic(imageView, imageUri.toString())
                 // imageView.setImageURI(imageUri);
             }
+             */
         }
     }
 
