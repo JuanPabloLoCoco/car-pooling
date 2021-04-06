@@ -72,6 +72,40 @@ class ShowProfileActivity : AppCompatActivity() {
         imageUri = storedImageUri.toString()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Save state in variables
+        Log.d("POLITO_ERRORS", "Image uri in showProfile on saved ... " + imageUri)
+        outState.putString("SHOW_IMAGE_URI", imageUri)
+        outState.putString("TEXT_FULL_NAME", findViewById<TextView>(R.id.textViewFullName).text.toString())
+        outState.putString("TEXT_NICK_NAME", findViewById<TextView>(R.id.textViewNickName).text.toString())
+        outState.putString("TEXT_EMAIl", findViewById<TextView>(R.id.textViewEmail).text.toString())
+        outState.putString("TEXT_LOCATION", findViewById<TextView>(R.id.textViewLocation).text.toString())
+        outState.putString("TEXT_PHONE_NUMBER", findViewById<TextView>(R.id.textViewPhoneNumber).text.toString())
+        outState.putString("TEXT_BIRTHDAY", findViewById<TextView>(R.id.textViewBirthday).text.toString())
+
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        // Restore state in views
+        val savedImageUri = savedInstanceState.getString("SHOW_IMAGE_URI")
+        if (savedImageUri != null) {
+            Log.d("POLITO_ERRORS", "Image uri in showProfile on restore ... " + savedImageUri)
+            imageUri = savedImageUri //Uri.parse(savedImageUri).toString()
+
+            findViewById<ImageView>(R.id.imageViewPhoto)
+        }
+
+        findViewById<TextView>(R.id.textViewFullName).text = savedInstanceState.getString("TEXT_FULL_NAME")
+        findViewById<TextView>(R.id.textViewNickName).text = savedInstanceState.getString("TEXT_NICK_NAME")
+        findViewById<TextView>(R.id.textViewEmail).text = savedInstanceState.getString("TEXT_EMAIl")
+        findViewById<TextView>(R.id.textViewLocation).text = savedInstanceState.getString("TEXT_LOCATION")
+        findViewById<TextView>(R.id.textViewPhoneNumber).text = savedInstanceState.getString("TEXT_PHONE_NUMBER")
+        findViewById<TextView>(R.id.textViewBirthday).text = savedInstanceState.getString("TEXT_BIRTHDAY")
+    }
+
     // ----------------------------- Edit Profile Options --------------------------------
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.show_profile_menu, menu)
@@ -139,19 +173,18 @@ class ShowProfileActivity : AppCompatActivity() {
             val phoneNumber = data?.getStringExtra("group32.lab1.PHONE_NUMBER")
             val dataImageUri = data?.getStringExtra("group32.lab1.IMAGE_URI")
 
-            tvFullName.text = fullName
-            if (fullName != null) {
-                Log.d("POLITO_ERROR", fullName)
-            }
-            tvNickname.text = nickName
-            tvEmail.text = email
-            tvLocation.text = location
-            tvBirthday.text = birthday
-            tvPhoneNumber.text = phoneNumber
+            tvFullName.text = if (fullName == null || fullName == "") getString(R.string.fullName) else fullName
+            tvNickname.text = if (nickName == null || nickName == "") getString(R.string.nickName) else nickName
+            tvEmail.text = if (email == null || email == "") getString(R.string.email) else email
+            tvLocation.text = if (location == null || location == "") getString(R.string.location) else location
+            tvBirthday.text = if (birthday == null || birthday == "") getString(R.string.birthday) else birthday
+            tvPhoneNumber.text = if (phoneNumber == null || phoneNumber == "") getString(R.string.phoneNumber) else phoneNumber
 
             if (dataImageUri != null && dataImageUri.isNotEmpty()) {
+
                 ivPhoto.setImageURI(Uri.parse(dataImageUri))
                 imageUri = dataImageUri.toString()
+                Log.d("POLITO_ERRORS", "Image uri in showProfile on acti ... " + imageUri)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)

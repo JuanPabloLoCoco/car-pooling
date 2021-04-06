@@ -7,7 +7,6 @@
         android:required="true" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -30,8 +29,13 @@
                 android:resource="@xml/file_paths"
                 ></meta-data>
         </provider>
-        <activity android:name=".EditProfileActivity"></activity>
-        <activity android:name=".ShowProfileActivity">
+        <activity
+            android:name=".EditProfileActivity"
+            android:label="Edit Profile">
+
+        </activity>
+        <activity android:name=".ShowProfileActivity"
+            android:label="Profile">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
