@@ -61,12 +61,12 @@ class ShowProfileActivity : AppCompatActivity() {
         val storedImageUri =  sharedPreferences.getString(getString(R.string.KeyImage), getUriFromResource(R.drawable.default_image).toString())
 
         // Set stored data
-        findViewById<TextView>(R.id.textViewFullName).text = fullName
-        findViewById<TextView>(R.id.textViewNickName).text = nickname
-        findViewById<TextView>(R.id.textViewEmail).text = email
-        findViewById<TextView>(R.id.textViewLocation).text = location
-        findViewById<TextView>(R.id.textViewPhoneNumber).text = phoneNumber
-        findViewById<TextView>(R.id.textViewBirthday).text = birthday
+        findViewById<TextView>(R.id.textViewFullName).text = if (fullName == null || fullName.isEmpty() || fullName.isBlank()) getString(R.string.fullName) else fullName
+        findViewById<TextView>(R.id.textViewNickName).text = if (nickname == null || nickname.isEmpty() || nickname.isBlank()) getString(R.string.nickName) else nickname
+        findViewById<TextView>(R.id.textViewEmail).text = if (email == null || email.isEmpty() || email.isBlank()) getString(R.string.email) else email
+        findViewById<TextView>(R.id.textViewLocation).text = if (location == null || location.isEmpty() || location.isBlank()) getString(R.string.location) else location
+        findViewById<TextView>(R.id.textViewPhoneNumber).text = if (phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.isBlank()) getString(R.string.phoneNumber) else phoneNumber
+        findViewById<TextView>(R.id.textViewBirthday).text = if (birthday == null || birthday.isEmpty() || birthday.isBlank()) getString(R.string.birthday) else birthday
         findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(storedImageUri))
 
         imageUri = storedImageUri.toString()

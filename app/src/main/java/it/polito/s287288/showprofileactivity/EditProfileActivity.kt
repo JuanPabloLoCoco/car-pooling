@@ -2,6 +2,7 @@ package it.polito.s287288.showprofileactivity
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -22,7 +23,9 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.util.*
 
 class EditProfileActivity : AppCompatActivity() {
@@ -84,6 +87,7 @@ class EditProfileActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         // Save state in variables
+        Log.d("POLITO_ERRORS", "On save uri: " + imageUri.toString())
         outState.putString("IMAGE_URI", imageUri.toString())
         outState.putString("EDIT_TEXT_FULL_NAME", findViewById<TextView>(R.id.editViewFullName).text.toString())
         outState.putString("EDIT_TEXT_NICK_NAME", findViewById<TextView>(R.id.editViewNickName).text.toString())
@@ -99,9 +103,10 @@ class EditProfileActivity : AppCompatActivity() {
 
         // Restore state in views
         val savedImageUri = savedInstanceState.getString("IMAGE_URI")
+        Log.d("POLITO_ERRORS","On restore uri: " + savedImageUri)
         if (savedImageUri != null) {
             imageUri = Uri.parse(savedImageUri)
-            findViewById<ImageView>(R.id.imageViewEditPhoto)
+            findViewById<ImageView>(R.id.imageViewEditPhoto).setImageURI(imageUri)
         }
 
         findViewById<TextView>(R.id.editViewFullName).text = savedInstanceState.getString("EDIT_TEXT_FULL_NAME")
@@ -286,13 +291,18 @@ class EditProfileActivity : AppCompatActivity() {
             //imageView.setImageBitmap(takenImage)
 
             imageUri = Uri.fromFile(photoFile)
-            setPic(imageView, photoFile?.absolutePath)
+            imageView.setImageURI(imageUri)
+            //setPic(imageView, photoFile?.absolutePath)
         }
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_OPEN_GALLERY) {
             imageUri = data?.data
-            Log.d("POLITO_ERRORS", "Image uri: " + imageUri.toString())
-            imageView.setImageURI(data?.data)
+            // Log.d("POLITO_ERRORS", "Image uri: " + imageUri.toString())
+            // imageView.setImageURI(data?.data)
+            // setPic(imageView, imageUri.toString())
 
+            val source = imageUri?.let { ImageDecoder.createSource(this.contentResolver, it) }
+            imageUri = bitmapToFile(ImageDecoder.decodeBitmap(source!!))
+            imageView.setImageURI(imageUri)
             /*
             if (imageUri != null) {
                 setPic(imageView, imageUri.toString())
@@ -348,5 +358,29 @@ class EditProfileActivity : AppCompatActivity() {
         BitmapFactory.decodeFile(photoPath, bmOptions)?.also { bitmap ->
             imageView.setImageBitmap(bitmap)
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun bitmapToFile(bitmap:Bitmap): Uri {
+        // Get the context wrapper
+        val wrapper = ContextWrapper(applicationContext)
+
+        // Initialize a new file instance to save bitmap object
+        var file = wrapper.getDir("Images",Context.MODE_PRIVATE)
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        file = File(file,"JPEG_${timeStamp}.jpg")
+
+        try{
+            // Compress the bitmap and save in jpg format
+            val stream: OutputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream)
+            stream.flush()
+            stream.close()
+        }catch (e:IOException){
+            e.printStackTrace()
+        }
+
+        // Return the saved bitmap uri
+        return Uri.parse(file.absolutePath)
     }
 }
