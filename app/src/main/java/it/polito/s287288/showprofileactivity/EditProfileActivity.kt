@@ -289,9 +289,20 @@ class EditProfileActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_IMAGE_CAPTURE) {
             //val takenImage = BitmapFactory.decodeFile(photoFile?.absolutePath)
             //imageView.setImageBitmap(takenImage)
-
-            imageUri = Uri.fromFile(photoFile)
-            imageView.setImageURI(imageUri)
+            if (photoFile != null) {
+                imageUri = Uri.fromFile(photoFile)
+                val finalUri = imageUri
+                if (finalUri != null) {
+                    val bitmap = BitmapFactory.decodeFile(imageUri?.path).fixRotation(finalUri)
+                    imageView.setImageBitmap(bitmap)
+                } else {
+                    //imageView.setImageBitmap(/*Bitmap().fixRotation(uri)*/)
+                    imageView.setImageURI(imageUri)
+                }
+            } else {
+                Toast.makeText(applicationContext, "There was a problem while taking the photo", Toast.LENGTH_SHORT).show()
+            }
+            //imageView.setImageURI(imageUri)
             //setPic(imageView, photoFile?.absolutePath)
         }
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_OPEN_GALLERY) {
@@ -382,5 +393,37 @@ class EditProfileActivity : AppCompatActivity() {
 
         // Return the saved bitmap uri
         return Uri.parse(file.absolutePath)
+    }
+
+    fun Bitmap.fixRotation(uri: Uri): Bitmap? {
+        val pathString = uri.path
+        lateinit var ei: ExifInterface;
+        if (pathString != null) {
+            ei = ExifInterface(pathString)
+        } else {
+            return null
+        }
+
+        val orientation: Int = ei.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED
+        )
+
+        return when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage( 90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage( 180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage( 270f)
+            ExifInterface.ORIENTATION_NORMAL -> this
+            else -> this
+        }
+    }
+
+    fun Bitmap.rotateImage(angle: Float): Bitmap? {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(
+                this, 0, 0, width, height,
+                matrix, true
+        )
     }
 }
