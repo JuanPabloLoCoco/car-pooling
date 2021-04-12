@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/imageViewPhoto"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="16dp"
@@ -25,60 +25,60 @@
         android:paddingHorizontal="16dp">
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/textViewFullName"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="Full Name"
+            android:text="@string/fullName"
             android:textSize="30sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
             android:gravity="center_vertical"/>
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/textViewNickName"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:text="NickName"
+            android:text="@string/nickName"
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
             android:gravity="center_vertical"/>
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/textViewEmail"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:text="Email@address"
+            android:text="@string/email"
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
             android:gravity="center_vertical"/>
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/textViewLocation"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:text="Location"
+            android:text="@string/location"
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
             android:gravity="center_vertical"/>
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/textViewBirthday"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:text="Birthday"
+            android:text="@string/birthday"
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
             android:gravity="center_vertical"/>
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/textViewPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:text="PhoneNumber"
+            android:text="@string/phoneNumber"
             android:textSize="20sp"
             android:textColor="#000000"
             android:gravity="center_vertical"/>

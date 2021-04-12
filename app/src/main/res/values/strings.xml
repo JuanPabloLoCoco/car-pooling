@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">ShowProfileActivity</string>
+    <string name="image">Image</string>
+    <string name="fullName">Full Name</string>
+    <string name="nickName">NickName</string>
+    <string name="email">Email@Address</string>
+    <string name="location">Location</string>
+    <string name="birthday">Birthday</string>
+    <string name="phoneNumber">PhoneNumber</string>
+
+    <string name="preference_file_key">AppSharedPreference</string>
+    <string name="KeyFullName">FullName</string>
+    <string name="KeyNickName">NickName</string>
+    <string name="KeyEmail">Email</string>
+    <string name="KeyLocation">Location</string>
+    <string name="KeyPhoneNumber">PhoneNumber</string>
+    <string name="KeyBirthday">Birthday</string>
+    <string name="KeyImage">Image</string>
+
 </resources>

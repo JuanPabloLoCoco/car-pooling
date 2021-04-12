@@ -13,7 +13,7 @@
         android:layout_marginHorizontal="16dp">
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/imageViewEditPhoto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="16dp"
@@ -29,9 +29,8 @@
             android:background="@android:drawable/ic_menu_camera"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/imageView1"
-            app:layout_constraintTop_toTopOf="@+id/imageView1"
-            app:srcCompat="@android:drawable/ic_menu_camera" />
+            app:layout_constraintStart_toStartOf="@+id/imageViewEditPhoto"
+            app:layout_constraintTop_toTopOf="@+id/imageViewEditPhoto" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
@@ -44,66 +43,66 @@
         android:layout_marginRight="16dp">
 
         <EditText
-            android:id="@+id/editView1"
+            android:id="@+id/editViewFullName"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
             android:inputType="textShortMessage"
-            android:hint="Full Name"
+            android:hint="@string/fullName"
             android:textColor="#9A9797"
             android:textSize="25sp"/>
 
         <EditText
-            android:id="@+id/editView2"
+            android:id="@+id/editViewNickName"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
-            android:hint="NickName"
+            android:hint="@string/nickName"
             android:textSize="15sp"
             android:inputType="textShortMessage"
             android:textColor="#9A9797"/>
 
         <EditText
-            android:id="@+id/editView3"
+            android:id="@+id/editViewEmail"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
-            android:hint="Email@address"
+            android:hint="@string/email"
             android:textSize="15sp"
             android:inputType="textEmailAddress"
             android:textColor="#9A9797"/>
 
         <EditText
-            android:id="@+id/editView4"
+            android:id="@+id/editViewLocation"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
-            android:hint="Location"
+            android:hint="@string/location"
             android:textSize="15sp"
             android:inputType="textLongMessage"
             android:textColor="#9A9797"/>
 
         <EditText
-            android:id="@+id/editView5"
+            android:id="@+id/editViewBirthday"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
-            android:hint="Birthday"
+            android:hint="@string/birthday"
             android:textSize="15sp"
             android:inputType="datetime"
             android:textColor="#9A9797"/>
 
         <EditText
-            android:id="@+id/editView6"
+            android:id="@+id/editViewPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center_vertical"
-            android:hint="PhoneNumber"
+            android:hint="@string/phoneNumber"
             android:textSize="15sp"
             android:inputType="phone"
             android:textColor="#9A9797"/>
