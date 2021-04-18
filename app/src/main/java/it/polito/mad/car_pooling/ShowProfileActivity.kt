@@ -1,4 +1,4 @@
-package it.polito.s287288.showprofileactivity
+package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
 import android.content.Context
@@ -23,29 +23,8 @@ class ShowProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile_layout)
-
-
-        //image.setImageResource(R.drawable.default_image)
-
-
         imageUri = ""
         readSharedPreferences()
-
-
-        //name.text = "Song Tailai"
-        //nickname.text = "Song's nickname"
-        //email.text = "s287288@polito.it"
-        //location.text = "Torino Politecnico"
-        //bithday.text = "yyyy/mm/dd"
-        //phoneNumber.text = "123456789"
-        /*val Song = ProfileUser(image,
-       name.text.toString(),
-       nickname.text.toString(),
-       email.text.toString(),
-       location.text.toString(),
-       birthday.text.toString(),
-       phoneNumber.text.toString()) */
-
     }
 
     private fun readSharedPreferences () {
