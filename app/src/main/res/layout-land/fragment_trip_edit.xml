@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    tools:context=".TripDetailsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="16dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/imageEditCar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            app:srcCompat="@drawable/car_default" />
+
+        <ImageButton
+            android:id="@+id/imageButton2"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@android:drawable/ic_menu_camera"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:layout_marginHorizontal="16dp"
+        android:paddingTop="10dp"
+        android:paddingHorizontal="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/textEditDepAriLocation"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5dp"
+                android:textSize="30sp"
+                android:hint="Departure&amp;arrival"/>
+
+            <EditText
+                android:id="@+id/textEditDepDateTime"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5dp"
+                android:textSize="30sp"
+                android:hint="Departure date&amp;time"
+                android:inputType="datetime"/>
+
+            <EditText
+                android:id="@+id/textEditEstDuration"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5dp"
+                android:textSize="30sp"
+                android:hint="Estimated trip duration"
+                android:inputType="time"/>
+
+            <EditText
+                android:id="@+id/textEditAvaSeat"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5dp"
+                android:textSize="30sp"
+                android:hint="Available seats number"
+                android:inputType="number"/>
+
+            <EditText
+                android:id="@+id/textEditPrice"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="5dp"
+                android:gravity="center_vertical"
+                android:hint="Price"
+                android:textSize="30sp"
+                android:inputType="number"/>
+
+            <EditText
+                android:id="@+id/textEditAdditional"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5dp"
+                android:textSize="30sp"
+                android:hint="Additional information"/>
+
+            <EditText
+                android:id="@+id/textEditOptional"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5dp"
+                android:textSize="30sp"
+                android:hint="Optional intermediates"
+                android:inputType="textMultiLine"/>
+
+            <EditText
+                android:id="@+id/textEditPlate"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:textSize="30sp"
+                android:hint="Plate number"
+                android:inputType="number"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

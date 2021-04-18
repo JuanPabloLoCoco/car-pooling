@@ -1,4 +1,4 @@
-package it.polito.s287288.showprofileactivity
+package it.polito.mad.car_pooling
 
 import android.app.Activity
 import android.content.Context
@@ -75,12 +75,6 @@ class EditProfileActivity : AppCompatActivity() {
         // Register photo menu
         val imageButton = findViewById<ImageButton>(R.id.imageButton1)
         registerForContextMenu(imageButton)
-
-        /*
-        imageButton?.setOnClickListener {
-            openContextMenu(imageButton)
-        }
-         */
 
     }
 
