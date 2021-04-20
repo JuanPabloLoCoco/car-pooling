@@ -28,12 +28,12 @@ class ShowProfileFragment : Fragment() {
         return inflater.inflate(R.layout.profile_layout, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        readSharedPreferences()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        readSharedPreferences(view)
     }
 
-    private fun readSharedPreferences () {
+    private fun readSharedPreferences (view: View) {
         val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         // Get stored data
@@ -46,14 +46,14 @@ class ShowProfileFragment : Fragment() {
         val storedImageUri =  sharedPreferences.getString(getString(R.string.KeyImage), getUriFromResource(R.drawable.default_image).toString())
 
         // Set stored data
-        requireView().findViewById<TextView>(R.id.textViewFullName).text = if (fullName == null || fullName.isEmpty() || fullName.isBlank()) getString(R.string.fullName) else fullName
-        requireView().findViewById<TextView>(R.id.textViewNickName).text = if (nickname == null || nickname.isEmpty() || nickname.isBlank()) getString(R.string.nickName) else nickname
-        requireView().findViewById<TextView>(R.id.textViewEmail).text = if (email == null || email.isEmpty() || email.isBlank()) getString(R.string.email) else email
-        requireView().findViewById<TextView>(R.id.textViewLocation).text = if (location == null || location.isEmpty() || location.isBlank()) getString(R.string.location) else location
-        requireView().findViewById<TextView>(R.id.textViewPhoneNumber).text = if (phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.isBlank()) getString(R.string.phoneNumber) else phoneNumber
-        requireView().findViewById<TextView>(R.id.textViewBirthday).text = if (birthday == null || birthday.isEmpty() || birthday.isBlank()) getString(R.string.birthday) else birthday
+        view.findViewById<TextView>(R.id.textViewFullName).text = if (fullName == null || fullName.isEmpty() || fullName.isBlank()) getString(R.string.fullName) else fullName
+        view.findViewById<TextView>(R.id.textViewNickName).text = if (nickname == null || nickname.isEmpty() || nickname.isBlank()) getString(R.string.nickName) else nickname
+        view.findViewById<TextView>(R.id.textViewEmail).text = if (email == null || email.isEmpty() || email.isBlank()) getString(R.string.email) else email
+        view.findViewById<TextView>(R.id.textViewLocation).text = if (location == null || location.isEmpty() || location.isBlank()) getString(R.string.location) else location
+        view.findViewById<TextView>(R.id.textViewPhoneNumber).text = if (phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.isBlank()) getString(R.string.phoneNumber) else phoneNumber
+        view.findViewById<TextView>(R.id.textViewBirthday).text = if (birthday == null || birthday.isEmpty() || birthday.isBlank()) getString(R.string.birthday) else birthday
 
-        requireView().findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(storedImageUri))
+        view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(storedImageUri))
         imageUri = storedImageUri.toString()
     }
 
@@ -66,7 +66,6 @@ class ShowProfileFragment : Fragment() {
         return when (item.itemId){
             R.id.edit_profile -> {
                 findNavController().navigate(R.id.nav_edit_profile)
-                //editProfile()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -103,10 +102,8 @@ class ShowProfileFragment : Fragment() {
 
         // Start intent
         startActivityForResult(intent,EDIT_PROFILE_CODE)
-
          */
     }
-
 
     // ----------------------------- Util functions ----------------------------------
     private fun getUriFromResource (resourceId: Int): Uri {
