@@ -32,6 +32,7 @@ import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
+import com.google.android.material.navigation.NavigationView
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -170,9 +171,11 @@ class EditProfileFragment : Fragment() {
 
     private fun savedProfileData () {
         val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-
+        var newFullName = requireView().findViewById<TextView>(R.id.editViewFullName).text.toString()
+        newFullName = if (newFullName == null || newFullName.isBlank() || newFullName.isEmpty()) getString(R.string.KeyFullName) else newFullName
         with(sharedPreferences.edit()) {
-            putString( getString(R.string.KeyFullName), requireView().findViewById<TextView>(R.id.editViewFullName).text.toString())
+
+            putString( getString(R.string.KeyFullName), newFullName)
             putString( getString(R.string.KeyNickName), requireView().findViewById<TextView>(R.id.editViewNickName).text.toString())
             putString( getString(R.string.KeyEmail), requireView().findViewById<TextView>(R.id.editViewEmail).text.toString())
             putString( getString(R.string.KeyLocation), requireView().findViewById<TextView>(R.id.editViewLocation).text.toString())
@@ -181,6 +184,11 @@ class EditProfileFragment : Fragment() {
             putString( getString(R.string.KeyImage), imageUri.toString())
             commit()
         }
+
+        val nav_header_image = requireActivity().findViewById<ImageView>(R.id.nav_header_image)
+        nav_header_image.setImageURI(imageUri)
+        val nav_header_full_name = requireActivity().findViewById<TextView>(R.id.nav_header_full_name)
+        nav_header_full_name.text = newFullName
     }
 
     // ----------------------------- Option Menu ---------------------
