@@ -3,7 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/card"
+    android:id="@+id/tripCard"
+    android:clickable="true"
+    android:focusable="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp">
@@ -21,39 +23,46 @@
             app:srcCompat="@drawable/car_default"
 
             />
-            <LinearLayout
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:orientation="vertical"
-                 android:padding="16dp">
+        <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical"
+             android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/depatureview"
+            <TextView
+                android:id="@+id/depatureview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Departure&amp;arrival"
                 android:textAppearance="?attr/textAppearanceBody2"/>
-                <TextView
-                    android:id="@+id/timeview"
+            <TextView
+                android:id="@+id/timeview"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:text="Departure date&amp;time"
                  android:textAppearance="?attr/textAppearanceBody2"
-                 />
-                <TextView
-                    android:id="@+id/priceview"
+             />
+            <TextView
+                android:id="@+id/priceview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Price"
+            />
+            <TextView
+                android:id="@+id/tripAvailableSeatsField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Avaiable Seats"
                 />
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/edit_trip"
-                    android:layout_gravity="right"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    style="?attr/borderlessButtonStyle"
-                    />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tripCardEditTripButton"
+                android:layout_gravity="right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                style="?attr/borderlessButtonStyle"
+                android:text="Edit"
+                />
 
             </LinearLayout>
     </LinearLayout>
