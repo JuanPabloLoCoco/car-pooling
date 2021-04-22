@@ -1,18 +1,21 @@
 package it.polito.mad.car_pooling
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
+import it.polito.mad.car_pooling.models.Trip
 
-
-
-data class  Model(val name: String= "", val count: Int = 0)
 
 class TripListFragment : Fragment() {
 
@@ -26,52 +29,83 @@ class TripListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
-        val dataList = ArrayList<Model>()
-        dataList.add(Model("Phone", 1))
-        dataList.add(Model("Watch", 2))
-        dataList.add(Model("Note", 3))
-        dataList.add(Model("Pin", 4))
-        dataList.add(Model("Pin1", 5))
-        dataList.add(Model("Pin2", 6))
-        dataList.add(Model("Pin3", 7))
-        val rvAdapter = ModelAdapter(dataList.shuffled())
+
+        val trip1 = Trip(1)
+        trip1.price = "10 Euros"
+        trip1.depAriLocation = "Torino"
+        trip1.depDateTime = "10pm"
+        trip1.avaSeat = "4 Seats"
+
+        val trip2 = Trip(2)
+        trip2.price = "80 Euros"
+        trip2.depAriLocation = "Milano"
+        trip2.depDateTime = "9pm"
+        trip2.avaSeat = "5 Seats"
+
+        val trip3 = Trip(3)
+        trip3.price = "30 Euros"
+        trip3.depAriLocation = "Rome"
+        trip3.depDateTime = "1pm"
+        trip3.avaSeat = "2 Seats"
+
+        // val dataList = ArrayList<Trip>(trip1, trip2, trip3)
+        val dataList = arrayListOf<Trip>(trip1, trip2, trip3)
+
+        val rvAdapter = TripCardAdapter(dataList.shuffled(), requireContext())
         reciclerView.adapter = rvAdapter
         // Log.d("POLITO_ERRORS", "Recicler view es null: " + (reciclerView == null).toString())
     }
 }
 
-class ModelAdapter (val userList: List<Model>): RecyclerView.Adapter<ModelAdapter.ModelViewHolder>() {
+class TripCardAdapter (val tripList: List<Trip>, val context: Context): RecyclerView.Adapter<TripCardAdapter.TripCardViewHolder>() {
+    class TripCardViewHolder(v: View): RecyclerView.ViewHolder (v) {
+        val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
+        val departureTimeView = v.findViewById<TextView>(R.id.timeview)
+        val priceView = v.findViewById<TextView>(R.id.priceview)
+        val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
 
-    class ModelViewHolder(v: View): RecyclerView.ViewHolder(v){
-        //val nameView = v.findViewById<TextView>(R.id.text)
-        val name = v.findViewById<TextView>(R.id.tvName)
-        val count = v.findViewById<TextView>(R.id.tvCount)
-
-        fun bind(m: Model) {
+        val tripCardView = v.findViewById<CardView>(R.id.tripCard)
+        fun bind(t: Trip) {
 
         }
-        fun unbind(){
+
+        fun unbind() {
 
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripCardViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false)
-        return ModelViewHolder(v)
+        return TripCardViewHolder(v)
     }
 
-    override fun onViewRecycled(holder: ModelViewHolder) {
+    override fun onViewRecycled(holder: TripCardViewHolder) {
         super.onViewRecycled(holder)
         holder.unbind()
     }
 
-    override fun onBindViewHolder(holder: ModelViewHolder, position: Int) {
-        holder.name?.text = userList[position].name
-        holder.count?.text = userList[position].count.toString()
+    override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
+        val selectedTrip: Trip = tripList[position]
+
+        holder.departureLocationView.text = selectedTrip.depAriLocation
+        holder.departureTimeView.text = selectedTrip.depDateTime
+        holder.priceView.text = selectedTrip.price
+        holder.availableSeatsView.text = selectedTrip.avaSeat
+
+        holder.tripCardView.setOnClickListener {
+            // Handle navigation to show trip detail
+
+            Toast.makeText(context, "A click on card ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
+        }
+
+        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
+            // Handle navigation to edit trip detail
+            Toast.makeText(context, "Go to edit trip ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun getItemCount(): Int {
-        return userList.size
+        return tripList.size
     }
-
 }
