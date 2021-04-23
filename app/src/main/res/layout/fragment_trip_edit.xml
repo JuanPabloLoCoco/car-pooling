@@ -46,82 +46,168 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <EditText
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textEditDepAriLocation"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="5dp"
-                android:textSize="30sp"
-                android:hint="Departure&amp;arrival"/>
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:hint="Departure&amp;arrival Location"
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_edit_location_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
 
-            <EditText
-                android:id="@+id/textEditDepDateTime"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:textColor="#4D000000"
+                    android:inputType="textMultiLine"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="5dp"
-                android:textSize="30sp"
-                android:hint="Departure date&amp;time"
-                android:inputType="datetime"/>
+                android:layout_height="60dp"
+                android:background="#20000000"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_baseline_access_time_24"
+                    tools:ignore="VectorDrawableCompat"
+                    android:layout_gravity="center"/>
+                <EditText
+                    android:id="@+id/textEditDepDateTime"
+                    android:focusableInTouchMode="false"
+                    android:clickable="true"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6"
+                    android:inputType="datetime"
+                    android:textSize="20sp"
+                    android:hint="Departure date&amp;time"
+                    android:background="@null"
+                    android:textColorHint="#9E150808"/>
+            </LinearLayout>
 
-            <EditText
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textEditEstDuration"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="5dp"
-                android:textSize="30sp"
+                android:layout_height="60dp"
                 android:hint="Estimated trip duration"
-                android:inputType="time"/>
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_timelapse_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
 
-            <EditText
-                android:id="@+id/textEditAvaSeat"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:inputType="time"
+                    android:textColor="#4D000000"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="5dp"
-                android:textSize="30sp"
-                android:hint="Available seats number"
-                android:inputType="number"/>
+                android:layout_height="60dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/textEditPrice"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginBottom="5dp"
-                android:gravity="center_vertical"
-                android:hint="Price"
-                android:textSize="30sp"
-                android:inputType="number"/>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textEditAvaSeat"
+                    android:layout_width="180dp"
+                    android:layout_height="match_parent"
+                    android:hint="Available seats"
+                    app:startIconDrawable="@drawable/ic_baseline_airline_seat_recline_normal_24"
+                    app:startIconContentDescription="temp"
+                    app:endIconMode="clear_text">
 
-            <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="15sp"
+                        android:inputType="number"
+                        android:textColor="#4D000000"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textEditPrice"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:hint="Price"
+                    app:startIconDrawable="@drawable/ic_baseline_euro_24"
+                    app:startIconContentDescription="temp"
+                    app:endIconMode="clear_text"
+                    android:layout_marginLeft="10dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="20sp"
+                        android:inputType="number"
+                        android:textColor="#4D000000"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textEditAdditional"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="5dp"
-                android:textSize="30sp"
-                android:hint="Additional information"/>
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:hint="Additional information"
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_note_add_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
 
-            <EditText
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:textColor="#4D000000"
+                    android:inputType="textMultiLine"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textEditOptional"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="5dp"
-                android:textSize="30sp"
+                android:minHeight="60dp"
                 android:hint="Optional intermediates"
-                android:inputType="textMultiLine"/>
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_share_location_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
 
-            <EditText
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:inputType="textMultiLine"
+                    android:textColor="#4D000000"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textEditPlate"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:textSize="30sp"
+                android:layout_height="60dp"
                 android:hint="Plate number"
-                android:inputType="number"/>
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_looks_one_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:inputType="number"
+                    android:textColor="#4D000000"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
 
