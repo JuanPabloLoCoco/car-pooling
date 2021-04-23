@@ -161,26 +161,26 @@ class TripEditFragment : Fragment() {
     private fun writeSharedPreferences() {
         val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
+
+        val editDepAriLocation = requireView().findViewById<TextView>(R.id.textEditDepAriLocation).text.toString()
+        val editDepDateTime = requireView().findViewById<TextView>(R.id.textEditDepDateTime).text.toString()
+        val editEstDuration = requireView().findViewById<TextView>(R.id.textEditEstDuration).text.toString()
+        val editAvaSeat = requireView().findViewById<TextView>(R.id.textEditAvaSeat).text.toString()
+        val editPrice = requireView().findViewById<TextView>(R.id.textEditPrice).text.toString()
+        val editAdditional = requireView().findViewById<TextView>(R.id.textEditAdditional).text.toString()
+        val editOptional = requireView().findViewById<TextView>(R.id.textEditOptional).text.toString()
+        val editPlate = requireView().findViewById<TextView>(R.id.textEditPlate).text.toString()
+
+        val input1 = if (editDepAriLocation == storeDepAriLocation || editDepAriLocation.isEmpty()) storeDepAriLocation else editDepAriLocation
+        val input2 = if (editDepDateTime == storeDepDateTime || editDepDateTime.isEmpty()) storeDepDateTime else editDepDateTime
+        val input3 = if (editEstDuration == storeEstDuration || editEstDuration.isEmpty()) storeEstDuration else editEstDuration
+        val input4 = if (editAvaSeat == storeAvaSeat || editAvaSeat.isEmpty()) storeAvaSeat else editAvaSeat
+        val input5 = if (editPrice == storePrice || editPrice.isEmpty()) storePrice else editPrice
+        val input6 = if (editAdditional == storeAdditional || editAdditional.isEmpty()) storeAdditional else editAdditional
+        val input7 = if (editOptional == storeOptional || editOptional.isEmpty()) storeOptional else editOptional
+        val input8 = if (editPlate == storePlate || editPlate.isEmpty()) storePlate else editPlate
+
         with(sharedPreferences.edit()) {
-
-            val editDepAriLocation = requireView().findViewById<TextView>(R.id.textEditDepAriLocation).text.toString()
-            val editDepDateTime = requireView().findViewById<TextView>(R.id.textEditDepDateTime).text.toString()
-            val editEstDuration = requireView().findViewById<TextView>(R.id.textEditEstDuration).text.toString()
-            val editAvaSeat = requireView().findViewById<TextView>(R.id.textEditAvaSeat).text.toString()
-            val editPrice = requireView().findViewById<TextView>(R.id.textEditPrice).text.toString()
-            val editAdditional = requireView().findViewById<TextView>(R.id.textEditAdditional).text.toString()
-            val editOptional = requireView().findViewById<TextView>(R.id.textEditOptional).text.toString()
-            val editPlate = requireView().findViewById<TextView>(R.id.textEditPlate).text.toString()
-
-            val input1 = if (editDepAriLocation == storeDepAriLocation || editDepAriLocation.isEmpty()) storeDepAriLocation else editDepAriLocation
-            val input2 = if (editDepDateTime == storeDepDateTime || editDepDateTime.isEmpty()) storeDepDateTime else editDepDateTime
-            val input3 = if (editEstDuration == storeEstDuration || editEstDuration.isEmpty()) storeEstDuration else editEstDuration
-            val input4 = if (editAvaSeat == storeAvaSeat || editAvaSeat.isEmpty()) storeAvaSeat else editAvaSeat
-            val input5 = if (editPrice == storePrice || editPrice.isEmpty()) storePrice else editPrice
-            val input6 = if (editAdditional == storeAdditional || editAdditional.isEmpty()) storeAdditional else editAdditional
-            val input7 = if (editOptional == storeOptional || editOptional.isEmpty()) storeOptional else editOptional
-            val input8 = if (editPlate == storePlate || editPlate.isEmpty()) storePlate else editPlate
-
             putString( getString(R.string.KeyDepAriLocation), input1)
             putString( getString(R.string.KeyDepDateTime), input2)
             putString( getString(R.string.KeyEstDuration), input3)

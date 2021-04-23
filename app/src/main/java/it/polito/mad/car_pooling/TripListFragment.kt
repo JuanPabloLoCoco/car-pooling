@@ -11,9 +11,12 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Trip
 
 
@@ -27,6 +30,20 @@ class TripListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val fabView = view.findViewById<FloatingActionButton>(R.id.addTripFAB)
+
+        val list = ModelPreferencesManager.get<ArrayList<Trip>>(getString(R.string.KeyTripList))
+        if (list == null || list.isEmpty()) {
+            Toast.makeText(context, "Esta vacia la lista", Toast.LENGTH_LONG).show()
+        }
+
+        fabView.setOnClickListener {
+            Toast.makeText(context, "A click on FAB", Toast.LENGTH_SHORT).show()
+            ModelPreferencesManager.put(Trip.CREATE_TRIP, getString(R.string.KeyEditTripAction))
+            findNavController().navigate(R.id.tripEditFragment)
+        }
+
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
