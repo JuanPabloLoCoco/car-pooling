@@ -6,12 +6,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".TripListFragment">-->
 
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/container_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
+        <TextView
+            android:id="@+id/empty_triplist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="empty_triplist" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv"
             android:layout_width="match_parent"
