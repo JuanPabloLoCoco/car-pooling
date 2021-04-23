@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -31,7 +32,7 @@ class TripListFragment : Fragment() {
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val trip1 = Trip(1)
-        trip1.price = "10 Euros"
+        trip1.price = "price:10 Euros"
         trip1.depAriLocation = "Torino"
         trip1.depDateTime = "10pm"
         trip1.avaSeat = "4 Seats"
@@ -48,11 +49,19 @@ class TripListFragment : Fragment() {
         trip3.depDateTime = "1pm"
         trip3.avaSeat = "2 Seats"
 
-        // val dataList = ArrayList<Trip>(trip1, trip2, trip3)
+        //val dataList = ArrayList<Trip>(trip1, trip2, trip3)
         val dataList = arrayListOf<Trip>(trip1, trip2, trip3)
+        //val dataList = arrayListOf<Trip>()
+        if(dataList.isNotEmpty()){
 
-        val rvAdapter = TripCardAdapter(dataList.shuffled(), requireContext())
-        reciclerView.adapter = rvAdapter
+            val rvAdapter = TripCardAdapter(dataList.shuffled(), requireContext())
+            reciclerView.adapter = rvAdapter
+            requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
+        }else {
+
+            //display some message ,that message will on the trip detailfragment
+        }
+
         // Log.d("POLITO_ERRORS", "Recicler view es null: " + (reciclerView == null).toString())
     }
 }
@@ -63,6 +72,7 @@ class TripCardAdapter (val tripList: List<Trip>, val context: Context): Recycler
         val departureTimeView = v.findViewById<TextView>(R.id.timeview)
         val priceView = v.findViewById<TextView>(R.id.priceview)
         val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
+
 
         val tripCardView = v.findViewById<CardView>(R.id.tripCard)
         fun bind(t: Trip) {
