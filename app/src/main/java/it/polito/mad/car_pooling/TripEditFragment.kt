@@ -175,8 +175,6 @@ class TripEditFragment : Fragment() {
     private fun writeSharedPreferences() {
         val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
-        with(sharedPreferences.edit()) {
-
             val editDepAriLocation = requireView().findViewById<TextInputLayout>(R.id.textEditDepAriLocation).editText?.text.toString()
             val editDepDateTime = requireView().findViewById<TextView>(R.id.textEditDepDateTime).text.toString()
             val editEstDuration = requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration).editText?.text.toString()
@@ -195,6 +193,7 @@ class TripEditFragment : Fragment() {
             val input7 = if (editOptional == storeOptional || editOptional.isEmpty()) storeOptional else editOptional
             val input8 = if (editPlate == storePlate || editPlate.isEmpty()) storePlate else editPlate
 
+        with(sharedPreferences.edit()) {
             putString( getString(R.string.KeyDepAriLocation), input1)
             putString( getString(R.string.KeyDepDateTime), input2)
             putString( getString(R.string.KeyEstDuration), input3)

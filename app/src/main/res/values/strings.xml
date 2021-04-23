@@ -39,4 +39,8 @@
     <string name="KeyOptional">Optional Intermediates</string>
     <string name="KeyPlate">Plate Number</string>
 
+    <string name="KeyTripList">KeyTripList</string>
+    <string name="KeyEditTripAction">KeyEditTripAction</string>
+
+
 </resources>

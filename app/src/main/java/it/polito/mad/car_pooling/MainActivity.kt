@@ -20,6 +20,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import com.google.android.material.badge.BadgeDrawable
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ModelPreferencesManager.with(application, getString(R.string.preference_file_key))
+
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -52,7 +55,9 @@ class MainActivity : AppCompatActivity() {
         hView.findViewById<TextView>(R.id.nav_header_full_name).text = fullName
 
         val navController = findNavController(R.id.nav_host_fragment)
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home, R.id.nav_profile, R.id.nav_trip), drawerLayout)
+
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home, R.id.nav_profile, R.id.nav_list_trip), drawerLayout)
+        // appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home, R.id.nav_profile, R.id.nav_trip), drawerLayout)
         //var badge = navController.
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)

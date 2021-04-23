@@ -14,8 +14,9 @@
             android:icon="@drawable/ic_baseline_account_box_24"
             android:title="Profile" />
         <item
-            android:id="@+id/nav_trip"
+            android:id="@+id/nav_list_trip"
             android:icon="@drawable/ic_baseline_view_headline_24"
             android:title="Trip List" />
+
     </group>
 </menu>
