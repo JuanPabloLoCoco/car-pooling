@@ -18,12 +18,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShowProfileActivity">
+        <meta-data
+            android:name="com.google.android.actions"
+            android:resource="@xml/circle" />
+
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.ShowProfileActivity.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -43,7 +48,7 @@
             android:label="Edit Profile" />
         <activity
             android:name=".ShowProfileActivity"
-            android:label="Profile"></activity>
+            android:label="Profile" />
     </application>
 
 </manifest>
