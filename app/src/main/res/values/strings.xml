@@ -33,7 +33,7 @@
     <string name="KeyDepAriLocation">Departure&amp;Arrival</string>
     <string name="KeyDepDateTime">Departure Date&amp;Time</string>
     <string name="KeyEstDuration">Estimated Trip Duration</string>
-    <string name="KeyAvaSeat">Available Seats Number</string>
+    <string name="KeyAvaSeat">Available Seats</string>
     <string name="KeyPrice">Price</string>
     <string name="KeyAdditional">Additional Information</string>
     <string name="KeyOptional">Optional Intermediates</string>

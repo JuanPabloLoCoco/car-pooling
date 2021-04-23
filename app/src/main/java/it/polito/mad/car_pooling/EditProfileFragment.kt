@@ -27,12 +27,14 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import java.util.*
 import androidx.appcompat.app.AppCompatActivity
-
 import android.view.*
 import android.widget.*
+import android.widget.Toast.makeText
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -76,13 +78,18 @@ class EditProfileFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.edit_profile_layout, container, false)
 
-
-        val etFullName: TextView = view.findViewById(R.id.editViewFullName) as TextView
+        /*val etFullName: TextView = view.findViewById(R.id.editViewFullName) as TextView
         val etNickname: TextView = view.findViewById(R.id.editViewNickName) as TextView
         val etEmail: TextView = view.findViewById(R.id.editViewEmail) as TextView
         val etLocation: TextView = view.findViewById(R.id.editViewLocation) as TextView
         val etBirthday: TextView = view.findViewById(R.id.editViewBirthday) as TextView
-        val etPhoneNumber: TextView = view.findViewById(R.id.editViewPhoneNumber) as TextView
+        val etPhoneNumber: TextView = view.findViewById(R.id.editViewPhoneNumber) as TextView*/
+        val etFullName = view.findViewById<TextInputLayout>(R.id.editViewFullName)
+        val etNickname = view.findViewById<TextInputLayout>(R.id.editViewNickName)
+        val etEmail = view.findViewById<TextInputLayout>(R.id.editViewEmail)
+        val etLocation = view.findViewById<TextInputLayout>(R.id.editViewLocation)
+        val etBirthday = view.findViewById<TextInputLayout>(R.id.editViewBirthday)
+        val etPhoneNumber = view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber)
         val editPhotoView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
 
         val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
@@ -96,12 +103,20 @@ class EditProfileFragment : Fragment() {
         val storedImageUri =  sharedPreferences.getString(getString(R.string.KeyImage), getUriFromResource(R.drawable.default_image).toString())
 
         // Set Text
-        etFullName.text = if (fullName == getString(R.string.fullName)) "" else fullName
-        etNickname.text = if (nickName == getString(R.string.nickName)) "" else nickName
-        etEmail.text = if (email == getString(R.string.email)) "" else email
-        etLocation.text = if (location == getString(R.string.location)) "" else location
-        etBirthday.text = if (birthday == getString(R.string.birthday)) "" else birthday
-        etPhoneNumber.text = if (phoneNumber == getString(R.string.phoneNumber)) "" else phoneNumber
+        val etFullNameInput = if (fullName == getString(R.string.fullName)) "" else fullName
+        val etNicknameInput = if (nickName == getString(R.string.nickName)) "" else nickName
+        val etEmailInput = if (email == getString(R.string.email)) "" else email
+        val etLocationInput = if (location == getString(R.string.location)) "" else location
+        val etBirthdayInput = if (birthday == getString(R.string.birthday)) "" else birthday
+        val etPhoneNumberInput = if (phoneNumber == getString(R.string.phoneNumber)) "" else phoneNumber
+
+        etFullName.editText?.setText(etFullNameInput)
+        etNickname.editText?.setText(etNicknameInput)
+        etEmail.editText?.setText(etEmailInput)
+        etLocation.editText?.setText(etLocationInput)
+        etBirthday.editText?.setText(etBirthdayInput)
+        etPhoneNumber.editText?.setText(etPhoneNumberInput)
+
 
         if (storedImageUri != null && storedImageUri.isNotEmpty()) {
             imageUri = Uri.parse(storedImageUri)
@@ -171,16 +186,16 @@ class EditProfileFragment : Fragment() {
 
     private fun savedProfileData () {
         val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        var newFullName = requireView().findViewById<TextView>(R.id.editViewFullName).text.toString()
+        var newFullName = requireView().findViewById<TextInputLayout>(R.id.editViewFullName).editText?.text.toString()
         newFullName = if (newFullName == null || newFullName.isBlank() || newFullName.isEmpty()) getString(R.string.KeyFullName) else newFullName
         with(sharedPreferences.edit()) {
 
             putString( getString(R.string.KeyFullName), newFullName)
-            putString( getString(R.string.KeyNickName), requireView().findViewById<TextView>(R.id.editViewNickName).text.toString())
-            putString( getString(R.string.KeyEmail), requireView().findViewById<TextView>(R.id.editViewEmail).text.toString())
-            putString( getString(R.string.KeyLocation), requireView().findViewById<TextView>(R.id.editViewLocation).text.toString())
-            putString( getString(R.string.KeyPhoneNumber), requireView().findViewById<TextView>(R.id.editViewPhoneNumber).text.toString())
-            putString( getString(R.string.KeyBirthday), requireView().findViewById<TextView>(R.id.editViewBirthday).text.toString())
+            putString( getString(R.string.KeyNickName), requireView().findViewById<TextInputLayout>(R.id.editViewNickName).editText?.text.toString())
+            putString( getString(R.string.KeyEmail), requireView().findViewById<TextInputLayout>(R.id.editViewEmail).editText?.text.toString())
+            putString( getString(R.string.KeyLocation), requireView().findViewById<TextInputLayout>(R.id.editViewLocation).editText?.text.toString())
+            putString( getString(R.string.KeyPhoneNumber), requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString())
+            putString( getString(R.string.KeyBirthday), requireView().findViewById<TextInputLayout>(R.id.editViewBirthday).editText?.text.toString())
             putString( getString(R.string.KeyImage), imageUri.toString())
             commit()
         }
@@ -201,6 +216,7 @@ class EditProfileFragment : Fragment() {
         when (item.itemId) {
             R.id.saveItem -> {
                 savedProfileData()
+                //Toast.makeText(requireContext(),"Saving success", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.nav_profile)
                 return true
             }
@@ -310,7 +326,7 @@ class EditProfileFragment : Fragment() {
                     imageView.setImageURI(imageUri)
                 }
             } else {
-                Toast.makeText(requireContext(), "There was a problem while taking the photo", Toast.LENGTH_SHORT).show()
+                makeText(requireContext(), "There was a problem while taking the photo", Toast.LENGTH_SHORT).show()
             }
             //imageView.setImageURI(imageUri)
             //setPic(imageView, photoFile?.absolutePath)

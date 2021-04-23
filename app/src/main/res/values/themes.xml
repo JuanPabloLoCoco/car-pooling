@@ -22,4 +22,5 @@
     <style name="Theme.ShowProfileActivity.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.ShowProfileActivity.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>

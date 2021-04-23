@@ -30,6 +30,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -61,7 +63,7 @@ class TripEditFragment : Fragment() {
     ): View? {
         val view = inflater!!.inflate(R.layout.fragment_trip_edit, container, false)
 
-        val editDepAriLocation = view.findViewById<TextView>(R.id.textEditDepAriLocation)
+        /*val editDepAriLocation = view.findViewById<TextView>(R.id.textEditDepAriLocation)
         val editDepDateTime = view.findViewById<TextView>(R.id.textEditDepDateTime)
         val editEstDuration = view.findViewById<TextView>(R.id.textEditEstDuration)
         val editAvaSeat = view.findViewById<TextView>(R.id.textEditAvaSeat)
@@ -69,35 +71,46 @@ class TripEditFragment : Fragment() {
         val editAdditional = view.findViewById<TextView>(R.id.textEditAdditional)
         val editOptional = view.findViewById<TextView>(R.id.textEditOptional)
         val editPlate = view.findViewById<TextView>(R.id.textEditPlate)
+        val editimageView = view.findViewById<ImageView>(R.id.imageEditCar)*/
+
+        val editDepAriLocation = view.findViewById<TextInputLayout>(R.id.textEditDepAriLocation)
+        val editDepDateTime = view.findViewById<TextView>(R.id.textEditDepDateTime)
+        val editEstDuration = view.findViewById<TextInputLayout>(R.id.textEditEstDuration)
+        val editAvaSeat = view.findViewById<TextInputLayout>(R.id.textEditAvaSeat)
+        val editPrice = view.findViewById<TextInputLayout>(R.id.textEditPrice)
+        val editAdditional = view.findViewById<TextInputLayout>(R.id.textEditAdditional)
+        val editOptional = view.findViewById<TextInputLayout>(R.id.textEditOptional)
+        val editPlate = view.findViewById<TextInputLayout>(R.id.textEditPlate)
         val editimageView = view.findViewById<ImageView>(R.id.imageEditCar)
 
         val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        storeDepAriLocation = sharedPreferences.getString(getString(R.string.KeyDepAriLocation), "Departure&Arrival")!!
+        storeDepAriLocation = sharedPreferences.getString(getString(R.string.KeyDepAriLocation), "Departure&Arrival Location")!!
         storeDepDateTime = sharedPreferences.getString(getString(R.string.KeyDepDateTime), "Departure Date&Time")!!
         storeEstDuration = sharedPreferences.getString(getString(R.string.KeyEstDuration), "Estimated Duration")!!
-        storeAvaSeat = sharedPreferences.getString(getString(R.string.KeyAvaSeat), "Available Seats Number")!!
+        storeAvaSeat = sharedPreferences.getString(getString(R.string.KeyAvaSeat), "Available Seats")!!
         storePrice = sharedPreferences.getString(getString(R.string.KeyPrice), "Price")!!
         storeAdditional = sharedPreferences.getString(getString(R.string.KeyAdditional), "Additional Information")!!
         storeOptional = sharedPreferences.getString(getString(R.string.KeyOptional), "Optional Intermediates")!!
         storePlate = sharedPreferences.getString(getString(R.string.KeyPlate), "Plate Number")!!
 
-        val depAriLocationInput = if (storeDepAriLocation == "Departure&Arrival" || storeDepAriLocation.isEmpty()) "Departure&Arrival" else storeDepAriLocation
+        val depAriLocationInput = if (storeDepAriLocation == "Departure&Arrival Location" || storeDepAriLocation.isEmpty()) "" else storeDepAriLocation
         val depDateTimeInput = if (storeDepDateTime == "Departure Date&Time" || storeDepDateTime.isEmpty()) "Departure Date&Time" else storeDepDateTime
-        val estDurationInput = if (storeEstDuration == "Estimated Duration" || storeEstDuration.isEmpty()) "Estimated Duration" else storeEstDuration
-        val avaSeatInput = if (storeAvaSeat == "Available Seats Number" || storeAvaSeat.isEmpty()) "Available Seats Number" else storeAvaSeat
-        val priceInput = if (storePrice == "Price" || storePrice.isEmpty()) "Price" else storePrice
-        val additionalInput = if (storeAdditional == "Additional Information" || storeAdditional.isEmpty()) "Additional Information" else storeAdditional
-        val optionalInput = if (storeOptional == "Optional Intermediates" || storeOptional.isEmpty()) "Optional Intermediates" else storeOptional
-        val plateInput = if (storePlate == "Plate Number" || storePlate.isEmpty()) "Plate Number" else storePlate
+        val estDurationInput = if (storeEstDuration == "Estimated Duration" || storeEstDuration.isEmpty()) "" else storeEstDuration
+        val avaSeatInput = if (storeAvaSeat == "Available Seats" || storeAvaSeat.isEmpty()) "" else storeAvaSeat
+        val priceInput = if (storePrice == "Price" || storePrice.isEmpty()) "" else storePrice
+        val additionalInput = if (storeAdditional == "Additional Information" || storeAdditional.isEmpty()) "" else storeAdditional
+        val optionalInput = if (storeOptional == "Optional Intermediates" || storeOptional.isEmpty()) "" else storeOptional
+        val plateInput = if (storePlate == "Plate Number" || storePlate.isEmpty()) "" else storePlate
 
-        editDepAriLocation.hint = depAriLocationInput
-        editDepDateTime.hint = depDateTimeInput
-        editEstDuration.hint = estDurationInput
-        editAvaSeat.hint = avaSeatInput
-        editPrice.hint = priceInput
-        editAdditional.hint = additionalInput
-        editOptional.hint = optionalInput
-        editPlate.hint = plateInput
+        editDepAriLocation.editText?.setText(depAriLocationInput)
+        editDepDateTime.hint= depDateTimeInput
+        editEstDuration.editText?.setText(estDurationInput)
+        editAvaSeat.editText?.setText(avaSeatInput)
+        editPrice.editText?.setText(priceInput)
+        editAdditional.editText?.setText(additionalInput)
+        editOptional.editText?.setText(optionalInput)
+        editPlate.editText?.setText(plateInput)
+
         val TripImageUri = sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
         val uri_input = if (TripImageUri.toString() == "android.resource://it.polito.mad.car_pooling/drawable/car_default"
                 || TripImageUri.toString().isEmpty()) "android.resource://it.polito.mad.car_pooling/drawable/car_default" else TripImageUri
@@ -152,6 +165,7 @@ class TripEditFragment : Fragment() {
             R.id.save_Trip -> {
                 writeSharedPreferences()
                 findNavController().navigate(R.id.nav_trip)
+                //Toast.makeText(requireContext(), "Saving success", Toast.LENGTH_SHORT).show()
                 return true
             }
         }
@@ -163,14 +177,14 @@ class TripEditFragment : Fragment() {
 
         with(sharedPreferences.edit()) {
 
-            val editDepAriLocation = requireView().findViewById<TextView>(R.id.textEditDepAriLocation).text.toString()
+            val editDepAriLocation = requireView().findViewById<TextInputLayout>(R.id.textEditDepAriLocation).editText?.text.toString()
             val editDepDateTime = requireView().findViewById<TextView>(R.id.textEditDepDateTime).text.toString()
-            val editEstDuration = requireView().findViewById<TextView>(R.id.textEditEstDuration).text.toString()
-            val editAvaSeat = requireView().findViewById<TextView>(R.id.textEditAvaSeat).text.toString()
-            val editPrice = requireView().findViewById<TextView>(R.id.textEditPrice).text.toString()
-            val editAdditional = requireView().findViewById<TextView>(R.id.textEditAdditional).text.toString()
-            val editOptional = requireView().findViewById<TextView>(R.id.textEditOptional).text.toString()
-            val editPlate = requireView().findViewById<TextView>(R.id.textEditPlate).text.toString()
+            val editEstDuration = requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration).editText?.text.toString()
+            val editAvaSeat = requireView().findViewById<TextInputLayout>(R.id.textEditAvaSeat).editText?.text.toString()
+            val editPrice = requireView().findViewById<TextInputLayout>(R.id.textEditPrice).editText?.text.toString()
+            val editAdditional = requireView().findViewById<TextInputLayout>(R.id.textEditAdditional).editText?.text.toString()
+            val editOptional = requireView().findViewById<TextInputLayout>(R.id.textEditOptional).editText?.text.toString()
+            val editPlate = requireView().findViewById<TextInputLayout>(R.id.textEditPlate).editText?.text.toString()
 
             val input1 = if (editDepAriLocation == storeDepAriLocation || editDepAriLocation.isEmpty()) storeDepAriLocation else editDepAriLocation
             val input2 = if (editDepDateTime == storeDepDateTime || editDepDateTime.isEmpty()) storeDepDateTime else editDepDateTime
