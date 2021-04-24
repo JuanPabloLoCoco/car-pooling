@@ -5,6 +5,7 @@ data class Trip (var id: Int) {
     companion object {
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
+        val NEW_TRIP_ID: Int = -1
     }
 
 

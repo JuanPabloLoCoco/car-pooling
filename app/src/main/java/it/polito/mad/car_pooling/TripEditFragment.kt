@@ -31,6 +31,7 @@ import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.internal.LinkedTreeMap
@@ -61,10 +62,10 @@ class TripEditFragment : Fragment() {
     lateinit var storeAdditional : String
     lateinit var storeOptional : String
     lateinit var storePlate : String
-
-
     lateinit var action: String
     */
+    val args: TripEditFragmentArgs by navArgs()
+
     lateinit var selectedTrip: Trip
     lateinit var save_date : String
     @RequiresApi(Build.VERSION_CODES.N)
@@ -74,12 +75,13 @@ class TripEditFragment : Fragment() {
     ): View? {
         val view = inflater!!.inflate(R.layout.fragment_trip_edit, container, false)
 
-        val action: String? = arguments?.getString(getString(R.string.KeyEditTripAction))
-        Log.d("POLITO_ERRORS", "Action: ${action}")
+        // val action: String? = arguments?.getString(getString(R.string.KeyEditTripAction))
+        val tripId = args.tripId
+        Log.d("POLITO_ERRORS", "Trip Id: ${tripId}")
 
 
-        if (action == Trip.CREATE_TRIP) {
-            selectedTrip = Trip(-1)
+        if (tripId == Trip.NEW_TRIP_ID) {
+            selectedTrip = Trip(Trip.NEW_TRIP_ID)
         } else {
             // Cargar de memoria el id del trip a elegir!!!!
 
@@ -219,7 +221,7 @@ class TripEditFragment : Fragment() {
                     tripList = storedTripList.tripList;
                 }
                 mutableTripList = tripList.toMutableList()
-                if (selectedTrip.id == -1) {
+                if (selectedTrip.id == Trip.NEW_TRIP_ID) {
                     selectedTrip.id = tripList.size
                     mutableTripList.add(selectedTrip)
                 } else {
@@ -232,7 +234,8 @@ class TripEditFragment : Fragment() {
                 //writeSharedPreferences()
 
                 val tripDetailArguments = bundleOf(getString(R.string.KeyDetailTripId) to selectedTrip.id)
-                findNavController().navigate(R.id.nav_trip, tripDetailArguments)
+                findNavController().popBackStack()
+                        //.navigate(R.id.nav_trip, tripDetailArguments)
                 return true
             }
         }

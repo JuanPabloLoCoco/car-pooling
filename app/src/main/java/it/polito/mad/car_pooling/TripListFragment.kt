@@ -48,8 +48,11 @@ class TripListFragment : Fragment() {
 
         fabView.setOnClickListener {
             Toast.makeText(context, "A click on FAB", Toast.LENGTH_SHORT).show()
-            val bundleNewTrip = bundleOf(getString(R.string.KeyEditTripAction) to Trip.CREATE_TRIP)
-            findNavController().navigate(R.id.tripEditFragment, bundleNewTrip)
+            //val bundleNewTrip = bundleOf(getString(R.string.KeyEditTripAction) to Trip.CREATECREATE_TRIP_TRIP)
+
+            val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(Trip.NEW_TRIP_ID)
+                //TripEditFragtDirections.actionTripEditFragmentToTripDetailsFragment(Trip.NEW_TRIP_ID)
+            findNavController().navigate(action)
         }
 
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
