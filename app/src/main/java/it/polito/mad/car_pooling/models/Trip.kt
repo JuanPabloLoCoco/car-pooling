@@ -16,5 +16,5 @@ data class Trip (var id: Int) {
     var additional: String = ""
     var optional: String = ""
     var plate: String = ""
-    var trimImageUri: String = ""
+    var imageUri: String = ""
 }
