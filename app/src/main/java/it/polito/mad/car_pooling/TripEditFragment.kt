@@ -331,7 +331,6 @@ class TripEditFragment : Fragment() {
     }
 
     private fun openGallery () {
-        Log.d("POLITO_ERRORS", "Open gallery")
         val openGalleryIntent = Intent(Intent.ACTION_PICK)
         openGalleryIntent.type = "image/*"
         startActivityForResult(openGalleryIntent, REQUEST_OPEN_GALLERY)

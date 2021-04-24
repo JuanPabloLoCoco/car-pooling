@@ -41,59 +41,28 @@ class TripListFragment : Fragment() {
         var dataList: List<Trip>
         if (storedTripList == null) {
             dataList = listOf()
-            // Toast.makeText(context, "Esta vacia la lista", Toast.LENGTH_LONG).show()
-            Log.d("POLITO_ERRORS", "La lista esta vacia")
         } else {
             dataList = storedTripList.tripList
-            Log.d("POLITO_ERRORS", "La lista no esta vacia")
         }
 
         fabView.setOnClickListener {
             Toast.makeText(context, "A click on FAB", Toast.LENGTH_SHORT).show()
-            //val bundleNewTrip = bundleOf(getString(R.string.KeyEditTripAction) to Trip.CREATECREATE_TRIP_TRIP)
 
             val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(Trip.NEW_TRIP_ID)
-                //TripEditFragtDirections.actionTripEditFragmentToTripDetailsFragment(Trip.NEW_TRIP_ID)
             findNavController().navigate(action)
         }
 
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        /*
-        val trip1 = Trip(1)
-        trip1.price = "price:10 Euros"
-        trip1.depAriLocation = "Torino"
-        trip1.depDateTime = "10pm"
-        trip1.avaSeat = "4 Seats"
-
-        val trip2 = Trip(2)
-        trip2.price = "80 Euros"
-        trip2.depAriLocation = "Milano"
-        trip2.depDateTime = "9pm"
-        trip2.avaSeat = "5 Seats"
-
-        val trip3 = Trip(3)
-        trip3.price = "30 Euros"
-        trip3.depAriLocation = "Rome"
-        trip3.depDateTime = "1pm"
-        trip3.avaSeat = "2 Seats"
-        */
-        //val dataList = ArrayList<Trip>(trip1, trip2, trip3)
-        //val dataList = arrayListOf<Trip>(trip1, trip2, trip3)
-
-        //val dataList = arrayListOf<Trip>()
 
         if(dataList.isNotEmpty()){
             val rvAdapter = TripCardAdapter(dataList, requireContext(), findNavController())
             reciclerView.adapter = rvAdapter
             requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
         }else {
-
-            //display some message ,that message will on the trip detailfragment
+            // display some message ,that message will on the trip detailfragment
         }
-
-        // Log.d("POLITO_ERRORS", "Recicler view es null: " + (reciclerView == null).toString())
     }
 }
 
@@ -140,9 +109,6 @@ class TripCardAdapter (val tripList: List<Trip>,
         holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeat)
 
         holder.tripCardView.setOnClickListener {
-            // Handle navigation to show trip detail
-            // Toast.makeText(context, "A click on card ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
-
             val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
             navController.navigate(tripDetailArguments)
         }
