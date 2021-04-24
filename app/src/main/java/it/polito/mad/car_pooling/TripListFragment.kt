@@ -141,7 +141,10 @@ class TripCardAdapter (val tripList: List<Trip>,
 
         holder.tripCardView.setOnClickListener {
             // Handle navigation to show trip detail
-            Toast.makeText(context, "A click on card ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
+            // Toast.makeText(context, "A click on card ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
+
+            val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
+            navController.navigate(tripDetailArguments)
         }
 
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
