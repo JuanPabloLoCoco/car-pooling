@@ -12,6 +12,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -83,7 +85,7 @@ class TripListFragment : Fragment() {
         //val dataList = arrayListOf<Trip>()
 
         if(dataList.isNotEmpty()){
-            val rvAdapter = TripCardAdapter(dataList, requireContext())
+            val rvAdapter = TripCardAdapter(dataList, requireContext(), findNavController())
             reciclerView.adapter = rvAdapter
             requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
         }else {
@@ -95,7 +97,9 @@ class TripListFragment : Fragment() {
     }
 }
 
-class TripCardAdapter (val tripList: List<Trip>, val context: Context): RecyclerView.Adapter<TripCardAdapter.TripCardViewHolder>() {
+class TripCardAdapter (val tripList: List<Trip>,
+                       val context: Context,
+                       val navController: NavController): RecyclerView.Adapter<TripCardAdapter.TripCardViewHolder>() {
     class TripCardViewHolder(v: View): RecyclerView.ViewHolder (v) {
         val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
         val departureTimeView = v.findViewById<TextView>(R.id.timeview)
@@ -143,6 +147,8 @@ class TripCardAdapter (val tripList: List<Trip>, val context: Context): Recycler
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
             // Handle navigation to edit trip detail
             Toast.makeText(context, "Go to edit trip ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
+            val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id)
+            navController.navigate(action)
         }
 
     }

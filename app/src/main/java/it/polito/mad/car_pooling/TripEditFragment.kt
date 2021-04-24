@@ -77,26 +77,21 @@ class TripEditFragment : Fragment() {
 
         // val action: String? = arguments?.getString(getString(R.string.KeyEditTripAction))
         val tripId = args.tripId
-        Log.d("POLITO_ERRORS", "Trip Id: ${tripId}")
-
 
         if (tripId == Trip.NEW_TRIP_ID) {
             selectedTrip = Trip(Trip.NEW_TRIP_ID)
         } else {
-            // Cargar de memoria el id del trip a elegir!!!!
+            var storedTripList = ModelPreferencesManager.get<TripList>(getString(R.string.KeyTripList))
+            if (storedTripList == null) {
+                // An imposible case
+                Log.e("POLITO_ERRORS", "You are accesing an invalid id")
+            } else {
+                val tripList = storedTripList.tripList
+                selectedTrip = tripList.get(tripId)
+            }
 
         }
         loadDataInFields(selectedTrip, view)
-
-        /*val editDepAriLocation = view.findViewById<TextView>(R.id.textEditDepAriLocation)
-        val editDepDateTime = view.findViewById<TextView>(R.id.textEditDepDateTime)
-        val editEstDuration = view.findViewById<TextView>(R.id.textEditEstDuration)
-        val editAvaSeat = view.findViewById<TextView>(R.id.textEditAvaSeat)
-        val editPrice = view.findViewById<TextView>(R.id.textEditPrice)
-        val editAdditional = view.findViewById<TextView>(R.id.textEditAdditional)
-        val editOptional = view.findViewById<TextView>(R.id.textEditOptional)
-        val editPlate = view.findViewById<TextView>(R.id.textEditPlate)
-        val editimageView = view.findViewById<ImageView>(R.id.imageEditCar)*/
 
         val editDepDateTime = view.findViewById<TextView>(R.id.textEditDepDateTime)
         /*
@@ -225,7 +220,8 @@ class TripEditFragment : Fragment() {
                     selectedTrip.id = tripList.size
                     mutableTripList.add(selectedTrip)
                 } else {
-                    Toast.makeText(requireContext(), "Save edited trip. Still not implemented", Toast.LENGTH_LONG).show()
+                    mutableTripList[selectedTrip.id] = selectedTrip
+                    // Toast.makeText(requireContext(), "Save edited trip. Still not implemented", Toast.LENGTH_LONG).show()
                 }
 
                 ModelPreferencesManager.put(TripList(mutableTripList.toList()), getString(R.string.KeyTripList))
