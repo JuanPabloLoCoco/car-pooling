@@ -48,20 +48,23 @@ class TripListFragment : Fragment() {
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val trip1 = Trip(1)
-        trip1.price = "price:10 Euros"
+        trip1.price = "10 Euros"
         trip1.depAriLocation = "Torino"
+        trip1.arrLocation="Milano"
         trip1.depDateTime = "10pm"
         trip1.avaSeat = "4 Seats"
 
         val trip2 = Trip(2)
         trip2.price = "80 Euros"
         trip2.depAriLocation = "Milano"
+        trip2.arrLocation="Milano"
         trip2.depDateTime = "9pm"
         trip2.avaSeat = "5 Seats"
 
         val trip3 = Trip(3)
         trip3.price = "30 Euros"
         trip3.depAriLocation = "Rome"
+        trip3.arrLocation="Milano"
         trip3.depDateTime = "1pm"
         trip3.avaSeat = "2 Seats"
 
@@ -85,6 +88,7 @@ class TripListFragment : Fragment() {
 class TripCardAdapter (val tripList: List<Trip>, val context: Context): RecyclerView.Adapter<TripCardAdapter.TripCardViewHolder>() {
     class TripCardViewHolder(v: View): RecyclerView.ViewHolder (v) {
         val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
+        val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
         val departureTimeView = v.findViewById<TextView>(R.id.timeview)
         val priceView = v.findViewById<TextView>(R.id.priceview)
         val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
@@ -114,6 +118,7 @@ class TripCardAdapter (val tripList: List<Trip>, val context: Context): Recycler
         val selectedTrip: Trip = tripList[position]
 
         holder.departureLocationView.text = selectedTrip.depAriLocation
+        holder.arriveLocationView.text= selectedTrip.arrLocation
         holder.departureTimeView.text = selectedTrip.depDateTime
         holder.priceView.text = selectedTrip.price
         holder.availableSeatsView.text = selectedTrip.avaSeat

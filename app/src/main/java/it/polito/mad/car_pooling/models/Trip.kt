@@ -8,6 +8,7 @@ data class Trip (var id: Int) {
     }
 
 
+    var arrLocation: String=""
     var depAriLocation: String = ""
     var depDateTime: String = ""
     var estDuration: String = ""
