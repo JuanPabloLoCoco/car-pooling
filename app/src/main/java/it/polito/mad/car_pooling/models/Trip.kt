@@ -5,6 +5,7 @@ data class Trip (var id: Int) {
     companion object {
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
+        val NEW_TRIP_ID: Int = -1
     }
 
 
@@ -17,5 +18,5 @@ data class Trip (var id: Int) {
     var additional: String = ""
     var optional: String = ""
     var plate: String = ""
-    var trimImageUri: String = ""
+    var imageUri: String = ""
 }

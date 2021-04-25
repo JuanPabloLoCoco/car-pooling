@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         val navController = findNavController(R.id.nav_host_fragment)
 
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home, R.id.nav_profile, R.id.nav_list_trip), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_list_trip, R.id.nav_profile), drawerLayout)
         // appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home, R.id.nav_profile, R.id.nav_trip), drawerLayout)
         //var badge = navController.
         setupActionBarWithNavController(navController, appBarConfiguration)
