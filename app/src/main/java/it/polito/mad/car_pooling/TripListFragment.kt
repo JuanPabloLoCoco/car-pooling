@@ -71,6 +71,7 @@ class TripCardAdapter (val tripList: List<Trip>,
                        val navController: NavController): RecyclerView.Adapter<TripCardAdapter.TripCardViewHolder>() {
     class TripCardViewHolder(v: View): RecyclerView.ViewHolder (v) {
         val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
+        val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
         val departureTimeView = v.findViewById<TextView>(R.id.timeview)
         val priceView = v.findViewById<TextView>(R.id.priceview)
         val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
@@ -103,7 +104,9 @@ class TripCardAdapter (val tripList: List<Trip>,
     override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
         val selectedTrip: Trip = tripList[position]
 
+
         holder.departureLocationView.text = getStringFromField(selectedTrip.depAriLocation)
+        holder.arriveLocationView.text = getStringFromField(selectedTrip.arrLocation)
         holder.departureTimeView.text = getStringFromField(selectedTrip.depDateTime)
         holder.priceView.text = getStringFromField(selectedTrip.price)
         holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeat)
