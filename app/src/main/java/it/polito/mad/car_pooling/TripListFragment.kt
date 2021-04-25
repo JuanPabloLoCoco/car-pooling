@@ -1,6 +1,7 @@
 package it.polito.mad.car_pooling
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
@@ -75,7 +77,7 @@ class TripCardAdapter (val tripList: List<Trip>,
         val departureTimeView = v.findViewById<TextView>(R.id.timeview)
         val priceView = v.findViewById<TextView>(R.id.priceview)
         val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
-
+        val tripImageView = v.findViewById<ImageView>(R.id.imageview)
 
         val tripCardView = v.findViewById<CardView>(R.id.tripCard)
         fun bind(t: Trip) {
@@ -110,6 +112,12 @@ class TripCardAdapter (val tripList: List<Trip>,
         holder.departureTimeView.text = getStringFromField(selectedTrip.depDateTime)
         holder.priceView.text = getStringFromField(selectedTrip.price)
         holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeat)
+
+        val tripImageUri = selectedTrip.imageUri //sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
+
+        val uri_input = if (tripImageUri.toString() == "android.resource://it.polito.mad.car_pooling/drawable/car_default"
+                || tripImageUri.toString().isEmpty()) "android.resource://it.polito.mad.car_pooling/drawable/car_default" else tripImageUri
+         holder.tripImageView.setImageURI(Uri.parse(uri_input))
 
         holder.tripCardView.setOnClickListener {
             val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
