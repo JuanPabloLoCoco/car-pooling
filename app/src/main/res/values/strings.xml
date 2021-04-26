@@ -9,6 +9,7 @@
     <string name="phoneNumber">PhoneNumber</string>
 
     <string name="preference_file_key">AppSharedPreference</string>
+    <string name="KeyProfileData">ProfileData</string>
     <string name="KeyFullName">FullName</string>
     <string name="KeyNickName">NickName</string>
     <string name="KeyEmail">Email</string>

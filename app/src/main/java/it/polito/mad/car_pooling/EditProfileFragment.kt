@@ -30,11 +30,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.*
 import android.widget.*
 import android.widget.Toast.makeText
+import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputLayout
+import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
+import it.polito.mad.car_pooling.models.Profile
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -54,7 +57,7 @@ private const val ARG_PARAM2 = "param2"
  */
 
 class EditProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_OPEN_GALLERY = 2
 
@@ -63,11 +66,7 @@ class EditProfileFragment : Fragment() {
     private var imageUri: Uri? = null
     private var photoFile: File? = null
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private lateinit var profile: Profile
 
     // ---------------------------- Life Cycle -----------------------
     @RequiresApi(Build.VERSION_CODES.N)
@@ -78,53 +77,6 @@ class EditProfileFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.edit_profile_layout, container, false)
 
-        /*val etFullName: TextView = view.findViewById(R.id.editViewFullName) as TextView
-        val etNickname: TextView = view.findViewById(R.id.editViewNickName) as TextView
-        val etEmail: TextView = view.findViewById(R.id.editViewEmail) as TextView
-        val etLocation: TextView = view.findViewById(R.id.editViewLocation) as TextView
-        val etBirthday: TextView = view.findViewById(R.id.editViewBirthday) as TextView
-        val etPhoneNumber: TextView = view.findViewById(R.id.editViewPhoneNumber) as TextView*/
-        val etFullName = view.findViewById<TextInputLayout>(R.id.editViewFullName)
-        val etNickname = view.findViewById<TextInputLayout>(R.id.editViewNickName)
-        val etEmail = view.findViewById<TextInputLayout>(R.id.editViewEmail)
-        val etLocation = view.findViewById<TextInputLayout>(R.id.editViewLocation)
-        val etBirthday = view.findViewById<TextInputLayout>(R.id.editViewBirthday)
-        val etPhoneNumber = view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber)
-        val editPhotoView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
-
-        val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        // Get stored data
-        val fullName = sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName))
-        val nickName = sharedPreferences.getString(getString(R.string.KeyNickName), getString(R.string.nickName))
-        val email = sharedPreferences.getString(getString(R.string.KeyEmail), getString(R.string.email))
-        val location = sharedPreferences.getString(getString(R.string.KeyLocation), getString(R.string.location))
-        val phoneNumber = sharedPreferences.getString(getString(R.string.KeyPhoneNumber), getString(R.string.phoneNumber))
-        val birthday = sharedPreferences.getString(getString(R.string.KeyBirthday), getString(R.string.birthday))
-        val storedImageUri =  sharedPreferences.getString(getString(R.string.KeyImage), getUriFromResource(R.drawable.default_image).toString())
-
-        // Set Text
-        val etFullNameInput = if (fullName == getString(R.string.fullName)) "" else fullName
-        val etNicknameInput = if (nickName == getString(R.string.nickName)) "" else nickName
-        val etEmailInput = if (email == getString(R.string.email)) "" else email
-        val etLocationInput = if (location == getString(R.string.location)) "" else location
-        val etBirthdayInput = if (birthday == getString(R.string.birthday)) "" else birthday
-        val etPhoneNumberInput = if (phoneNumber == getString(R.string.phoneNumber)) "" else phoneNumber
-
-        etFullName.editText?.setText(etFullNameInput)
-        etNickname.editText?.setText(etNicknameInput)
-        etEmail.editText?.setText(etEmailInput)
-        etLocation.editText?.setText(etLocationInput)
-        etBirthday.editText?.setText(etBirthdayInput)
-        etPhoneNumber.editText?.setText(etPhoneNumberInput)
-
-
-        if (storedImageUri != null && storedImageUri.isNotEmpty()) {
-            imageUri = Uri.parse(storedImageUri)
-            editPhotoView.setImageURI(imageUri);
-        }
-        // Load data
-        // readProfileData(view)
-
         // Register photo menu
         val imageButton = view.findViewById<ImageButton>(R.id.imageButton1)
         registerForContextMenu(imageButton)
@@ -132,6 +84,18 @@ class EditProfileFragment : Fragment() {
 
         return view
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))
+        if (storedProfile === null) {
+            storedProfile = Profile("")
+
+        }
+        profile = storedProfile
+        loadProfileInFields(storedProfile, view)
+    }
+
 
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -150,6 +114,7 @@ class EditProfileFragment : Fragment() {
 
     // ----------------------------- Manage Shared Preferences ---------------------
     // First Load
+    /*
     private fun readProfileData (view: View) {
         // Instantiate each variable
         val etFullName: TextView = view.findViewById(R.id.editViewFullName) as TextView
@@ -183,22 +148,64 @@ class EditProfileFragment : Fragment() {
             editPhotoView.setImageURI(imageUri);
         }
     }
+    */
+
+    private fun loadProfileInFields(profile: Profile, view: View) {
+        val etFullName = view.findViewById<TextInputLayout>(R.id.editViewFullName)
+        val etNickname = view.findViewById<TextInputLayout>(R.id.editViewNickName)
+        val etEmail = view.findViewById<TextInputLayout>(R.id.editViewEmail)
+        val etLocation = view.findViewById<TextInputLayout>(R.id.editViewLocation)
+        val etBirthday = view.findViewById<TextInputLayout>(R.id.editViewBirthday)
+        val etPhoneNumber = view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber)
+        val editPhotoView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
+
+        // val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+
+        // Get stored data
+        val fullName = profile.fullName //sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName))
+        val nickName = profile.nickName //sharedPreferences.getString(getString(R.string.KeyNickName), getString(R.string.nickName))
+        val email = profile.email //sharedPreferences.getString(getString(R.string.KeyEmail), getString(R.string.email))
+        val location = profile.location //sharedPreferences.getString(getString(R.string.KeyLocation), getString(R.string.location))
+        val phoneNumber = profile.phoneNumber //sharedPreferences.getString(getString(R.string.KeyPhoneNumber), getString(R.string.phoneNumber))
+        val birthday = profile.birthday //sharedPreferences.getString(getString(R.string.KeyBirthday), getString(R.string.birthday))
+        val storedImageUri =  if (profile.imageUri.isEmpty()) getUriFromResource(R.drawable.default_image).toString() else profile.imageUri //sharedPreferences.getString(getString(R.string.KeyImage), getUriFromResource(R.drawable.default_image).toString())
+
+        // Set Text
+        val etFullNameInput = if (fullName == getString(R.string.fullName)) "" else fullName
+        val etNicknameInput = if (nickName == getString(R.string.nickName)) "" else nickName
+        val etEmailInput = if (email == getString(R.string.email)) "" else email
+        val etLocationInput = if (location == getString(R.string.location)) "" else location
+        val etBirthdayInput = if (birthday == getString(R.string.birthday)) "" else birthday
+        val etPhoneNumberInput = if (phoneNumber == getString(R.string.phoneNumber)) "" else phoneNumber
+
+        etFullName.editText?.setText(etFullNameInput)
+        etNickname.editText?.setText(etNicknameInput)
+        etEmail.editText?.setText(etEmailInput)
+        etLocation.editText?.setText(etLocationInput)
+        etBirthday.editText?.setText(etBirthdayInput)
+        etPhoneNumber.editText?.setText(etPhoneNumberInput)
+
+
+        if (storedImageUri != null && storedImageUri.isNotEmpty()) {
+            imageUri = Uri.parse(storedImageUri)
+            editPhotoView.setImageURI(imageUri);
+        }
+    }
+
 
     private fun savedProfileData () {
-        val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        //val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         var newFullName = requireView().findViewById<TextInputLayout>(R.id.editViewFullName).editText?.text.toString()
-        newFullName = if (newFullName == null || newFullName.isBlank() || newFullName.isEmpty()) getString(R.string.KeyFullName) else newFullName
-        with(sharedPreferences.edit()) {
+        //newFullName = if (newFullName == null || newFullName.isBlank() || newFullName.isEmpty()) getString(R.string.KeyFullName) else newFullName
+        profile.fullName = newFullName
+        profile.nickName = requireView().findViewById<TextInputLayout>(R.id.editViewNickName).editText?.text.toString()
+        profile.email = requireView().findViewById<TextInputLayout>(R.id.editViewEmail).editText?.text.toString()
+        profile.location = requireView().findViewById<TextInputLayout>(R.id.editViewLocation).editText?.text.toString()
+        profile.phoneNumber = requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString()
+        profile.birthday = requireView().findViewById<TextInputLayout>(R.id.editViewBirthday).editText?.text.toString()
+        profile.imageUri = imageUri.toString()
 
-            putString( getString(R.string.KeyFullName), newFullName)
-            putString( getString(R.string.KeyNickName), requireView().findViewById<TextInputLayout>(R.id.editViewNickName).editText?.text.toString())
-            putString( getString(R.string.KeyEmail), requireView().findViewById<TextInputLayout>(R.id.editViewEmail).editText?.text.toString())
-            putString( getString(R.string.KeyLocation), requireView().findViewById<TextInputLayout>(R.id.editViewLocation).editText?.text.toString())
-            putString( getString(R.string.KeyPhoneNumber), requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString())
-            putString( getString(R.string.KeyBirthday), requireView().findViewById<TextInputLayout>(R.id.editViewBirthday).editText?.text.toString())
-            putString( getString(R.string.KeyImage), imageUri.toString())
-            commit()
-        }
+        ModelPreferencesManager.put(profile,getString(R.string.KeyProfileData))
 
         val nav_header_image = requireActivity().findViewById<ImageView>(R.id.nav_header_image)
         nav_header_image.setImageURI(imageUri)
@@ -217,7 +224,7 @@ class EditProfileFragment : Fragment() {
             R.id.saveItem -> {
                 savedProfileData()
                 //Toast.makeText(requireContext(),"Saving success", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.nav_profile)
+                findNavController().popBackStack()
                 return true
             }
         }
@@ -278,7 +285,6 @@ class EditProfileFragment : Fragment() {
         // takenPictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFile)
         val fileProvider = FileProvider.getUriForFile(requireContext(), "it.polito.mad.car_pooling.fileprovider", photoFile!!)
         takenPictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
-
         startActivityForResult(takenPictureIntent, REQUEST_IMAGE_CAPTURE)
     }
 
