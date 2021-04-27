@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_home">
+    app:startDestination="@id/nav_list_trip">
     <fragment
         android:id="@+id/nav_trip"
         android:name="it.polito.mad.car_pooling.TripDetailsFragment"
@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_tripDetailsFragment_to_tripEditFragment"
             app:destination="@id/tripEditFragment" />
+        <argument
+            android:name="tripId"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/tripEditFragment"
@@ -21,12 +24,11 @@
         <action
             android:id="@+id/action_tripEditFragment_to_tripDetailsFragment"
             app:destination="@id/nav_trip" />
+        <argument
+            android:name="tripId"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
-    <fragment
-        android:id="@+id/nav_home"
-        android:name="it.polito.mad.car_pooling.HomeFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/nav_list_trip"
         android:name="it.polito.mad.car_pooling.TripListFragment"

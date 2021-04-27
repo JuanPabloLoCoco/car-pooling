@@ -42,5 +42,7 @@
     <string name="KeyTripList">KeyTripList</string>
     <string name="KeyEditTripAction">KeyEditTripAction</string>
 
+    <string name="KeyDetailTripId">KeyEditTripAction</string>
+
 
 </resources>
