@@ -11,7 +11,11 @@
         tools:layout="@layout/fragment_trip_details" >
         <action
             android:id="@+id/action_tripDetailsFragment_to_tripEditFragment"
-            app:destination="@id/tripEditFragment" />
+            app:destination="@id/tripEditFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
         <argument
             android:name="tripId"
             app:argType="integer" />
@@ -23,7 +27,9 @@
         tools:layout="@layout/fragment_trip_edit" >
         <action
             android:id="@+id/action_tripEditFragment_to_tripDetailsFragment"
-            app:destination="@id/nav_trip" />
+            app:destination="@id/nav_trip"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left" />
         <argument
             android:name="tripId"
             app:argType="integer"
@@ -38,10 +44,18 @@
         >
         <action
             android:id="@+id/action_nav_list_trip_to_nav_trip"
-            app:destination="@id/nav_trip" />
+            app:destination="@id/nav_trip"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
         <action
             android:id="@+id/action_nav_list_trip_to_tripEditFragment"
-            app:destination="@id/tripEditFragment" />
+            app:destination="@id/tripEditFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
     </fragment>
 
 
@@ -52,8 +66,11 @@
         tools:layout="@layout/profile_layout">
         <action
             android:id="@+id/action_showProfileFragment_to_editProfileFragment"
-            app:destination="@+id/nav_edit_profile"
-            />
+            app:destination="@id/nav_edit_profile"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
     </fragment>
 
     <fragment
@@ -63,8 +80,12 @@
         tools:layout="@layout/edit_profile_layout">
         <action
             android:id="@+id/action_editProfileFragment_to_showProfileFragment"
-            app:destination="@+id/nav_profile"
-            />
+            app:destination="@id/nav_profile"
+            app:enterAnim="@anim/from_left"
+            app:exitAnim="@anim/to_right" />
+        <argument
+            android:name="profileId"
+            app:argType="integer" />
     </fragment>
 
 </navigation>

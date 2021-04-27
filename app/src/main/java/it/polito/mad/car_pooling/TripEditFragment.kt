@@ -34,6 +34,8 @@ import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.internal.LinkedTreeMap
@@ -54,18 +56,6 @@ private var imageUri: Uri? = null
 private var photoFile: File? = null
 
 class TripEditFragment : Fragment() {
-
-    /*
-    lateinit var storeDepAriLocation : String
-    lateinit var storeDepDateTime : String
-    lateinit var storeEstDuration : String
-    lateinit var storeAvaSeat : String
-    lateinit var storePrice : String
-    lateinit var storeAdditional : String
-    lateinit var storeOptional : String
-    lateinit var storePlate : String
-    lateinit var action: String
-    */
     val args: TripEditFragmentArgs by navArgs()
 
     lateinit var selectedTrip: Trip
@@ -93,7 +83,6 @@ class TripEditFragment : Fragment() {
                 val tripList = storedTripList.tripList
                 selectedTrip = tripList.get(tripId)
             }
-
         }
         loadDataInFields(selectedTrip, view)
 
@@ -229,22 +218,30 @@ class TripEditFragment : Fragment() {
                 if (storedTripList != null) {
                     tripList = storedTripList.tripList;
                 }
+                var tripCreated : Boolean = false
                 mutableTripList = tripList.toMutableList()
                 if (selectedTrip.id == Trip.NEW_TRIP_ID) {
                     selectedTrip.id = tripList.size
+                    tripCreated = true
                     mutableTripList.add(selectedTrip)
                 } else {
                     mutableTripList[selectedTrip.id] = selectedTrip
                     // Toast.makeText(requireContext(), "Save edited trip. Still not implemented", Toast.LENGTH_LONG).show()
                 }
 
-                ModelPreferencesManager.put(TripList(mutableTripList.toList()), getString(R.string.KeyTripList))
-                // Toast.makeText(requireContext(), "Save edited trip. Still not implemented", Toast.LENGTH_LONG).show()
-                Toast.makeText(requireContext(), "Saving success", Toast.LENGTH_SHORT).show()
-                //writeSharedPreferences()
 
-                val tripDetailArguments = bundleOf(getString(R.string.KeyDetailTripId) to selectedTrip.id)
+                ModelPreferencesManager.put(TripList(mutableTripList.toList()), getString(R.string.KeyTripList))
+
+                val message: String = if (tripCreated) getString(R.string.tripCreatedSucces) else getString(R.string.tripEditedSucces)
+                Snackbar.make(requireView(), message , Snackbar.LENGTH_SHORT)
+                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                        .show()
+
+
+                // val tripDetailArguments = bundleOf(getString(R.string.KeyDetailTripId) to selectedTrip.id)
+                // val args = TripEditFragmentDirections.actionTripEditFragmentToTripDetailsFragment(selectedTrip.id)
                 findNavController().popBackStack()
+
                         //.navigate(R.id.nav_trip, tripDetailArguments)
                 return true
             }
@@ -413,4 +410,33 @@ class TripEditFragment : Fragment() {
         return Uri.parse(file.absolutePath)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when(requestCode) {
+            REQUEST_IMAGE_CAPTURE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openCamera()
+                } else {
+                    Snackbar.make(requireView(), getString(R.string.cannotOpenCamera) , Snackbar.LENGTH_SHORT)
+                            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                            .show()
+                }
+            }
+
+            REQUEST_OPEN_GALLERY -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openGallery()
+                } else {
+                    Snackbar.make(requireView(), getString(R.string.cannotOpenGallery) , Snackbar.LENGTH_SHORT)
+                            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                            .show()
+                }
+            }
+            else -> {
+                // Nothing
+            }
+        }
+    }
 }

@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import com.google.android.material.badge.BadgeDrawable
+import it.polito.mad.car_pooling.models.Profile
 
 class MainActivity : AppCompatActivity() {
 
@@ -70,13 +71,17 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         // Get Stored Data
-        fullName = sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName)).toString()
-        val storedImageUri =  sharedPreferences.getString(getString(R.string.KeyImage), getUriFromResource(R.drawable.default_image).toString())
+        var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))
+        if (storedProfile === null) {
+            storedProfile = Profile("")
+        }
+        fullName = storedProfile.fullName //sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName)).toString()
+        val storedImageUri =  if (storedProfile.imageUri.isEmpty()) getUriFromResource(R.drawable.default_image).toString() else storedProfile.imageUri
+        imageUri = storedImageUri
+
+        // Set stored data in view
         //findViewById<ImageView>(R.id.nav_header_image).setImageURI(Uri.parse(storedImageUri))
-        // findViewById<TextView>(R.id.nav_header_full_name).text = fullName
-
-        imageUri = storedImageUri.toString()
-
+        //findViewById<TextView>(R.id.nav_header_full_name).text = fullName
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -104,7 +109,7 @@ class MainActivity : AppCompatActivity() {
             fullName = savedFullName
         }
         val navView: NavigationView = findViewById(R.id.nav_view)
-
+        imageUri = if (imageUri.isEmpty()) getUriFromResource(R.drawable.default_image).toString() else imageUri
         //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         val hView =  navView.getHeaderView(0);
         hView.findViewById<ImageView>(R.id.nav_header_image).setImageURI(Uri.parse(imageUri))
