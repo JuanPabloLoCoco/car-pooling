@@ -22,7 +22,8 @@
         android:layout_weight="2"
         android:layout_marginHorizontal="16dp"
         android:paddingTop="10dp"
-        android:paddingHorizontal="20dp">
+        android:paddingHorizontal="20dp"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
