@@ -83,6 +83,7 @@ class TripEditFragment : Fragment() {
 
         if (tripId == Trip.NEW_TRIP_ID) {
             selectedTrip = Trip(Trip.NEW_TRIP_ID)
+            (activity as AppCompatActivity).supportActionBar?.title = "Create new trip"
         } else {
             var storedTripList = ModelPreferencesManager.get<TripList>(getString(R.string.KeyTripList))
             if (storedTripList == null) {
