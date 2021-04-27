@@ -48,7 +48,7 @@ class TripListFragment : Fragment() {
         }
 
         fabView.setOnClickListener {
-            Toast.makeText(context, "A click on FAB", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, "A click on FAB", Toast.LENGTH_SHORT).show()
 
             val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(Trip.NEW_TRIP_ID)
             findNavController().navigate(action)
@@ -126,7 +126,7 @@ class TripCardAdapter (val tripList: List<Trip>,
 
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
             // Handle navigation to edit trip detail
-            Toast.makeText(context, "Go to edit trip ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
+            // Toast.makeText(context, "Go to edit trip ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
             val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id)
             navController.navigate(action)
         }
