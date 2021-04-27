@@ -46,13 +46,14 @@
             />
         <TextView
             android:id="@+id/depatureview"
-            android:layout_width="150dp"
+            android:layout_width="match_parent"
             android:layout_height="25dp"
             android:paddingLeft="10dp"
             android:layout_marginLeft="10dp"
             android:drawablePadding="10dp"
             android:textSize="20sp"
-            android:text="Departure&amp;arrival"
+            android:text="Departure Location"
+            android:textColor="@color/black"
             />
         </LinearLayout>
         <LinearLayout
@@ -72,13 +73,14 @@
                 />
             <TextView
                 android:id="@+id/arriveview"
-                android:layout_width="150dp"
+                android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:paddingLeft="10dp"
                 android:layout_marginLeft="10dp"
                 android:drawablePadding="10dp"
                 android:textSize="20sp"
-                android:text="Departure&amp;arrival"
+                android:text="Arrival Location"
+                android:textColor="@color/black"
                 />
         </LinearLayout>
         <LinearLayout
@@ -98,13 +100,14 @@
                 />
             <TextView
                 android:id="@+id/timeview"
-                android:layout_width="150dp"
+                android:layout_width="match_parent"
                 android:layout_height="25dp"
                 android:paddingLeft="10dp"
                 android:layout_marginLeft="10dp"
                 android:drawablePadding="10dp"
                 android:textSize="20sp"
-                android:text="Departure&amp;arrival"
+                android:text="Departure Date&amp;Time"
+                android:textColor="@color/black"
                 />
         </LinearLayout>
         <LinearLayout
@@ -124,13 +127,14 @@
                 />
             <TextView
                 android:id="@+id/tripAvailableSeatsField"
-                android:layout_width="150dp"
+                android:layout_width="match_parent"
                 android:layout_height="25dp"
                 android:paddingLeft="10dp"
                 android:layout_marginLeft="10dp"
                 android:drawablePadding="10dp"
                 android:textSize="20sp"
-                android:text="Departure&amp;arrival"
+                android:text="Available Seats"
+                android:textColor="@color/black"
                 />
         </LinearLayout>
         <LinearLayout
@@ -156,7 +160,8 @@
                 android:layout_marginLeft="10dp"
                 android:drawablePadding="10dp"
                 android:textSize="20sp"
-                android:text="Departure&amp;arrival"
+                android:text="Price"
+                android:textColor="@color/black"
                 />
 
             <com.google.android.material.button.MaterialButton

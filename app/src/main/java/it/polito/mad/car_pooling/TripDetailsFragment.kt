@@ -82,8 +82,10 @@ class TripDetailsFragment : Fragment() {
     private fun loadTripInFields (trip: Trip, view: View) {
         // val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
-        val DepAriLocation = trip.depAriLocation // sharedPreferences.getString(getString(R.string.KeyDepAriLocation), "Departure&Arrival Location")
-        val DepDateTime = trip.depDateTime // sharedPreferences.getString(getString(R.string.KeyDepDateTime), "Departure Date&Time")
+        val depLocation = trip.depLocation // sharedPreferences.getString(getString(R.string.KeyDepAriLocation), "Departure&Arrival Location")
+        val ariLocation = trip.ariLocation
+        val depDate = trip.depDate // sharedPreferences.getString(getString(R.string.KeyDepDateTime), "Departure Date&Time")
+        val depTime = trip.depTime
         val EstDuration = trip.estDuration // sharedPreferences.getString(getString(R.string.KeyEstDuration), "Estimated Trip Duration")
         val AvaSeat = trip.avaSeat // sharedPreferences.getString(getString(R.string.KeyAvaSeat), "Available Seats")
         val Price = trip.price // sharedPreferences.getString(getString(R.string.KeyPrice), "Price")
@@ -93,8 +95,10 @@ class TripDetailsFragment : Fragment() {
         val TripImageUri = trip.imageUri // sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
 
 
-        requireView().findViewById<TextView>(R.id.textDepAriLocation).text = if (DepAriLocation == null || DepAriLocation.isEmpty() || DepAriLocation.isBlank()) "Departure&Arrival Location" else DepAriLocation
-        requireView().findViewById<TextView>(R.id.textDepDateTime).text = if (DepDateTime == null || DepDateTime.isEmpty() || DepDateTime.isBlank()) "Departure Date&Time" else DepDateTime
+        requireView().findViewById<TextView>(R.id.textDepLocation).text = if (depLocation == null || depLocation.isEmpty() || depLocation.isBlank()) "Departure Location" else depLocation
+        requireView().findViewById<TextView>(R.id.textAriLocation).text = if (ariLocation == null || ariLocation.isEmpty() || ariLocation.isBlank()) "Arrival Location" else ariLocation
+        requireView().findViewById<TextView>(R.id.textDepDate).text = if (depDate == null || depDate.isEmpty() || depDate.isBlank()) "Departure Date&Time" else depDate
+        requireView().findViewById<TextView>(R.id.textDepTime).text = if (depTime == null || depTime.isEmpty() || depTime.isBlank()) "Departure Date&Time" else depTime
         requireView().findViewById<TextView>(R.id.textEstDuration).text = if (EstDuration == null || EstDuration.isEmpty() || EstDuration.isBlank()) "Estimated trip duration" else EstDuration
         requireView().findViewById<TextView>(R.id.textAvaSeat).text = if (AvaSeat == null || AvaSeat.isEmpty() || AvaSeat.isBlank()) "Available Seats" else AvaSeat
         requireView().findViewById<TextView>(R.id.textPrice).text = if (Price == null || Price.isEmpty() || Price.isBlank()) "Price" else Price
