@@ -45,5 +45,12 @@
 
     <string name="KeyDetailTripId">KeyEditTripAction</string>
 
+    <string name="profileEditedSucces">Profile updated!</string>
+    <string name="tripEditedSucces">Trip updated!</string>
+    <string name="tripCreatedSucces">Trip created!</string>
+
+    <string name="cannotOpenGallery">You cannot access to gallery</string>
+    <string name="cannotOpenCamera">You cannot open camera</string>
+    <string name="problemOpeningCamera">There was a problem while taking the photo</string>
 
 </resources>

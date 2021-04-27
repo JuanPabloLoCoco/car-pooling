@@ -35,6 +35,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
@@ -112,6 +114,35 @@ class EditProfileFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when(requestCode) {
+            REQUEST_IMAGE_CAPTURE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openCamera()
+                } else {
+                    Snackbar.make(requireView(), getString(R.string.cannotOpenCamera) , Snackbar.LENGTH_SHORT)
+                            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                            .show()
+                }
+            }
+
+            REQUEST_OPEN_GALLERY -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openGallery()
+                } else {
+                    Snackbar.make(requireView(), getString(R.string.cannotOpenGallery) , Snackbar.LENGTH_SHORT)
+                            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                            .show()
+                }
+            }
+            else -> {
+                // Nothing
+            }
+        }
+    }
     // ----------------------------- Manage Shared Preferences ---------------------
     // First Load
     /*
@@ -223,7 +254,10 @@ class EditProfileFragment : Fragment() {
         when (item.itemId) {
             R.id.saveItem -> {
                 savedProfileData()
-                //Toast.makeText(requireContext(),"Saving success", Toast.LENGTH_SHORT).show()
+                Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
+                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                        .show()
+
                 val showProfileArgs = EditProfileFragmentDirections.actionEditProfileFragmentToShowProfileFragment()
 
                 if (!findNavController().popBackStack()) {
@@ -336,7 +370,10 @@ class EditProfileFragment : Fragment() {
                     imageView.setImageURI(imageUri)
                 }
             } else {
-                makeText(requireContext(), "There was a problem while taking the photo", Toast.LENGTH_SHORT).show()
+                Snackbar.make(requireView(), getString(R.string.problemOpeningCamera) , Snackbar.LENGTH_SHORT)
+                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                        .show()
+                // makeText(requireContext(), "There was a problem while taking the photo", Toast.LENGTH_SHORT).show()
             }
             //imageView.setImageURI(imageUri)
             //setPic(imageView, photoFile?.absolutePath)
