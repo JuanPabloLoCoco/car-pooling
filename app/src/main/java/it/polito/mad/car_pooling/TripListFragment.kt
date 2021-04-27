@@ -106,10 +106,9 @@ class TripCardAdapter (val tripList: List<Trip>,
     override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
         val selectedTrip: Trip = tripList[position]
 
-
-        holder.departureLocationView.text = getStringFromField(selectedTrip.depAriLocation)
-        holder.arriveLocationView.text = getStringFromField(selectedTrip.arrLocation)
-        holder.departureTimeView.text = getStringFromField(selectedTrip.depDateTime)
+        holder.departureLocationView.text = getStringFromField(selectedTrip.depLocation)
+        holder.arriveLocationView.text = getStringFromField(selectedTrip.ariLocation)
+        holder.departureTimeView.text = getStringFromField(selectedTrip.depDate + " " + selectedTrip.depTime)
         holder.priceView.text = getStringFromField(selectedTrip.price)
         holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeat)
 

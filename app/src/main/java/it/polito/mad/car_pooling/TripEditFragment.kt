@@ -1,5 +1,6 @@
 package it.polito.mad.car_pooling
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DatePickerDialog
@@ -10,6 +11,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
@@ -57,7 +59,8 @@ class TripEditFragment : Fragment() {
     val args: TripEditFragmentArgs by navArgs()
 
     lateinit var selectedTrip: Trip
-    lateinit var save_date : String
+    //lateinit var save_date : String
+    //lateinit var save_time : String
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,7 +86,8 @@ class TripEditFragment : Fragment() {
         }
         loadDataInFields(selectedTrip, view)
 
-        val editDepDateTime = view.findViewById<TextView>(R.id.textEditDepDateTime)
+        val editDepDate = view.findViewById<TextView>(R.id.textEditDepDate)
+        val editDepTime = view.findViewById<TextView>(R.id.textEditDepTime)
         /*
         val editDepAriLocation = view.findViewById<TextInputLayout>(R.id.textEditDepAriLocation)
         val editEstDuration = view.findViewById<TextInputLayout>(R.id.textEditEstDuration)
@@ -133,24 +137,28 @@ class TripEditFragment : Fragment() {
             cal.set(Calendar.YEAR, year)
             cal.set(Calendar.MONTH, monthOfYear)
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            save_date = SimpleDateFormat("dd.MM.yyyy").format(cal.time)
+            editDepDate.text = SimpleDateFormat("dd.MM.yyyy").format(cal.time)
         }
         val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
             cal.set(Calendar.HOUR_OF_DAY, hour)
             cal.set(Calendar.MINUTE, minute)
-            editDepDateTime.text = save_date + " " + SimpleDateFormat("HH:mm").format(cal.time)
+            editDepTime.text = SimpleDateFormat("HH:mm").format(cal.time)
         }
-        editDepDateTime.setOnClickListener {
-            TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+        editDepDate.setOnClickListener {
             DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        }
+        editDepTime.setOnClickListener {
+            TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
         }
 
         return view
     }
 
     private fun loadDataInFields(trip: Trip, view: View) {
-        val editDepAriLocation = view.findViewById<TextInputLayout>(R.id.textEditDepAriLocation)
-        val editDepDateTime = view.findViewById<TextView>(R.id.textEditDepDateTime)
+        val editDepLocation = view.findViewById<TextInputLayout>(R.id.textEditDepLocation)
+        val editAriLocation = view.findViewById<TextInputLayout>(R.id.textEditAriLocation)
+        val editDepDate = view.findViewById<TextView>(R.id.textEditDepDate)
+        val editDepTime = view.findViewById<TextView>(R.id.textEditDepTime)
         val editEstDuration = view.findViewById<TextInputLayout>(R.id.textEditEstDuration)
         val editAvaSeat = view.findViewById<TextInputLayout>(R.id.textEditAvaSeat)
         val editPrice = view.findViewById<TextInputLayout>(R.id.textEditPrice)
@@ -159,8 +167,13 @@ class TripEditFragment : Fragment() {
         val editPlate = view.findViewById<TextInputLayout>(R.id.textEditPlate)
         val editimageView = view.findViewById<ImageView>(R.id.imageEditCar)
 
-        editDepAriLocation.editText?.setText(trip.depAriLocation)
-        editDepDateTime.hint= trip.depDateTime
+        editDepLocation.editText?.setText(trip.depLocation)
+        editAriLocation.editText?.setText(trip.ariLocation)
+        //editDepDateTime.hint= trip.depDateTime
+        editDepDate.text = if (editDepDate.text == "Departure Date") "Departure Date" else trip.depDate
+        editDepDate.setTextColor(Color.parseColor("#9E150808"))
+        editDepTime.text = if (editDepTime.text == "Time") "Time" else trip.depTime
+        editDepTime.setTextColor(Color.parseColor("#9E150808"))
         editEstDuration.editText?.setText(trip.estDuration)
         editAvaSeat.editText?.setText(trip.avaSeat)
         editPrice.editText?.setText(trip.price)
@@ -242,8 +255,10 @@ class TripEditFragment : Fragment() {
     }
 
     fun saveDataInTrip () {
-        var editDepAriLocation = requireView().findViewById<TextInputLayout>(R.id.textEditDepAriLocation).editText?.text.toString()
-        var editDepDateTime = requireView().findViewById<TextView>(R.id.textEditDepDateTime).text.toString()
+        var editDepLocation = requireView().findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.text.toString()
+        var editAriLocation = requireView().findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.text.toString()
+        var editDepDate = requireView().findViewById<TextView>(R.id.textEditDepDate).text.toString()
+        var editDepTime = requireView().findViewById<TextView>(R.id.textEditDepTime).text.toString()
         var editEstDuration = requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration).editText?.text.toString()
         var editAvaSeat = requireView().findViewById<TextInputLayout>(R.id.textEditAvaSeat).editText?.text.toString()
         var editPrice = requireView().findViewById<TextInputLayout>(R.id.textEditPrice).editText?.text.toString()
@@ -251,8 +266,10 @@ class TripEditFragment : Fragment() {
         var editOptional = requireView().findViewById<TextInputLayout>(R.id.textEditOptional).editText?.text.toString()
         var editPlate = requireView().findViewById<TextInputLayout>(R.id.textEditPlate).editText?.text.toString()
 
-        selectedTrip.depAriLocation = editDepAriLocation//if (editDepAriLocation == storeDepAriLocation || editDepAriLocation.isEmpty()) storeDepAriLocation else editDepAriLocation
-        selectedTrip.depDateTime = editDepDateTime//if (editDepDateTime == storeDepDateTime || editDepDateTime.isEmpty()) storeDepDateTime else editDepDateTime
+        selectedTrip.depLocation = editDepLocation//if (editDepAriLocation == storeDepAriLocation || editDepAriLocation.isEmpty()) storeDepAriLocation else editDepAriLocation
+        selectedTrip.ariLocation = editAriLocation
+        selectedTrip.depDate = editDepDate//if (editDepDateTime == storeDepDateTime || editDepDateTime.isEmpty()) storeDepDateTime else editDepDateTime
+        selectedTrip.depTime = editDepTime
         selectedTrip.estDuration = editEstDuration//if (editEstDuration == storeEstDuration || editEstDuration.isEmpty()) storeEstDuration else editEstDuration
         selectedTrip.avaSeat = editAvaSeat//if (editAvaSeat == storeAvaSeat || editAvaSeat.isEmpty()) storeAvaSeat else editAvaSeat
         selectedTrip.price = editPrice//if (editPrice == storePrice || editPrice.isEmpty()) storePrice else editPrice
@@ -316,8 +333,8 @@ class TripEditFragment : Fragment() {
 
     private fun openGalleryClick() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(requireContext(),android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                val permissionsGallery = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                val permissionsGallery = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
                 requestPermissions(permissionsGallery, REQUEST_OPEN_GALLERY)
             } else {
                 openGallery()
@@ -338,10 +355,10 @@ class TripEditFragment : Fragment() {
     @SuppressLint("WrongConstant")
     private fun openCameraClick() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
-                    || checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
-                val permissionsCamera = arrayOf(android.Manifest.permission.CAMERA,
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
+                    || checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+                val permissionsCamera = arrayOf(Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 requestPermissions(permissionsCamera, REQUEST_IMAGE_CAPTURE)
             } else {
                 openCamera()

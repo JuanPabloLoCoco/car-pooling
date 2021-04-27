@@ -8,10 +8,10 @@ data class Trip (var id: Int) {
         val NEW_TRIP_ID: Int = -1
     }
 
-
-    var arrLocation: String=""
-    var depAriLocation: String = ""
-    var depDateTime: String = ""
+    var depLocation: String = ""
+    var ariLocation: String=""
+    var depDate: String = ""
+    var depTime: String = ""
     var estDuration: String = ""
     var avaSeat: String = ""
     var price: String = ""
