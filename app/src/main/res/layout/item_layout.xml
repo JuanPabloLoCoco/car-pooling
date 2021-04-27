@@ -173,12 +173,14 @@
                 android:drawablePadding="10dp"
                 android:textSize="20sp"
                 android:text="Price" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/tripCardEditTripButton"
-                style="?attr/borderlessButtonStyle"
+                style="@style/Widget.MaterialComponents.Button.Icon"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
+
 
                 android:text="Edit" />
         </LinearLayout>

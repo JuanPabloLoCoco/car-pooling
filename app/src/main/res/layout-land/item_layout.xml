@@ -94,7 +94,7 @@
                 android:paddingLeft="10dp"
                 android:text="TIME"
                 android:gravity="center_vertical"
-                android:drawableLeft="@drawable/ic_baseline_location_on_24"
+                android:drawableLeft="@drawable/ic_baseline_access_time_24"
                 />
             <TextView
                 android:id="@+id/timeview"
@@ -120,7 +120,7 @@
                 android:paddingLeft="10dp"
                 android:text="AVASEATS"
                 android:gravity="center_vertical"
-                android:drawableLeft="@drawable/ic_baseline_location_on_24"
+                android:drawableLeft="@drawable/ic_baseline_airline_seat_recline_normal_24"
                 />
             <TextView
                 android:id="@+id/tripAvailableSeatsField"
@@ -146,7 +146,7 @@
                 android:paddingLeft="10dp"
                 android:text="PRICE"
                 android:gravity="center_vertical"
-                android:drawableLeft="@drawable/ic_baseline_location_on_24"
+                android:drawableLeft="@drawable/ic_baseline_euro_24"
                 />
             <TextView
                 android:id="@+id/priceview"
@@ -161,9 +161,10 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/tripCardEditTripButton"
-                style="?attr/borderlessButtonStyle"
+                style="@style/Widget.MaterialComponents.Button.Icon"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
+
                 android:layout_gravity="right"
 
                 android:text="Edit" />
