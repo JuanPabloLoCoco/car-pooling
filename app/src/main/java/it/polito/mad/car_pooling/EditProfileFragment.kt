@@ -1,6 +1,7 @@
 package it.polito.mad.car_pooling
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.ContentResolver
 import android.content.Context
 import android.content.ContextWrapper
@@ -83,6 +84,18 @@ class EditProfileFragment : Fragment() {
         val imageButton = view.findViewById<ImageButton>(R.id.imageButton1)
         registerForContextMenu(imageButton)
         setHasOptionsMenu(true)
+
+        val editBithday = view.findViewById<TextView>(R.id.editViewBirthday)
+        val cal = Calendar.getInstance()
+        val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, monthOfYear)
+            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            editBithday.text = SimpleDateFormat("dd.MM.yyyy").format(cal.time)
+        }
+        editBithday.setOnClickListener {
+            DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        }
 
         return view
     }
@@ -186,7 +199,7 @@ class EditProfileFragment : Fragment() {
         val etNickname = view.findViewById<TextInputLayout>(R.id.editViewNickName)
         val etEmail = view.findViewById<TextInputLayout>(R.id.editViewEmail)
         val etLocation = view.findViewById<TextInputLayout>(R.id.editViewLocation)
-        val etBirthday = view.findViewById<TextInputLayout>(R.id.editViewBirthday)
+        val etBirthday = view.findViewById<TextView>(R.id.editViewBirthday)
         val etPhoneNumber = view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber)
         val editPhotoView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
 
@@ -213,7 +226,7 @@ class EditProfileFragment : Fragment() {
         etNickname.editText?.setText(etNicknameInput)
         etEmail.editText?.setText(etEmailInput)
         etLocation.editText?.setText(etLocationInput)
-        etBirthday.editText?.setText(etBirthdayInput)
+        etBirthday.text = etBirthdayInput
         etPhoneNumber.editText?.setText(etPhoneNumberInput)
 
 
@@ -233,7 +246,7 @@ class EditProfileFragment : Fragment() {
         profile.email = requireView().findViewById<TextInputLayout>(R.id.editViewEmail).editText?.text.toString()
         profile.location = requireView().findViewById<TextInputLayout>(R.id.editViewLocation).editText?.text.toString()
         profile.phoneNumber = requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString()
-        profile.birthday = requireView().findViewById<TextInputLayout>(R.id.editViewBirthday).editText?.text.toString()
+        profile.birthday = requireView().findViewById<TextView>(R.id.editViewBirthday).text.toString()
         profile.imageUri = imageUri.toString()
 
         ModelPreferencesManager.put(profile,getString(R.string.KeyProfileData))

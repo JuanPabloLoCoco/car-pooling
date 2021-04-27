@@ -123,24 +123,34 @@
                     android:inputType="textMultiLine"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/editViewBirthday"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="60dp"
-                android:hint="@string/birthday"
-                android:layout_marginBottom="10dp"
-                app:startIconDrawable="@drawable/ic_baseline_date_range_24"
-                app:startIconContentDescription="temp"
-                app:endIconMode="clear_text">
+                android:background="#20000000"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_baseline_date_range_24"
+                    tools:ignore="VectorDrawableCompat"
+                    android:layout_gravity="center"/>
+                <EditText
+                    android:id="@+id/editViewBirthday"
+                    android:focusableInTouchMode="false"
+                    android:clickable="true"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="6"
+                    android:inputType="datetime"
                     android:textSize="20sp"
-                    android:textColor="#4D000000"
-                    android:inputType="datetime"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:hint="@string/birthday"
+                    android:background="@null"
+                    android:textColorHint="#9E150808"/>
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/editViewPhoneNumber"
