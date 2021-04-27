@@ -12,10 +12,10 @@
         <action
             android:id="@+id/action_tripDetailsFragment_to_tripEditFragment"
             app:destination="@id/tripEditFragment"
-            app:enterAnim="@anim/exit_anim"
-            app:exitAnim="@anim/enter_anim"
-            app:popEnterAnim="@anim/pop_exit_anim"
-            app:popExitAnim="@anim/pop_enter_anim" />
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
         <argument
             android:name="tripId"
             app:argType="integer" />
@@ -28,10 +28,8 @@
         <action
             android:id="@+id/action_tripEditFragment_to_tripDetailsFragment"
             app:destination="@id/nav_trip"
-            app:enterAnim="@anim/enter_anim"
-            app:exitAnim="@anim/enter_anim"
-            app:popEnterAnim="@anim/pop_enter_anim"
-            app:popExitAnim="@anim/pop_exit_anim" />
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left" />
         <argument
             android:name="tripId"
             app:argType="integer"
@@ -47,17 +45,17 @@
         <action
             android:id="@+id/action_nav_list_trip_to_nav_trip"
             app:destination="@id/nav_trip"
-            app:enterAnim="@anim/enter_anim"
-            app:exitAnim="@anim/exit_anim"
-            app:popEnterAnim="@anim/pop_enter_anim"
-            app:popExitAnim="@anim/pop_exit_anim" />
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
         <action
             android:id="@+id/action_nav_list_trip_to_tripEditFragment"
             app:destination="@id/tripEditFragment"
-            app:enterAnim="@anim/enter_anim"
-            app:exitAnim="@anim/exit_anim"
-            app:popEnterAnim="@anim/pop_enter_anim"
-            app:popExitAnim="@anim/pop_exit_anim" />
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
     </fragment>
 
 
@@ -69,10 +67,10 @@
         <action
             android:id="@+id/action_showProfileFragment_to_editProfileFragment"
             app:destination="@id/nav_edit_profile"
-            app:enterAnim="@anim/pop_enter_anim"
-            app:exitAnim="@anim/pop_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
     </fragment>
 
     <fragment
@@ -83,10 +81,11 @@
         <action
             android:id="@+id/action_editProfileFragment_to_showProfileFragment"
             app:destination="@id/nav_profile"
-            app:enterAnim="@anim/exit_anim"
-            app:exitAnim="@anim/enter_anim"
-            app:popEnterAnim="@anim/pop_exit_anim"
-            app:popExitAnim="@anim/pop_enter_anim" />
+            app:enterAnim="@anim/from_left"
+            app:exitAnim="@anim/to_right" />
+        <argument
+            android:name="profileId"
+            app:argType="integer" />
     </fragment>
 
 </navigation>

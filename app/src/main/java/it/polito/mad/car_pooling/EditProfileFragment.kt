@@ -224,7 +224,12 @@ class EditProfileFragment : Fragment() {
             R.id.saveItem -> {
                 savedProfileData()
                 //Toast.makeText(requireContext(),"Saving success", Toast.LENGTH_SHORT).show()
-                findNavController().popBackStack()
+                val showProfileArgs = EditProfileFragmentDirections.actionEditProfileFragmentToShowProfileFragment()
+
+                if (!findNavController().popBackStack()) {
+                    findNavController().navigate(showProfileArgs)
+                //navigate(showProfileArgs)
+                }
                 return true
             }
         }

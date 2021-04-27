@@ -19,6 +19,7 @@ import it.polito.mad.car_pooling.models.Profile
  */
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
+    private lateinit var profile: Profile
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +38,7 @@ class ShowProfileFragment : Fragment() {
         if (storedProfile === null) {
             storedProfile = Profile("")
         }
+        profile = storedProfile
         loadProfileInFields(storedProfile, view)
     }
 
@@ -95,7 +97,8 @@ class ShowProfileFragment : Fragment() {
         return when (item.itemId){
             R.id.edit_profile -> {
                 // Here comes the arguments
-                findNavController().navigate(R.id.nav_edit_profile)
+                val editProfileArgs = ShowProfileFragmentDirections.actionShowProfileFragmentToEditProfileFragment(profile.id)
+                findNavController().navigate(editProfileArgs)
                 true
             }
             else -> super.onOptionsItemSelected(item)
