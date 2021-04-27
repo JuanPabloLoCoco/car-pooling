@@ -38,9 +38,8 @@
     <fragment
         android:id="@+id/nav_list_trip"
         android:name="it.polito.mad.car_pooling.TripListFragment"
-        android:label="fragment_trip_list"
+        android:label="@string/CarPoolingApp"
         tools:layout="@layout/fragment_trip_list"
-
         >
         <action
             android:id="@+id/action_nav_list_trip_to_nav_trip"

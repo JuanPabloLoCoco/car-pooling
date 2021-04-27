@@ -53,4 +53,9 @@
     <string name="cannotOpenCamera">You cannot open camera</string>
     <string name="problemOpeningCamera">There was a problem while taking the photo</string>
 
+    <string name="noFutureTrips">There are no future trips</string>
+
+    <string name="CarPoolingApp">MAD Carpooling APP</string>
+
+
 </resources>
