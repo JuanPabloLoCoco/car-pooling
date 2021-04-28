@@ -1,4 +1,4 @@
-package it.polito.s287288.showprofileactivity
+package it.polito.mad.car_pooling
 
 import org.junit.Test
 

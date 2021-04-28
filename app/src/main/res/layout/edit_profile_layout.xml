@@ -34,80 +34,146 @@
             app:layout_constraintTop_toTopOf="@+id/imageViewEditPhoto" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
         android:layout_weight="2"
         android:layout_marginHorizontal="15dp"
         android:paddingTop="10dp"
         android:paddingHorizontal="20dp">
 
-        <EditText
-            android:id="@+id/editViewFullName"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_vertical"
-            android:inputType="textShortMessage"
-            android:hint="@string/fullName"
-            android:textColor="#9A9797"
-            android:textSize="30sp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/editViewNickName"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_vertical"
-            android:hint="@string/nickName"
-            android:textSize="20sp"
-            android:inputType="textShortMessage"
-            android:textColor="#9A9797"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/editViewFullName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:hint="@string/fullName"
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_person_add_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
 
-        <EditText
-            android:id="@+id/editViewEmail"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_vertical"
-            android:hint="@string/email"
-            android:textSize="20sp"
-            android:inputType="textEmailAddress"
-            android:textColor="#9A9797"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:textColor="#4D000000"
+                    android:inputType="textMultiLine"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/editViewLocation"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_vertical"
-            android:hint="@string/location"
-            android:textSize="20sp"
-            android:inputType="textLongMessage"
-            android:textColor="#9A9797"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/editViewNickName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:hint="@string/nickName"
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_person_add_alt_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
 
-        <EditText
-            android:id="@+id/editViewBirthday"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_vertical"
-            android:hint="@string/birthday"
-            android:textSize="20sp"
-            android:inputType="datetime"
-            android:textColor="#9A9797"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:textColor="#4D000000"
+                    android:inputType="textMultiLine"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/editViewPhoneNumber"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:hint="@string/phoneNumber"
-            android:textSize="20sp"
-            android:inputType="phone"
-            android:textColor="#9A9797"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/editViewEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:hint="@string/email"
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_email_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
 
-    </LinearLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:textColor="#4D000000"
+                    android:inputType="textEmailAddress"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/editViewLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:hint="@string/location"
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_location_on_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:textColor="#4D000000"
+                    android:inputType="textMultiLine"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:background="#20000000"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_baseline_date_range_24"
+                    tools:ignore="VectorDrawableCompat"
+                    android:layout_gravity="center"/>
+                <EditText
+                    android:id="@+id/editViewBirthday"
+                    android:focusableInTouchMode="false"
+                    android:clickable="true"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6"
+                    android:inputType="datetime"
+                    android:textSize="20sp"
+                    android:hint="@string/birthday"
+                    android:background="@null"
+                    android:textColorHint="#9E150808"/>
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/editViewPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:hint="@string/phoneNumber"
+                android:layout_marginBottom="10dp"
+                app:startIconDrawable="@drawable/ic_baseline_contact_phone_24"
+                app:startIconContentDescription="temp"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:textColor="#4D000000"
+                    android:inputType="phone"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
 
 </LinearLayout>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    style="style/widg"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tripCard"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_margin="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageview"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/car_default" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:orientation="horizontal"
+            android:outlineSpotShadowColor="@color/lightGrayColor">
+            <TextView
+                android:id="@+id/list_title"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="180dp"
+                android:layout_height="25dp"
+                android:background="#20000000"
+                android:drawablePadding="10dp"
+                android:paddingLeft="10dp"
+                android:text="DEPATURE"
+
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/ic_baseline_location_on_24"
+
+                 />
+            <TextView
+                android:id="@+id/depatureview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:layout_marginLeft="10dp"
+                android:drawablePadding="10dp"
+                android:textSize="20sp"
+                android:text="Departure Location"
+                android:textColor="@color/black"
+                 />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:orientation="horizontal"
+            android:outlineSpotShadowColor="@color/lightGrayColor">
+            <TextView
+                android:id="@+id/list_title1"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="ARRIVAL"
+                android:background="#20000000"
+                android:drawableLeft="@drawable/ic_baseline_location_on_24"
+
+                android:textAppearance="?attr/textAppearanceHeadline1" />
+
+            <TextView
+                android:id="@+id/arriveview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:layout_marginLeft="10dp"
+                android:drawablePadding="10dp"
+                android:textSize="20sp"
+                android:text="Arrival Location"
+                android:textAppearance="?attr/textAppearanceBody2" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:orientation="horizontal"
+            android:outlineSpotShadowColor="@color/lightGrayColor">
+            <TextView
+                android:id="@+id/list_title2"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="180dp"
+                android:layout_height="25dp"
+                android:text="TIME"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:background="#20000000"
+                android:drawableLeft="@drawable/ic_baseline_access_time_24"
+                android:textAppearance="?attr/textAppearanceHeadline1" />
+
+            <TextView
+                android:id="@+id/timeview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:layout_marginLeft="10dp"
+                android:drawablePadding="10dp"
+                android:textSize="20sp"
+                android:text="Departure date&amp;time"
+                android:textAppearance="?attr/textAppearanceBody2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:orientation="horizontal"
+                    android:outlineSpotShadowColor="@color/lightGrayColor">
+                    <TextView
+                        android:id="@+id/list_title4"
+                        style='@style/TextAppearance.AppCompat.Title'
+                        android:layout_width="180dp"
+                        android:layout_height="25dp"
+                        android:text="AVALABLE"
+                        android:drawablePadding="10dp"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:background="#20000000"
+                        android:drawableLeft="@drawable/ic_baseline_airline_seat_recline_normal_24"
+                        android:textAppearance="?attr/textAppearanceHeadline1" />
+
+                    <TextView
+                        android:id="@+id/tripAvailableSeatsField"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:drawablePadding="10dp"
+                        android:textSize="20sp"
+                        android:text="Seats"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:outlineSpotShadowColor="@color/lightGrayColor">
+            <TextView
+                android:id="@+id/list_title3"
+                style='@style/TextAppearance.AppCompat.Title'
+                android:drawableLeft="@drawable/ic_baseline_euro_24"
+                android:layout_width="180dp"
+                android:layout_height="match_parent"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:background="#20000000"
+                android:text="PRICE"
+                android:textAppearance="?attr/textAppearanceHeadline1" />
+
+            <TextView
+                android:id="@+id/priceview"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:layout_marginLeft="10dp"
+                android:drawablePadding="10dp"
+                android:textSize="20sp"
+                android:text="Price"
+                android:textColor="@color/black"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/tripCardEditTripButton"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:text="Edit" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

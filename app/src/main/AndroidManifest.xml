@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="it.polito.s287288.showprofileactivity">
+    package="it.polito.mad.car_pooling">
 
-    <uses-feature android:name="android.hardware.camera"
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -16,26 +18,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShowProfileActivity">
+        <meta-data
+            android:name="com.google.android.actions"
+            android:resource="@xml/circle" />
 
-
-        <provider
-            android:authorities="it.polito.s287288.showprofileactivity.fileprovider"
-            android:name="androidx.core.content.FileProvider"
-            android:exported="false"
-            android:grantUriPermissions="true"
-            >
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"
-                ></meta-data>
-        </provider>
         <activity
-            android:name=".EditProfileActivity"
-            android:label="Edit Profile">
-
-        </activity>
-        <activity android:name=".ShowProfileActivity"
-            android:label="Profile">
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.ShowProfileActivity.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,7 +33,22 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="it.polito.mad.car_pooling.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
+        <activity
+            android:name=".EditProfileActivity"
+            android:label="Edit Profile" />
+        <activity
+            android:name=".ShowProfileActivity"
+            android:label="Profile" />
     </application>
 
 </manifest>

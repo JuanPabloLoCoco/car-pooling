@@ -1,4 +1,4 @@
-package it.polito.s287288.showprofileactivity
+package it.polito.mad.car_pooling
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

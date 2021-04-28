@@ -32,7 +32,11 @@
             android:textSize="30sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_baseline_person_24"
+            android:drawablePadding="10dp"
+            android:background="#20000000"
+            android:paddingLeft="10dp"/>
 
         <TextView
             android:id="@+id/textViewNickName"
@@ -42,7 +46,11 @@
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_baseline_person_outline_24"
+            android:drawablePadding="10dp"
+            android:background="#20000000"
+            android:paddingLeft="10dp"/>
 
         <TextView
             android:id="@+id/textViewEmail"
@@ -52,7 +60,11 @@
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_baseline_email_24"
+            android:drawablePadding="10dp"
+            android:background="#20000000"
+            android:paddingLeft="10dp"/>
 
         <TextView
             android:id="@+id/textViewLocation"
@@ -62,7 +74,11 @@
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_baseline_location_on_24"
+            android:drawablePadding="10dp"
+            android:background="#20000000"
+            android:paddingLeft="10dp"/>
 
         <TextView
             android:id="@+id/textViewBirthday"
@@ -72,7 +88,11 @@
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
             android:textColor="#000000"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_baseline_date_range_24"
+            android:drawablePadding="10dp"
+            android:background="#20000000"
+            android:paddingLeft="10dp"/>
 
         <TextView
             android:id="@+id/textViewPhoneNumber"
@@ -81,7 +101,11 @@
             android:text="@string/phoneNumber"
             android:textSize="20sp"
             android:textColor="#000000"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_baseline_contact_phone_24"
+            android:drawablePadding="10dp"
+            android:background="#20000000"
+            android:paddingLeft="10dp"/>
     </LinearLayout>
 
 </LinearLayout>

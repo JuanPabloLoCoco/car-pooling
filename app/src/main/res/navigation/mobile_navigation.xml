@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/nav_list_trip">
+    <fragment
+        android:id="@+id/nav_trip"
+        android:name="it.polito.mad.car_pooling.TripDetailsFragment"
+        android:label="Trip Details"
+        tools:layout="@layout/fragment_trip_details" >
+        <action
+            android:id="@+id/action_tripDetailsFragment_to_tripEditFragment"
+            app:destination="@id/tripEditFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+        <argument
+            android:name="tripId"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/tripEditFragment"
+        android:name="it.polito.mad.car_pooling.TripEditFragment"
+        android:label="Edit Trip Details"
+        tools:layout="@layout/fragment_trip_edit" >
+        <action
+            android:id="@+id/action_tripEditFragment_to_tripDetailsFragment"
+            app:destination="@id/nav_trip"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left" />
+        <argument
+            android:name="tripId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_list_trip"
+        android:name="it.polito.mad.car_pooling.TripListFragment"
+        android:label="@string/CarPoolingApp"
+        tools:layout="@layout/fragment_trip_list"
+        >
+        <action
+            android:id="@+id/action_nav_list_trip_to_nav_trip"
+            app:destination="@id/nav_trip"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+        <action
+            android:id="@+id/action_nav_list_trip_to_tripEditFragment"
+            app:destination="@id/tripEditFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="it.polito.mad.car_pooling.ShowProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/profile_layout">
+        <action
+            android:id="@+id/action_showProfileFragment_to_editProfileFragment"
+            app:destination="@id/nav_edit_profile"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_edit_profile"
+        android:name="it.polito.mad.car_pooling.EditProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/edit_profile_layout">
+        <action
+            android:id="@+id/action_editProfileFragment_to_showProfileFragment"
+            app:destination="@id/nav_profile"
+            app:enterAnim="@anim/from_left"
+            app:exitAnim="@anim/to_right" />
+        <argument
+            android:name="profileId"
+            app:argType="integer" />
+    </fragment>
+
+</navigation>
