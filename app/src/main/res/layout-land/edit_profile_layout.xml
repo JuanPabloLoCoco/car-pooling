@@ -149,7 +149,7 @@
                     android:textSize="20sp"
                     android:hint="@string/birthday"
                     android:background="@null"
-                    android:textColorHint="#9E150808"/>
+                    android:textColor="#54150808"/>
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout

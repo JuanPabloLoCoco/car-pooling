@@ -1,15 +1,15 @@
 package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
+import com.google.firebase.firestore.FirebaseFirestore
 import it.polito.mad.car_pooling.models.Profile
 
 /**
@@ -33,15 +33,42 @@ class ShowProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        /*
         var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))
         if (storedProfile === null) {
             storedProfile = Profile("")
         }
         profile = storedProfile
         loadProfileInFields(storedProfile, view)
+         */
+
+        val db = FirebaseFirestore.getInstance()
+        val user = db.collection("user")
+        val my_profile = user.document("my_profile")
+
+        db.collection("user").document("my_profile").get().addOnFailureListener {
+            Toast.makeText(requireContext(), "Internet Connection Error", Toast.LENGTH_LONG).show()
+        }
+
+        my_profile.addSnapshotListener { value, error ->
+            if (error != null) throw error
+            if (value != null) {
+                view.findViewById<TextView>(R.id.textViewFullName).text =value["full_name"].toString()
+                view.findViewById<TextView>(R.id.textViewNickName).text = value["nick_name"].toString()
+                view.findViewById<TextView>(R.id.textViewEmail).text = value["email"].toString()
+                view.findViewById<TextView>(R.id.textViewLocation).text = value["location"].toString()
+                view.findViewById<TextView>(R.id.textViewBirthday).text = value["birthday"].toString()
+                view.findViewById<TextView>(R.id.textViewPhoneNumber).text = value["phone_number"].toString()
+
+                val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+                imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_profile
+                           else value["image_uri"].toString()
+                view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(imageUri))
+            }
+        }
     }
 
+    /*
     private fun loadProfileInFields(profile: Profile, view: View) {
         val fullName = profile.fullName //sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName))
         val nickname = profile.nickName //sharedPreferences.getString(getString(R.string.KeyNickName), getString(R.string.nickName))
@@ -60,7 +87,7 @@ class ShowProfileFragment : Fragment() {
 
         view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(storedImageUri))
         imageUri = storedImageUri.toString()
-    }
+    } */
 
     /* This code will be deleted
     private fun readSharedPreferences (view: View) {
@@ -97,8 +124,9 @@ class ShowProfileFragment : Fragment() {
         return when (item.itemId){
             R.id.edit_profile -> {
                 // Here comes the arguments
-                val editProfileArgs = ShowProfileFragmentDirections.actionShowProfileFragmentToEditProfileFragment(profile.id)
-                findNavController().navigate(editProfileArgs)
+                //val editProfileArgs = ShowProfileFragmentDirections.actionShowProfileFragmentToEditProfileFragment(profile.id)
+                //findNavController().navigate(editProfileArgs)
+                findNavController().navigate(R.id.nav_edit_profile)
                 true
             }
             else -> super.onOptionsItemSelected(item)

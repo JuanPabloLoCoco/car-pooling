@@ -5,23 +5,19 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.util.Log
-import android.view.Menu
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.navigation.NavigationView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.firestore.FirebaseFirestore
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
-import com.google.android.material.badge.BadgeDrawable
 import it.polito.mad.car_pooling.models.Profile
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageUri: String
     private lateinit var fullName: String
 
+    //private lateinit var mAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,27 +42,41 @@ class MainActivity : AppCompatActivity() {
 
         imageUri = ""
         fullName = ""
-        readSharedPreferences()
+        //readSharedPreferences()
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-        val hView =  navView.getHeaderView(0);
-        hView.findViewById<ImageView>(R.id.nav_header_image).setImageURI(Uri.parse(imageUri))
-        hView.findViewById<TextView>(R.id.nav_header_full_name).text = fullName
+        //val hView =  navView.getHeaderView(0);
+        //hView.findViewById<ImageView>(R.id.nav_header_image).setImageURI(Uri.parse(imageUri))
+        //hView.findViewById<TextView>(R.id.nav_header_full_name).text = fullName
 
         val navController = findNavController(R.id.nav_host_fragment)
 
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_list_trip, R.id.nav_profile), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_other_list_trip, R.id.nav_list_trip, R.id.nav_profile), drawerLayout)
         // appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home, R.id.nav_profile, R.id.nav_trip), drawerLayout)
         //var badge = navController.
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        val db = FirebaseFirestore.getInstance()
+        val user = db.collection("user")
+        val my_profile = user.document("my_profile")
+        my_profile.addSnapshotListener { value, error ->
+            if (error != null) throw error
+            if (value != null) {
+                val hView =  navView.getHeaderView(0);
+                val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+                imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_profile
+                else value["image_uri"].toString()
+                hView.findViewById<ImageView>(R.id.nav_header_image).setImageURI(Uri.parse(imageUri))
+                hView.findViewById<TextView>(R.id.nav_header_full_name).text = value["full_name"].toString()
+            }
+        }
+
         //navView.findViewById<ImageView>(R.id.nav_header_image).setImageURI(Uri.parse(imageUri))
     }
-
 
     private fun readSharedPreferences() {
         val sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
