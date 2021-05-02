@@ -144,12 +144,12 @@
                     android:clickable="true"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="6"
+                    android:layout_weight="5"
                     android:inputType="datetime"
                     android:textSize="20sp"
                     android:hint="@string/birthday"
                     android:background="@null"
-                    android:textColorHint="#9E150808"/>
+                    android:textColor="#54150808"/>
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
