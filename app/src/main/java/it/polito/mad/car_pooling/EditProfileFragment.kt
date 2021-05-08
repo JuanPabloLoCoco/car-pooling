@@ -19,7 +19,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -139,19 +138,28 @@ class EditProfileFragment : Fragment() {
                         view.findViewById<TextView>(R.id.editViewBirthday).text = value["birthday"].toString()
                         view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.setText(value["phone_number"].toString())
                         val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
-                        imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) Uri.parse(default_str_profile)
-                                   else Uri.parse(value["image_uri"].toString())
-                        view.findViewById<ImageView>(R.id.imageViewEditPhoto).setImageURI(imageUri)
-                        Log.d("editProfile", "${imageUri.toString()} 1111111111")
+                        val imageView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
+                        if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
+                            imageUri = Uri.parse(default_str_profile)
+                            imageView.setImageURI(imageUri)
+                        } else {
+                            val localFile = File.createTempFile("my_profile", "jpg")
+                            val storage = Firebase.storage
+                            storage.reference.child("users/$acc_email.jpg").getFile(localFile).addOnSuccessListener {
+                                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                                imageView.setImageBitmap(bitmap)
+                            }
+                            /*val my_profile_path = sharedPreferences.getString(getString(R.string.keyMyProfile), "my profile")
+                            val bitmap = BitmapFactory.decodeFile(my_profile_path)
+                            imageView.setImageBitmap(bitmap)*/
+                        }
                     } else {
                         writeTextView(view)
-                        Log.d("editProfile", "${imageUri.toString()} 222222222222")
                     }
                 }
             }
         } else {
             writeTextView(view)
-            Log.d("editProfile", "${imageUri.toString()} 22222222")
         }
     }
 

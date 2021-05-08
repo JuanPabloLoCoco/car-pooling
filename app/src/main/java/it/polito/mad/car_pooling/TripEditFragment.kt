@@ -20,7 +20,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -130,7 +129,6 @@ class TripEditFragment : Fragment() {
                 if (check_status == "new"){
                     editimageView.setImageURI(Uri.parse(default_str_car))
                 } else {
-                    Log.w("tripEdit", "trips/$input_idx.jpg")
                     val localFile = File.createTempFile("my_trip", "jpg")
                     val storage = Firebase.storage
                     storage.reference.child("trips/$input_idx.jpg").getFile(localFile).addOnSuccessListener {
@@ -304,7 +302,8 @@ class TripEditFragment : Fragment() {
                     "plate" to editPlate.editText?.text.toString(),
                     "depDate" to editDepDate.text.toString(),
                     "depTime" to editDepTime.text.toString(),
-                    "image_uri" to imageUri.toString(),
+                        //"image_uri" to imageUri.toString(),
+                    "image_uri" to "yes",
                     "owner" to acc_email.toString()
                 )
 

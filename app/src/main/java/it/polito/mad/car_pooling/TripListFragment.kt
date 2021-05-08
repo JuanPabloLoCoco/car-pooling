@@ -1,6 +1,7 @@
 package it.polito.mad.car_pooling
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -19,7 +20,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
+import java.io.File
 
 class TripListFragment : Fragment() {
 
@@ -58,7 +62,7 @@ class TripListFragment : Fragment() {
             trip_count = 0
             for (document in documents) {
                 trip_count += 1
-                var new_trip = Trip(document.id)
+                val new_trip = Trip(document.id)
                 new_trip.depLocation = document.data["depLocation"].toString()
                 new_trip.additional = document.data["additional"].toString()
                 new_trip.ariLocation = document.data["ariLocation"].toString()
@@ -69,6 +73,7 @@ class TripListFragment : Fragment() {
                 new_trip.optional = document.data["optional"].toString()
                 new_trip.plate = document.data["plate"].toString()
                 new_trip.price = document.data["price"].toString()
+                new_trip.imageUri = document.data["image_uri"].toString()
                 tripList.add(new_trip)
             }
             if (trip_count == 0){
@@ -139,10 +144,19 @@ class TripCardAdapter (val tripList: List<Trip>,
         holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeat)
 
         val tripImageUri = selectedTrip.imageUri //sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
-
-        val uri_input = if (tripImageUri.toString() == "android.resource://it.polito.mad.car_pooling/drawable/car_default"
+        if (tripImageUri == "yes") {
+            val localFile = File.createTempFile("trip_${selectedTrip.id}", "jpg")
+            val storage = Firebase.storage
+            storage.reference.child("trips/${selectedTrip.id}.jpg").getFile(localFile).addOnSuccessListener {
+                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                holder.tripImageView.setImageBitmap(bitmap)
+            }
+        } else {
+            holder.tripImageView.setImageURI(Uri.parse("android.resource://it.polito.mad.car_pooling/drawable/car_default"))
+        }
+        /*val uri_input = if (tripImageUri.toString() == "android.resource://it.polito.mad.car_pooling/drawable/car_default"
                 || tripImageUri.toString().isEmpty()) "android.resource://it.polito.mad.car_pooling/drawable/car_default" else tripImageUri
-        holder.tripImageView.setImageURI(Uri.parse(uri_input))
+        holder.tripImageView.setImageURI(Uri.parse(uri_input))*/
 
         holder.tripCardView.setOnClickListener {
             //val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
