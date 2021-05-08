@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
 import android.icu.text.SimpleDateFormat
 import android.media.ExifInterface
 import android.net.Uri
@@ -22,7 +23,6 @@ import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -31,17 +31,12 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
+import java.io.*
 import java.util.*
-
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 class EditProfileFragment : Fragment() {
 
@@ -90,11 +85,9 @@ class EditProfileFragment : Fragment() {
         var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))
         if (storedProfile === null) {
             storedProfile = Profile("")
-
         }
         profile = storedProfile
         loadProfileInFields(storedProfile, view)
-        */
 
         val etFullName = view.findViewById<TextInputLayout>(R.id.editViewFullName)
         val etNickname = view.findViewById<TextInputLayout>(R.id.editViewNickName)
@@ -126,8 +119,62 @@ class EditProfileFragment : Fragment() {
                            else Uri.parse(value["image_uri"].toString())
                 editPhotoView.setImageURI(imageUri)
             }
+        }*/
+
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        val db = FirebaseFirestore.getInstance()
+        val users = db.collection("Users")
+        if (acc_email != "no email"){
+            val my_profile = users.document(acc_email.toString())
+            my_profile.addSnapshotListener { value, error ->
+                if (error != null) throw error
+                if (value != null) {
+                    if (value.exists()) {
+                        view.findViewById<TextInputLayout>(R.id.editViewFullName).editText?.setText(value["full_name"].toString())
+                        view.findViewById<TextInputLayout>(R.id.editViewNickName).editText?.setText(value["nick_name"].toString())
+                        view.findViewById<TextInputLayout>(R.id.editViewEmail).editText?.setText(value["email"].toString())
+                        view.findViewById<TextInputLayout>(R.id.editViewLocation).editText?.setText(value["location"].toString())
+                        view.findViewById<TextView>(R.id.editViewBirthday).text = value["birthday"].toString()
+                        view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.setText(value["phone_number"].toString())
+                        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+                        val imageView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
+                        if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
+                            imageUri = Uri.parse(default_str_profile)
+                            imageView.setImageURI(imageUri)
+                        } else {
+                            val localFile = File.createTempFile("my_profile", "jpg")
+                            val storage = Firebase.storage
+                            storage.reference.child("users/$acc_email.jpg").getFile(localFile).addOnSuccessListener {
+                                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                                imageView.setImageBitmap(bitmap)
+                            }
+                            /*val my_profile_path = sharedPreferences.getString(getString(R.string.keyMyProfile), "my profile")
+                            val bitmap = BitmapFactory.decodeFile(my_profile_path)
+                            imageView.setImageBitmap(bitmap)*/
+                        }
+                    } else {
+                        writeTextView(view)
+                    }
+                }
+            }
+        } else {
+            writeTextView(view)
         }
     }
+
+    private fun writeTextView(view: View){
+        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+        view.findViewById<TextInputLayout>(R.id.editViewFullName).editText?.setText("Full Name")
+        view.findViewById<TextInputLayout>(R.id.editViewNickName).editText?.setText("Nick Name")
+        view.findViewById<TextInputLayout>(R.id.editViewEmail).editText?.setText("Email@Address")
+        view.findViewById<TextInputLayout>(R.id.editViewLocation).editText?.setText("Location")
+        view.findViewById<TextView>(R.id.editViewBirthday).text = "Birthday"
+        view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.setText("PhoneNumber")
+        imageUri = Uri.parse(default_str_profile)
+        view.findViewById<ImageView>(R.id.imageViewEditPhoto).setImageURI(imageUri)
+    }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -289,21 +336,32 @@ class EditProfileFragment : Fragment() {
                 val inputPhoneNumber =  requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString()
                 val inputPhotoView =  imageUri.toString()
 
+                val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
                 val db = FirebaseFirestore.getInstance()
-                val user = db.collection("user")
-                val my_profile = user.document("my_profile")
+                val users = db.collection("Users")
+                val my_profile = users.document(acc_email.toString())
 
-                db.collection("user").document("my_profile").get().addOnFailureListener {
-                    Toast.makeText(requireContext(), "Internet Connection Error", Toast.LENGTH_LONG).show()
-                }
+                val imageView = requireView().findViewById<ImageView>(R.id.imageViewEditPhoto)
+                imageView.isDrawingCacheEnabled = true
+                imageView.buildDrawingCache()
+                val bitmap = (imageView.drawable as BitmapDrawable).bitmap
+                val baos = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                val data = baos.toByteArray()
+                val storage = Firebase.storage
+                val storageRef = storage.reference
+                storageRef.child("users/$acc_email.jpg").putBytes(data)
 
                 my_profile.set(mapOf("full_name" to inputFullName,
                                      "nick_name" to inputNickname,
-                                     "email" to inputEmail,
+                                     "email" to acc_email.toString(),
+                                     //"email" to inputEmail,
                                      "location" to inputLocation,
                                      "birthday" to inputBirthday,
                                      "phone_number" to inputPhoneNumber,
-                                     "image_uri" to inputPhotoView))
+                                     //"image_uri" to inputPhotoView
+                                     "image_uri" to "yes"))
 
                 //savedProfileData()
                 Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
