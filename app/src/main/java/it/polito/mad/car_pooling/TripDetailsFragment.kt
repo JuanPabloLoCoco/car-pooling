@@ -3,10 +3,10 @@ package it.polito.mad.car_pooling
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -28,44 +28,14 @@ class TripDetailsFragment : Fragment() {
         setHasOptionsMenu(true)
         imageTripUri = ""
         return inflater.inflate(R.layout.fragment_trip_details, container, false)
-
-        //val tripId = arguments?.getInt("tripId")!!.toInt()
-        /*
-        val tripId = args.tripId
-        Log.d("nav_list_trip", "${tripId} yessssssssss")
-        val db = FirebaseFirestore.getInstance()
-        db.collection("my_trip").document("trip" + (tripId).toString()).addSnapshotListener { value, error ->
-            if (error != null) throw error
-            if (value != null) {
-                requireView().findViewById<TextView>(R.id.textDepLocation).text = value["depLocation"].toString()
-                requireView().findViewById<TextView>(R.id.textAriLocation).text = value["ariLocation"].toString()
-                requireView().findViewById<TextView>(R.id.textEstDuration).text = value["estDuration"].toString()
-                requireView().findViewById<TextView>(R.id.textAvaSeat).text = value["avaSeats"].toString()
-                requireView().findViewById<TextView>(R.id.textPrice).text = value["price"].toString()
-                requireView().findViewById<TextView>(R.id.textAdditional).text = value["additional"].toString()
-                requireView().findViewById<TextView>(R.id.textOptional).text = value["optional"].toString()
-                requireView().findViewById<TextView>(R.id.textPlate).text = value["plate"].toString()
-                requireView().findViewById<TextView>(R.id.textDepDate).text = value["depDate"].toString()
-                requireView().findViewById<TextView>(R.id.textDepTime).text = value["depTime"].toString()
-                requireView().findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
-                requireView().findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
-                val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
-                imageTripUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_car
-                else value["image_uri"].toString()
-                requireView().findViewById<ImageView>(R.id.imageviewCar).setImageURI(Uri.parse(imageTripUri))
-            }
-        }
-
-         */
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val tripId = args.tripId
-        Log.d("nav_list_trip", "${tripId} yessssssssss")
         val db = FirebaseFirestore.getInstance()
-        db.collection("my_trip").document("trip" + (tripId).toString()).addSnapshotListener { value, error ->
+        db.collection("Trips").document(tripId.toString()).addSnapshotListener { value, error ->
             if (error != null) throw error
             if (value != null) {
                 view.findViewById<TextView>(R.id.textDepLocation).text = value["depLocation"].toString()
@@ -82,7 +52,7 @@ class TripDetailsFragment : Fragment() {
                 view.findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
                 val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
                 imageTripUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_car
-                else value["image_uri"].toString()
+                               else value["image_uri"].toString()
                 view.findViewById<ImageView>(R.id.imageviewCar).setImageURI(Uri.parse(imageTripUri))
             }
         }
@@ -169,9 +139,11 @@ class TripDetailsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId){
             R.id.edit_trip -> {
-                val tripId = arguments?.getInt("tripId")!!.toInt()
-                val editTripFragmentArguments = TripDetailsFragmentDirections.actionTripDetailsFragmentToTripEditFragment(tripId-1)
-                findNavController().navigate(editTripFragmentArguments)
+                val tripId = arguments?.getString("tripId")
+                //val editTripFragmentArguments = TripDetailsFragmentDirections.actionTripDetailsFragmentToTripEditFragment(tripId)
+                //findNavController().navigate(editTripFragmentArguments)
+                val bundle = bundleOf( "tripId" to tripId)
+                findNavController().navigate(R.id.action_tripDetailsFragment_to_tripEditFragment, bundle)
                 true
             }
             else -> super.onOptionsItemSelected(item)

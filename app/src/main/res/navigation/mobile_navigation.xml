@@ -18,7 +18,7 @@
             app:popExitAnim="@anim/to_right" />
         <argument
             android:name="tripId"
-            app:argType="integer" />
+            app:argType="string" />
         <action
             android:id="@+id/action_nav_trip_to_othersTripListFragment"
             app:destination="@id/nav_other_list_trip"
@@ -39,7 +39,7 @@
             app:exitAnim="@anim/to_right" />
         <argument
             android:name="tripId"
-            app:argType="integer"
+            app:argType="string"
             android:defaultValue="-1" />
         <argument
             android:name="tripCount"
@@ -108,7 +108,7 @@
     <fragment
         android:id="@+id/singInFragment"
         android:name="it.polito.mad.car_pooling.SignInFragment"
-        android:label="SingInFragment"
+        android:label="Sign In"
         tools:layout="@layout/fragment_sign_in">
         <action
             android:id="@+id/action_singInFragment_to_othersTripListFragment"

@@ -1,22 +1,18 @@
 package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.firestore.FirebaseFirestore
 import it.polito.mad.car_pooling.models.Profile
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ShowProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
     private lateinit var profile: Profile
@@ -41,31 +37,48 @@ class ShowProfileFragment : Fragment() {
         profile = storedProfile
         loadProfileInFields(storedProfile, view)
          */
-
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         val db = FirebaseFirestore.getInstance()
-        val user = db.collection("user")
-        val my_profile = user.document("my_profile")
-
-        db.collection("user").document("my_profile").get().addOnFailureListener {
-            Toast.makeText(requireContext(), "Internet Connection Error", Toast.LENGTH_LONG).show()
-        }
-
-        my_profile.addSnapshotListener { value, error ->
-            if (error != null) throw error
-            if (value != null) {
-                view.findViewById<TextView>(R.id.textViewFullName).text =value["full_name"].toString()
-                view.findViewById<TextView>(R.id.textViewNickName).text = value["nick_name"].toString()
-                view.findViewById<TextView>(R.id.textViewEmail).text = value["email"].toString()
-                view.findViewById<TextView>(R.id.textViewLocation).text = value["location"].toString()
-                view.findViewById<TextView>(R.id.textViewBirthday).text = value["birthday"].toString()
-                view.findViewById<TextView>(R.id.textViewPhoneNumber).text = value["phone_number"].toString()
-
-                val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
-                imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_profile
-                           else value["image_uri"].toString()
-                view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(imageUri))
+        val users = db.collection("Users")
+        if (acc_email != "no email"){
+            val my_profile = users.document(acc_email.toString())
+            my_profile.addSnapshotListener { value, error ->
+                if (error != null) throw error
+                if (value != null) {
+                    if (value.exists()){
+                        view.findViewById<TextView>(R.id.textViewFullName).text = value["full_name"].toString()
+                        view.findViewById<TextView>(R.id.textViewNickName).text = value["nick_name"].toString()
+                        view.findViewById<TextView>(R.id.textViewEmail).text = value["email"].toString()
+                        view.findViewById<TextView>(R.id.textViewLocation).text = value["location"].toString()
+                        view.findViewById<TextView>(R.id.textViewBirthday).text = value["birthday"].toString()
+                        view.findViewById<TextView>(R.id.textViewPhoneNumber).text = value["phone_number"].toString()
+                        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+                        imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_profile
+                                   else value["image_uri"].toString()
+                        view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(imageUri))
+                    } else {
+                        writeTextView(view)
+                        Log.d("showProfile", "${value.exists()} 11111111")
+                    }
+                }
             }
+        } else {
+            Log.d("showProfile", "22222222222")
+            writeTextView(view)
         }
+    }
+
+    private fun writeTextView(view: View){
+        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+        view.findViewById<TextView>(R.id.textViewFullName).text = "Full Name"
+        view.findViewById<TextView>(R.id.textViewNickName).text = "Nick Name"
+        view.findViewById<TextView>(R.id.textViewEmail).text = "Email@Address"
+        view.findViewById<TextView>(R.id.textViewLocation).text = "Location"
+        view.findViewById<TextView>(R.id.textViewBirthday).text = "Birthday"
+        view.findViewById<TextView>(R.id.textViewPhoneNumber).text = "PhoneNumber"
+        imageUri = default_str_profile
+        view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(imageUri))
     }
 
     /*
