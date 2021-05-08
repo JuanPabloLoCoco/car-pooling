@@ -57,5 +57,8 @@
 
     <string name="CarPoolingApp">MAD Carpooling APP</string>
 
+    <string name="keyCurrentAccount">no email</string>
+    <string name="keyMyProfile">my profile</string>
+
 
 </resources>
