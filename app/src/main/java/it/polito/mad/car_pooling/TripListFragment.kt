@@ -19,13 +19,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
-import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Trip
-import it.polito.mad.car_pooling.models.TripList
 
 class TripListFragment : Fragment() {
 
     var trip_count : Int = 0
+    var trip_total : Int = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // val  rv= requireView().findViewById<RecyclerView>(R.id.rv)
@@ -37,115 +37,59 @@ class TripListFragment : Fragment() {
 
         val fabView = view.findViewById<FloatingActionButton>(R.id.addTripFAB)
 
-        var storedTripList = ModelPreferencesManager.get<TripList>(getString(R.string.KeyTripList))
+        /*var storedTripList = ModelPreferencesManager.get<TripList>(getString(R.string.KeyTripList))
         var dataList: List<Trip>
         if (storedTripList == null) {
             dataList = listOf()
         } else {
             dataList = storedTripList.tripList
-        }
+        }*/
 
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        //var check : String = "yes"
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         val db = FirebaseFirestore.getInstance()
-        val my_trip = db.collection("my_trip")
-        //var trip_count = 0
-        my_trip.document("trip1").get()
-            .addOnSuccessListener { document ->
-                if (document.data != null) {
-                    Log.d("nav_list_trip", "Success")
-                    //check = "yes"
-                    val tripList = mutableListOf<Trip>()
-                    val db = FirebaseFirestore.getInstance()
-                    val my_trip = db.collection("my_trip")
-                    my_trip.get()
-                            .addOnSuccessListener { result ->
-                                for (document in result) {
-                                    Log.d("nav_list_trip", "${document.id} => ${document.data}")
-                                    if (document.id != "default_trip") {
-                                        var new_trip = Trip(document.id.last().toString().toInt())
-                                        new_trip.depLocation = document.data["depLocation"].toString()
-                                        new_trip.additional = document.data["additional"].toString()
-                                        new_trip.ariLocation = document.data["ariLocation"].toString()
-                                        new_trip.avaSeat = document.data["avaSeats"].toString()
-                                        new_trip.depDate = document.data["depDate"].toString()
-                                        new_trip.depTime = document.data["depTime"].toString()
-                                        new_trip.estDuration = document.data["estDuration"].toString()
-                                        new_trip.optional = document.data["optional"].toString()
-                                        new_trip.plate = document.data["plate"].toString()
-                                        new_trip.price = document.data["price"].toString()
-                                        tripList.add(new_trip)
-                                        trip_count += 1
-                                    }
-                                }
-                                val rvAdapter = TripCardAdapter(tripList, requireContext(), findNavController())
-                                reciclerView.adapter = rvAdapter
-                                requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
-                            }
-                            .addOnFailureListener { exception ->
-                                Log.d("nav_list_trip", "Error getting documents: ", exception)
-                            }
-                } else {
-                    Log.d("nav_list_trip", "No such document")
-                    //check = "no"
-                    //Log.d("nav_list_trip", "${check} whyyyyyyyyy")
-                    super.onViewCreated(view, savedInstanceState)
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("nav_list_trip", "get failed with ", exception)
-            }
+        val trips = db.collection("Trips")
+        val tripList = mutableListOf<Trip>()
 
-
+        trips.whereEqualTo("owner", acc_email).get().addOnSuccessListener { documents ->
+            trip_count = 0
+            for (document in documents) {
+                trip_count += 1
+                var new_trip = Trip(document.id)
+                new_trip.depLocation = document.data["depLocation"].toString()
+                new_trip.additional = document.data["additional"].toString()
+                new_trip.ariLocation = document.data["ariLocation"].toString()
+                new_trip.avaSeat = document.data["avaSeats"].toString()
+                new_trip.depDate = document.data["depDate"].toString()
+                new_trip.depTime = document.data["depTime"].toString()
+                new_trip.estDuration = document.data["estDuration"].toString()
+                new_trip.optional = document.data["optional"].toString()
+                new_trip.plate = document.data["plate"].toString()
+                new_trip.price = document.data["price"].toString()
+                tripList.add(new_trip)
+            }
+            if (trip_count == 0){
+                super.onViewCreated(view, savedInstanceState)
+            } else {
+                val rvAdapter = TripCardAdapter(tripList, requireContext(), findNavController())
+                reciclerView.adapter = rvAdapter
+                requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
+            }
+        }.addOnFailureListener { exception ->
+            Log.d("nav_list_trip", "Error getting documents: ", exception)
+        }
 
         //val tripCount = arguments?.getInt("tripCount")!!.toInt()
 
-        //if(dataList.isNotEmpty()){
-        /*var trip_count = 0
-        if(check == "no"){
-           return super.onViewCreated(view, savedInstanceState)
-        } else {
-            val tripList = mutableListOf<Trip>()
-            val db = FirebaseFirestore.getInstance()
-            val my_trip = db.collection("my_trip")
-            my_trip.get()
-                .addOnSuccessListener { result ->
-                    for (document in result) {
-                        Log.d("nav_list_trip", "${document.id} => ${document.data}")
-                        if (document.id != "default_trip") {
-                            var new_trip = Trip(document.id.last().toString().toInt())
-                            new_trip.depLocation = document.data["depLocation"].toString()
-                            new_trip.additional = document.data["additional"].toString()
-                            new_trip.ariLocation = document.data["ariLocation"].toString()
-                            new_trip.avaSeat = document.data["avaSeats"].toString()
-                            new_trip.depDate = document.data["depDate"].toString()
-                            new_trip.depTime = document.data["depTime"].toString()
-                            new_trip.estDuration = document.data["estDuration"].toString()
-                            new_trip.optional = document.data["optional"].toString()
-                            new_trip.plate = document.data["plate"].toString()
-                            new_trip.price = document.data["price"].toString()
-                            tripList.add(new_trip)
-                            trip_count += 1
-                        }
-                    }
-                    val rvAdapter = TripCardAdapter(tripList, requireContext(), findNavController())
-                    reciclerView.adapter = rvAdapter
-                    requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
-                }
-                .addOnFailureListener { exception ->
-                    Log.d("nav_list_trip", "Error getting documents: ", exception)
-                }
-            // display some message ,that message will on the trip detailfragment
-        }*/
-
         fabView.setOnClickListener {
             //Toast.makeText(context, "A click on FAB", Toast.LENGTH_SHORT).show()
-
             //val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(Trip.NEW_TRIP_ID)
             //findNavController().navigate(action)
-            val bundle = bundleOf("tripId" to Trip.NEW_TRIP_ID, "tripCount" to trip_count)
+            //Log.d("nav_list_trip", "${trip_total} yesssssssss")
+            val bundle = bundleOf( "newOrOld" to "new")
             findNavController().navigate(R.id.action_nav_list_trip_to_tripEditFragment, bundle)
         }
     }
@@ -161,7 +105,6 @@ class TripCardAdapter (val tripList: List<Trip>,
         val priceView = v.findViewById<TextView>(R.id.priceview)
         val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
         val tripImageView = v.findViewById<ImageView>(R.id.imageview)
-
         val tripCardView = v.findViewById<CardView>(R.id.tripCard)
         fun bind(t: Trip) {
 
@@ -202,15 +145,20 @@ class TripCardAdapter (val tripList: List<Trip>,
         holder.tripImageView.setImageURI(Uri.parse(uri_input))
 
         holder.tripCardView.setOnClickListener {
-            val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
-            navController.navigate(tripDetailArguments)
+            //val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
+            //navController.navigate(tripDetailArguments)
+            val bundle = bundleOf( "tripId" to selectedTrip.id)
+            navController.navigate(R.id.action_nav_list_trip_to_nav_trip, bundle)
         }
 
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
             // Handle navigation to edit trip detail
             // Toast.makeText(context, "Go to edit trip ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
-            val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id-1)
-            navController.navigate(action)
+            //val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id)
+            //navController.navigate(action)
+            val bundle = bundleOf( "tripId" to selectedTrip.id)
+            navController.navigate(R.id.action_nav_list_trip_to_tripEditFragment, bundle)
+            //Log.d("nav_list_trip", "${selectedTrip.id} yessssssss")
         }
     }
 

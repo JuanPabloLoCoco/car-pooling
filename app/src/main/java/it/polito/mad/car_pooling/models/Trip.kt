@@ -1,7 +1,7 @@
 package it.polito.mad.car_pooling.models
 
 // data class  Model(val name: String= "", val count: Int = 0)
-data class Trip (var id: Int) {
+data class Trip (var id: String) {
     companion object {
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
