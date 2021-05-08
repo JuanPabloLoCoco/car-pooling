@@ -2,6 +2,7 @@ package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -21,7 +22,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -80,11 +84,9 @@ class MainActivity : AppCompatActivity() {
                 if (error != null) throw error
                 if (value != null) {
                     if (value.exists()){
-                        imageUri = if (value["image_uri"].toString() == "yes" || value["image_uri"].toString().isEmpty()) default_str_profile
+                        imageUri = if (value["image_uri"].toString() != "yes" || value["image_uri"].toString().isEmpty()) default_str_profile
                                    else value["image_uri"].toString()
-                        writeDefaultValue(value["full_name"].toString(), imageUri)
-                        /*imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_profile
-                                   else value["image_uri"].toString()
+                        //writeDefaultValue(value["full_name"].toString(), imageUri)
                         val navView: NavigationView = findViewById(R.id.nav_view)
                         val hView =  navView.getHeaderView(0)
                         hView.findViewById<TextView>(R.id.nav_header_full_name).text = value["full_name"].toString()
@@ -92,23 +94,19 @@ class MainActivity : AppCompatActivity() {
                         if (imageUri == default_str_profile){
                             headerImage.setImageURI(Uri.parse(imageUri))
                         } else {
+                            val localFile = File.createTempFile("my_profile", "jpg")
                             val storage = Firebase.storage
-                            val storageRef = storage.reference
-                            val islandRef = storageRef.child("users/$acc_email.jpg")
-                            val outputDir = this.cacheDir
-                            val localFile = File.createTempFile("my_profile", "jpg", outputDir)
-                            islandRef.getFile(localFile)
-                            headerImage.setImageURI(Uri.parse(outputDir.toString()))
-                            //Log.d("main_activity", "${storageRef.child("users/$acc_email.jpg").downloadUrl} yessssssssssssss")
-                            /*
-                            val inputImage = java.net.URL(storageRef.child("users/$acc_email.jpg").downloadUrl.toString()).openStream()
-                            val image = BitmapFactory.decodeStream(inputImage)
-                            headerImage.setImageBitmap(image)
-                            Picasso.get().load(storageRef.child("users/$acc_email.jpg").downloadUrl.toString()).into(headerImage)
-                            Glide.with(this)
-                                .load(storage.reference.child("users/$acc_email.jpg"))
-                                .into(headerImage)*/
-                        }*/
+                            storage.reference.child("users/$acc_email.jpg").getFile(localFile).addOnSuccessListener {
+                                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                                headerImage.setImageBitmap(bitmap)
+                                //ModelPreferencesManager.put()
+                                val sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                                with(sharedPreferences.edit()) {
+                                    putString( getString(R.string.keyMyProfile), localFile.absolutePath.toString())
+                                    commit()
+                                }
+                            }
+                        }
                     } else {
                         writeDefaultValue("Full Name", default_str_profile)
                         //Log.d("main_activity", "${acc_email} yessssssssssssss")
@@ -118,7 +116,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } else {
-            //Log.d("main_activity", "nooooooooooooo", )
             writeDefaultValue("Full Name", default_str_profile)
         }
         /*var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))

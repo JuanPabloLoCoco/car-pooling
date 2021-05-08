@@ -1,5 +1,6 @@
 package it.polito.mad.car_pooling
 
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -11,7 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
+import java.io.File
 
 
 @Suppress("UNREACHABLE_CODE")
@@ -51,9 +55,18 @@ class TripDetailsFragment : Fragment() {
                 view.findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
                 view.findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
                 val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
-                imageTripUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_car
-                               else value["image_uri"].toString()
-                view.findViewById<ImageView>(R.id.imageviewCar).setImageURI(Uri.parse(imageTripUri))
+                val imageView = view.findViewById<ImageView>(R.id.imageviewCar)
+                if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
+                    imageTripUri = default_str_car
+                    imageView.setImageURI(Uri.parse(imageTripUri))
+                } else {
+                    val localFile = File.createTempFile("trip_$tripId", "jpg")
+                    val storage = Firebase.storage
+                    storage.reference.child("trips/$tripId.jpg").getFile(localFile).addOnSuccessListener {
+                        val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                        imageView.setImageBitmap(bitmap)
+                    }
+                }
             }
         }
 

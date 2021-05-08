@@ -16,6 +16,7 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Suppress("UNREACHABLE_CODE")
@@ -26,6 +27,7 @@ class SignInFragment : Fragment() {
     }
 
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var input_uri: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,7 +87,6 @@ class SignInFragment : Fragment() {
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
-
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         val mAuth = FirebaseAuth.getInstance()
         mAuth.signInWithCredential(credential)
@@ -97,22 +98,34 @@ class SignInFragment : Fragment() {
                     val acc = GoogleSignIn.getLastSignedInAccount(requireContext())
                     val db = FirebaseFirestore.getInstance()
                     val users = db.collection("Users")
-                    users.document(acc?.getEmail().toString()).set(
-                            mapOf("full_name" to "Full Name",
-                                    "nick_name" to "Nick Name",
-                                    "email" to acc?.getEmail().toString(),
-                                    //"email" to "Email@Address",
-                                    "location" to "Location",
-                                    "birthday" to "Birthday",
-                                    "phone_number" to "PhoneNumber",
-                                    "image_uri" to "")
-                    )
+                    val my_profile = users.document(acc?.getEmail().toString())
+
+                    my_profile.get().addOnSuccessListener {document ->
+                        if (document.data != null) {
+                            initializeFirebaseMyProfile("yes", users, acc?.getEmail().toString())
+                        } else {
+                            initializeFirebaseMyProfile("", users, acc?.getEmail().toString())
+                        }
+                    }
                     findNavController().navigate(R.id.nav_other_list_trip)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("signInFragment", "signInWithCredential:failure", task.exception)
                 }
             }
+    }
+
+    fun initializeFirebaseMyProfile(input_uri: String, user: CollectionReference, email: String){
+        user.document(email).set(
+            mapOf("full_name" to "Full Name",
+                    "nick_name" to "Nick Name",
+                    "email" to email,
+                    //"email" to "Email@Address",
+                    "location" to "Location",
+                    "birthday" to "Birthday",
+                    "phone_number" to "PhoneNumber",
+                    "image_uri" to input_uri)
+        )
     }
 
     private fun writeSharedPreferences() {

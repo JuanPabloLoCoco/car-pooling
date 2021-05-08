@@ -2,6 +2,7 @@ package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +12,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Profile
+import java.io.File
 
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
@@ -54,9 +58,21 @@ class ShowProfileFragment : Fragment() {
                         view.findViewById<TextView>(R.id.textViewBirthday).text = value["birthday"].toString()
                         view.findViewById<TextView>(R.id.textViewPhoneNumber).text = value["phone_number"].toString()
                         val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
-                        imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) default_str_profile
-                                   else value["image_uri"].toString()
-                        view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(imageUri))
+                        val imageView = view.findViewById<ImageView>(R.id.imageViewPhoto)
+                        if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
+                            imageUri = default_str_profile
+                            imageView.setImageURI(Uri.parse(imageUri))
+                        } else {
+                            val localFile = File.createTempFile("my_profile", "jpg")
+                            val storage = Firebase.storage
+                            storage.reference.child("users/$acc_email.jpg").getFile(localFile).addOnSuccessListener {
+                                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                                imageView.setImageBitmap(bitmap)
+                            }
+                            /*val my_profile_path = sharedPreferences.getString(getString(R.string.keyMyProfile), "my profile")
+                            val bitmap = BitmapFactory.decodeFile(my_profile_path)
+                            imageView.setImageBitmap(bitmap)*/
+                        }
                     } else {
                         writeTextView(view)
                         Log.d("showProfile", "${value.exists()} 11111111")
