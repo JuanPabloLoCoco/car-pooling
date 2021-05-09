@@ -1,6 +1,5 @@
 package it.polito.mad.car_pooling
 
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -11,11 +10,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
-import java.io.File
 
 
 @Suppress("UNREACHABLE_CODE")
@@ -60,11 +59,11 @@ class TripDetailsFragment : Fragment() {
                     imageTripUri = default_str_car
                     imageView.setImageURI(Uri.parse(imageTripUri))
                 } else {
-                    val localFile = File.createTempFile("trip_$tripId", "jpg")
                     val storage = Firebase.storage
-                    storage.reference.child("trips/$tripId.jpg").getFile(localFile).addOnSuccessListener {
-                        val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
-                        imageView.setImageBitmap(bitmap)
+                    val imageRef = storage.reference.child("trips/$tripId.jpg")
+                    imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                        val image_uri = Uri.toString()
+                        Glide.with(this).load(image_uri).into(imageView)
                     }
                 }
             }

@@ -1,7 +1,6 @@
 package it.polito.mad.car_pooling.Adapter
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -12,12 +11,12 @@ import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.R
 import it.polito.mad.car_pooling.models.Trip
-import java.io.File
 
 class TripCardAdapter (val tripList: List<Trip>,
                        val context: Context,
@@ -64,11 +63,16 @@ class TripCardAdapter (val tripList: List<Trip>,
 
         val tripImageUri = selectedTrip.imageUri //sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
         if (tripImageUri == "yes") {
-            val localFile = File.createTempFile("trip_${selectedTrip.id}", "jpg")
             val storage = Firebase.storage
+            /*val localFile = File.createTempFile("trip_${selectedTrip.id}", "jpg")
             storage.reference.child("trips/${selectedTrip.id}.jpg").getFile(localFile).addOnSuccessListener {
                 val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
                 holder.tripImageView.setImageBitmap(bitmap)
+            }*/
+            val imageRef = storage.reference.child("trips/${selectedTrip.id}.jpg")
+            imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                val image_uri = Uri.toString()
+                Glide.with(context).load(image_uri).into(holder.tripImageView)
             }
         } else {
             holder.tripImageView.setImageURI(Uri.parse("android.resource://it.polito.mad.car_pooling/drawable/car_default"))

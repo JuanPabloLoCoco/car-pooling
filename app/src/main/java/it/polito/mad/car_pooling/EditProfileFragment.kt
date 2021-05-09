@@ -27,6 +27,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
@@ -143,15 +144,12 @@ class EditProfileFragment : Fragment() {
                             imageUri = Uri.parse(default_str_profile)
                             imageView.setImageURI(imageUri)
                         } else {
-                            val localFile = File.createTempFile("my_profile", "jpg")
                             val storage = Firebase.storage
-                            storage.reference.child("users/$acc_email.jpg").getFile(localFile).addOnSuccessListener {
-                                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
-                                imageView.setImageBitmap(bitmap)
+                            val imageRef = storage.reference.child("users/$acc_email.jpg")
+                            imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                                val image_uri = Uri.toString()
+                                Glide.with(this).load(image_uri).into(imageView)
                             }
-                            /*val my_profile_path = sharedPreferences.getString(getString(R.string.keyMyProfile), "my profile")
-                            val bitmap = BitmapFactory.decodeFile(my_profile_path)
-                            imageView.setImageBitmap(bitmap)*/
                         }
                     } else {
                         writeTextView(view)
