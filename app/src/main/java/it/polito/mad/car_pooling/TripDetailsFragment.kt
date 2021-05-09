@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -94,11 +95,11 @@ class TripDetailsFragment : Fragment() {
                     imageTripUri = default_str_car
                     imageView.setImageURI(Uri.parse(imageTripUri))
                 } else {
-                    val localFile = File.createTempFile("trip_$tripId", "jpg")
                     val storage = Firebase.storage
-                    storage.reference.child("trips/$tripId.jpg").getFile(localFile).addOnSuccessListener {
-                        val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
-                        imageView.setImageBitmap(bitmap)
+                    val imageRef = storage.reference.child("trips/$tripId.jpg")
+                    imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                        val image_uri = Uri.toString()
+                        Glide.with(this).load(image_uri).into(imageView)
                     }
                 }
             }
