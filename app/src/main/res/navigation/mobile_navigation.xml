@@ -94,10 +94,12 @@
             app:popExitAnim="@anim/to_right" />
         <argument
             android:name="userId"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue="no email" />
         <argument
             android:name="isOwner"
-            app:argType="boolean" />
+            app:argType="boolean"
+            android:defaultValue="true" />
     </fragment>
 
     <fragment
