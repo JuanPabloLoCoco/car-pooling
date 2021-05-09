@@ -2,7 +2,6 @@ package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.opengl.Visibility
 import android.os.Bundle
@@ -12,12 +11,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import androidx.navigation.fragment.navArgs
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Profile
-import java.io.File
 
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
@@ -76,15 +75,12 @@ class ShowProfileFragment : Fragment() {
                             imageUri = default_str_profile
                             imageView.setImageURI(Uri.parse(imageUri))
                         } else {
-                            val localFile = File.createTempFile("my_profile", "jpg")
                             val storage = Firebase.storage
-                            storage.reference.child("users/$acc_email.jpg").getFile(localFile).addOnSuccessListener {
-                                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
-                                imageView.setImageBitmap(bitmap)
+                            val imageRef = storage.reference.child("users/$acc_email.jpg")
+                            imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                                val image_uri = Uri.toString()
+                                Glide.with(this).load(image_uri).into(imageView)
                             }
-                            /*val my_profile_path = sharedPreferences.getString(getString(R.string.keyMyProfile), "my profile")
-                            val bitmap = BitmapFactory.decodeFile(my_profile_path)
-                            imageView.setImageBitmap(bitmap)*/
                         }
                     } else {
                         writeTextView(view)

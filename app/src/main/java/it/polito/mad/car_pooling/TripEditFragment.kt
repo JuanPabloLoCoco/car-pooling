@@ -10,7 +10,6 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.graphics.drawable.BitmapDrawable
@@ -32,6 +31,7 @@ import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
@@ -129,16 +129,17 @@ class TripEditFragment : Fragment() {
                 if (check_status == "new"){
                     editimageView.setImageURI(Uri.parse(default_str_car))
                 } else {
-                    val localFile = File.createTempFile("my_trip", "jpg")
                     val storage = Firebase.storage
+                    /*val localFile = File.createTempFile("my_trip", "jpg")
                     storage.reference.child("trips/$input_idx.jpg").getFile(localFile).addOnSuccessListener {
                         val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
                         editimageView.setImageBitmap(bitmap)
+                    }*/
+                    val imageRef = storage.reference.child("trips/$input_idx.jpg")
+                    imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                        val image_uri = Uri.toString()
+                        Glide.with(this).load(image_uri).into(editimageView)
                     }
-                    /*Glide.with(this)
-                        //.load(storage.reference.child("trips/$input_idx.jpg"))
-                        .load(storage.reference)
-                        .into(editimageView)*/
                 }
             }
         }
@@ -265,27 +266,18 @@ class TripEditFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.save_Trip -> {
-                val editDepLocation =
-                    requireView().findViewById<TextInputLayout>(R.id.textEditDepLocation)
-                val editAriLocation =
-                    requireView().findViewById<TextInputLayout>(R.id.textEditAriLocation)
-                val editEstDuration =
-                    requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration)
+                val editDepLocation = requireView().findViewById<TextInputLayout>(R.id.textEditDepLocation)
+                val editAriLocation = requireView().findViewById<TextInputLayout>(R.id.textEditAriLocation)
+                val editEstDuration = requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration)
                 val editAvaSeat = requireView().findViewById<TextInputLayout>(R.id.textEditAvaSeat)
                 val editPrice = requireView().findViewById<TextInputLayout>(R.id.textEditPrice)
-                val editAdditional =
-                    requireView().findViewById<TextInputLayout>(R.id.textEditAdditional)
-                val editOptional =
-                    requireView().findViewById<TextInputLayout>(R.id.textEditOptional)
+                val editAdditional = requireView().findViewById<TextInputLayout>(R.id.textEditAdditional)
+                val editOptional = requireView().findViewById<TextInputLayout>(R.id.textEditOptional)
                 val editPlate = requireView().findViewById<TextInputLayout>(R.id.textEditPlate)
                 val editDepDate = requireView().findViewById<TextView>(R.id.textEditDepDate)
                 val editDepTime = requireView().findViewById<TextView>(R.id.textEditDepTime)
-                val sharedPreferences = requireContext().getSharedPreferences(
-                    getString(R.string.preference_file_key),
-                    Context.MODE_PRIVATE
-                )
-                val acc_email =
-                    sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+                val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
 
                 val db = FirebaseFirestore.getInstance()
                 val trips = db.collection("Trips")
