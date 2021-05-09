@@ -1,5 +1,6 @@
 package it.polito.mad.car_pooling
 
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
@@ -7,10 +8,14 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -22,20 +27,25 @@ import java.io.File
 class TripDetailsFragment : Fragment() {
 
     private lateinit var imageTripUri: String
-    val args: TripEditFragmentArgs by navArgs()
+    val args: TripDetailsFragmentArgs by navArgs()
     private lateinit var selectedTrip: Trip
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        setHasOptionsMenu(true)
+        val isOwner = args.isOwner
+        setHasOptionsMenu(isOwner)
         imageTripUri = ""
         return inflater.inflate(R.layout.fragment_trip_details, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (!args.isOwner) {
+            view.findViewById<TextView>(R.id.textPlate).visibility = View.INVISIBLE
+        }
 
         val tripId = args.tripId
         val db = FirebaseFirestore.getInstance()

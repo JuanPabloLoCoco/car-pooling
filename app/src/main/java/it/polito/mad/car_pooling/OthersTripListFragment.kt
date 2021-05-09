@@ -71,7 +71,7 @@ class OthersTripListFragment : Fragment() {
             if (trip_count == 0){
                 super.onViewCreated(view, savedInstanceState)
             } else {
-                val rvAdapter = TripCardAdapter(tripList, requireContext(), findNavController())
+                val rvAdapter = OthersTripCardAdapter(tripList, requireContext(), findNavController())
                 reciclerView.adapter = rvAdapter
                 requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
             }
@@ -107,9 +107,10 @@ class OthersTripListFragment : Fragment() {
     }
 }
 
-class TripCardAdapter (val tripList: List<Trip>,
+
+class OthersTripCardAdapter (val tripList: List<Trip>,
                        val context: Context,
-                       val navController: NavController): RecyclerView.Adapter<TripCardAdapter.TripCardViewHolder>() {
+                       val navController: NavController): RecyclerView.Adapter<OthersTripCardAdapter.TripCardViewHolder>() {
     class TripCardViewHolder(v: View): RecyclerView.ViewHolder (v) {
         val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
         val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
@@ -144,7 +145,6 @@ class TripCardAdapter (val tripList: List<Trip>,
     override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
         val selectedTrip: Trip = tripList[position]
 
-
         holder.departureLocationView.text = getStringFromField(selectedTrip.depLocation)
         holder.arriveLocationView.text = getStringFromField(selectedTrip.ariLocation)
         holder.departureTimeView.text = getStringFromField(selectedTrip.depDate + " " + selectedTrip.depTime)
@@ -167,23 +167,16 @@ class TripCardAdapter (val tripList: List<Trip>,
         holder.tripImageView.setImageURI(Uri.parse(uri_input))*/
 
         holder.tripCardView.setOnClickListener {
-            //val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
-            //navController.navigate(tripDetailArguments)
-            val bundle = bundleOf( "tripId" to selectedTrip.id)
-            navController.navigate(R.id.action_nav_list_trip_to_nav_trip, bundle)
+            // Handle navigation to Trip
+            val action = OthersTripListFragmentDirections.actionOthersTripListFragmentToNavTrip(tripId = selectedTrip.id, isOwner = false)
+            navController.navigate(action)
         }
 
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
-            // Handle navigation to edit trip detail
-            // Toast.makeText(context, "Go to edit trip ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
-            //val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id)
-            //navController.navigate(action)
+            // Handle navigation to Owner Profile
 
-           // val action = TripListFragmentDirections.
             val action = OthersTripListFragmentDirections.actionNavOtherListTripToNavProfile(userId=selectedTrip.owner,isOwner = false)
-            val bundle = bundleOf( "owner" to selectedTrip.id)
             navController.navigate(action)
-            //Log.d("nav_list_trip", "${selectedTrip.id} yessssssss")
         }
     }
 

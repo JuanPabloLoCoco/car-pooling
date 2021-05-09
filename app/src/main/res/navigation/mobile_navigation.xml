@@ -26,6 +26,9 @@
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
             app:popExitAnim="@anim/to_right"/>
+        <argument
+            android:name="isOwner"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/tripEditFragment"
