@@ -19,6 +19,8 @@ import com.bumptech.glide.Glide
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -122,14 +124,26 @@ class TripDetailsFragment : Fragment() {
         requestFabView.setOnClickListener {
             // A new Request from the current user to the owner of the user,should be done
             var tripRequest = TripRequest(acc_email, selectedTrip.owner, selectedTrip.id)
-
-            // Store the request in the database
-            // Show a message
-            // Return to the main page
-
-            //Log.d("POLITO", "Trip ${tripRequest}")
-            //Log.d("POLITO", "Trip data: Status: ${tripRequest.status} - creationTS: ${tripRequest.creationTimestamp}")
-
+            db.collection("TripsRequests").add(tripRequest)
+                    .addOnSuccessListener { documentReference ->
+                        // Show the message
+                        // Return to main menu
+                        Log.d("POLITO", "DocumentSnapshot written with ID: ${documentReference.id}")
+                        val message = "Trip requested!"
+                        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                                .show()
+                    }
+                    .addOnFailureListener { e ->
+                        // Show error
+                        // Return to main menu
+                        val message = "A problem occurs while creating the request"
+                        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                                .setBackgroundTint(Color.RED)
+                                .show()
+                        Log.w("POLITO", "Error adding document", e)
+                    }
         }
     }
 
