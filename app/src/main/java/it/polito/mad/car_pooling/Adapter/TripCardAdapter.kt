@@ -18,6 +18,8 @@ import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.R
 import it.polito.mad.car_pooling.models.Trip
 
+import java.io.File
+/*
 class TripCardAdapter (val tripList: List<Trip>,
                        val context: Context,
                        val navController: NavController): RecyclerView.Adapter<TripCardAdapter.TripCardViewHolder>() {
@@ -103,3 +105,5 @@ class TripCardAdapter (val tripList: List<Trip>,
         return tripList.size
     }
 }
+
+ */

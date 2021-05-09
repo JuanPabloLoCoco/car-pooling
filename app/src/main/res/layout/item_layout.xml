@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
         <ImageView
             android:id="@+id/imageview"
             android:layout_width="match_parent"
@@ -116,7 +115,6 @@
                 android:text="Departure date&amp;time"
                 android:textAppearance="?attr/textAppearanceBody2" />
         </LinearLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -205,7 +203,5 @@
                     android:text="Edit" />
             </LinearLayout>
         </LinearLayout>
-
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>
