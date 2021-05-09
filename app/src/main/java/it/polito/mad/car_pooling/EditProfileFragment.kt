@@ -50,6 +50,8 @@ class EditProfileFragment : Fragment() {
 
     private lateinit var profile: Profile
 
+    private lateinit var acc_email: String
+
     // ---------------------------- Life Cycle -----------------------
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -122,7 +124,9 @@ class EditProfileFragment : Fragment() {
         }*/
 
         val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        var acc_emailone =sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+
+        acc_email = if (acc_emailone == null) "" else acc_emailone
         val db = FirebaseFirestore.getInstance()
         val users = db.collection("Users")
         if (acc_email != "no email"){
@@ -368,7 +372,7 @@ class EditProfileFragment : Fragment() {
                         .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                         .show()
 
-                val showProfileArgs = EditProfileFragmentDirections.actionEditProfileFragmentToShowProfileFragment()
+                val showProfileArgs = EditProfileFragmentDirections.actionEditProfileFragmentToShowProfileFragment(userId = acc_email!!,isOwner=true)
 
                 if (!findNavController().popBackStack()) {
                     findNavController().navigate(showProfileArgs)

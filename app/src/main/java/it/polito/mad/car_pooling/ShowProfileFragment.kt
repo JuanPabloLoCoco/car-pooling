@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -11,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -20,13 +22,14 @@ import java.io.File
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
     private lateinit var profile: Profile
-
+    val args: ShowProfileFragmentArgs by navArgs()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        setHasOptionsMenu(true)
+        val isOwner = args.isOwner
+        setHasOptionsMenu(isOwner)
         imageUri = ""
         return inflater.inflate(R.layout.profile_layout, container, false)
     }
@@ -41,9 +44,19 @@ class ShowProfileFragment : Fragment() {
         profile = storedProfile
         loadProfileInFields(storedProfile, view)
          */
-        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        //val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val acc_email = args.userId //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        val isOwner = args.isOwner
+        if (!isOwner) {
+            view.findViewById<TextView>(R.id.textViewLocation).visibility = View.INVISIBLE
+            view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.INVISIBLE
+            view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.INVISIBLE
+
+        }
+
+
         val db = FirebaseFirestore.getInstance()
+
         val users = db.collection("Users")
         if (acc_email != "no email"){
             val my_profile = users.document(acc_email.toString())
@@ -79,7 +92,9 @@ class ShowProfileFragment : Fragment() {
                     }
                 }
             }
-        } else {
+        }
+
+        else {
             Log.d("showProfile", "22222222222")
             writeTextView(view)
         }

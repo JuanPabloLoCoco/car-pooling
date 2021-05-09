@@ -89,6 +89,12 @@
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
             app:popExitAnim="@anim/to_right" />
+        <argument
+            android:name="userId"
+            app:argType="string" />
+        <argument
+            android:name="isOwner"
+            app:argType="boolean" />
     </fragment>
 
     <fragment
@@ -122,6 +128,9 @@
         <action
             android:id="@+id/action_othersTripListFragment_to_nav_trip"
             app:destination="@id/nav_trip" />
+        <action
+            android:id="@+id/action_nav_other_list_trip_to_nav_profile"
+            app:destination="@id/nav_profile" />
     </fragment>
 
 </navigation>

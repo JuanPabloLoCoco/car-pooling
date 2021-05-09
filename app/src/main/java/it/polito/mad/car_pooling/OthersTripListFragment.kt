@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -63,7 +64,9 @@ class OthersTripListFragment : Fragment() {
                         new_trip.plate = document.data["plate"].toString()
                         new_trip.price = document.data["price"].toString()
                         new_trip.imageUri = document.data["image_uri"].toString()
+                        new_trip.owner = document.data["owner"].toString()
                         tripList.add(new_trip)
+
                     }
             if (trip_count == 0){
                 super.onViewCreated(view, savedInstanceState)
@@ -141,6 +144,7 @@ class TripCardAdapter (val tripList: List<Trip>,
     override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
         val selectedTrip: Trip = tripList[position]
 
+
         holder.departureLocationView.text = getStringFromField(selectedTrip.depLocation)
         holder.arriveLocationView.text = getStringFromField(selectedTrip.ariLocation)
         holder.departureTimeView.text = getStringFromField(selectedTrip.depDate + " " + selectedTrip.depTime)
@@ -174,8 +178,11 @@ class TripCardAdapter (val tripList: List<Trip>,
             // Toast.makeText(context, "Go to edit trip ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
             //val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id)
             //navController.navigate(action)
-            val bundle = bundleOf( "tripId" to selectedTrip.id)
-            navController.navigate(R.id.action_nav_list_trip_to_tripEditFragment, bundle)
+
+           // val action = TripListFragmentDirections.
+            val action = OthersTripListFragmentDirections.actionNavOtherListTripToNavProfile(userId=selectedTrip.owner,isOwner = false)
+            val bundle = bundleOf( "owner" to selectedTrip.id)
+            navController.navigate(action)
             //Log.d("nav_list_trip", "${selectedTrip.id} yessssssss")
         }
     }
