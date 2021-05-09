@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -45,6 +46,15 @@ class ShowProfileFragment : Fragment() {
          */
         //val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         val acc_email = args.userId //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        val isOwner = args.isOwner
+        if (!isOwner) {
+            view.findViewById<TextView>(R.id.textViewLocation).visibility = View.INVISIBLE
+            view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.INVISIBLE
+            view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.INVISIBLE
+
+        }
+
+
         val db = FirebaseFirestore.getInstance()
 
         val users = db.collection("Users")
@@ -83,40 +93,7 @@ class ShowProfileFragment : Fragment() {
                 }
             }
         }
-        if (acc_email == "no email")
-        {
-            val my_profile = users.document(acc_email.toString())
-            my_profile.addSnapshotListener { value, error ->
-                if (error != null) throw error
-                if (value != null) {
-                    if (value.exists()){
-                        view.findViewById<TextView>(R.id.textViewFullName).text = value["full_name"].toString()
-                        view.findViewById<TextView>(R.id.textViewNickName).text = value["nick_name"].toString()
-                        view.findViewById<TextView>(R.id.textViewEmail).text = value["email"].toString()
-                        view.findViewById<TextView>(R.id.textViewLocation).text = value["location"].toString()
-                        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
-                        val imageView = view.findViewById<ImageView>(R.id.imageViewPhoto)
-                        if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
-                            imageUri = default_str_profile
-                            imageView.setImageURI(Uri.parse(imageUri))
-                        } else {
-                            val localFile = File.createTempFile("my_profile", "jpg")
-                            val storage = Firebase.storage
-                            storage.reference.child("users/$acc_email.jpg").getFile(localFile).addOnSuccessListener {
-                                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
-                                imageView.setImageBitmap(bitmap)
-                            }
-                            /*val my_profile_path = sharedPreferences.getString(getString(R.string.keyMyProfile), "my profile")
-                            val bitmap = BitmapFactory.decodeFile(my_profile_path)
-                            imageView.setImageBitmap(bitmap)*/
-                        }
-                    } else {
-                        writeTextView(view)
-                        Log.d("showProfile", "${value.exists()} 11111111")
-                    }
-                }
-            }
-        }
+
         else {
             Log.d("showProfile", "22222222222")
             writeTextView(view)
