@@ -1,17 +1,27 @@
 package it.polito.mad.car_pooling
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
-import it.polito.mad.car_pooling.Adapter.TripCardAdapter
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
+import java.io.File
 
 class OthersTripListFragment : Fragment() {
 
@@ -54,12 +64,14 @@ class OthersTripListFragment : Fragment() {
                         new_trip.plate = document.data["plate"].toString()
                         new_trip.price = document.data["price"].toString()
                         new_trip.imageUri = document.data["image_uri"].toString()
+                        new_trip.owner = document.data["owner"].toString()
                         tripList.add(new_trip)
+
                     }
             if (trip_count == 0){
                 super.onViewCreated(view, savedInstanceState)
             } else {
-                val rvAdapter = TripCardAdapter(tripList, requireContext(), findNavController())
+                val rvAdapter = OthersTripCardAdapter(tripList, requireContext(), findNavController())
                 reciclerView.adapter = rvAdapter
                 requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
             }
@@ -92,5 +104,83 @@ class OthersTripListFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+}
+
+
+class OthersTripCardAdapter (val tripList: List<Trip>,
+                       val context: Context,
+                       val navController: NavController): RecyclerView.Adapter<OthersTripCardAdapter.TripCardViewHolder>() {
+    class TripCardViewHolder(v: View): RecyclerView.ViewHolder (v) {
+        val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
+        val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
+        val departureTimeView = v.findViewById<TextView>(R.id.timeview)
+        val priceView = v.findViewById<TextView>(R.id.priceview)
+        val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
+        val tripImageView = v.findViewById<ImageView>(R.id.imageview)
+        val tripCardView = v.findViewById<CardView>(R.id.tripCard)
+        fun bind(t: Trip) {
+
+        }
+
+        fun unbind() {
+
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripCardViewHolder {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false)
+        return TripCardViewHolder(v)
+    }
+
+    override fun onViewRecycled(holder: TripCardViewHolder) {
+        super.onViewRecycled(holder)
+        holder.unbind()
+    }
+
+    fun getStringFromField(field: String?): String {
+        return if (field == null) "" else field
+    }
+
+    override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
+        val selectedTrip: Trip = tripList[position]
+
+        holder.departureLocationView.text = getStringFromField(selectedTrip.depLocation)
+        holder.arriveLocationView.text = getStringFromField(selectedTrip.ariLocation)
+        holder.departureTimeView.text = getStringFromField(selectedTrip.depDate + " " + selectedTrip.depTime)
+        holder.priceView.text = getStringFromField(selectedTrip.price)
+        holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeat)
+
+        val tripImageUri = selectedTrip.imageUri //sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
+        if (tripImageUri == "yes") {
+            val localFile = File.createTempFile("trip_${selectedTrip.id}", "jpg")
+            val storage = Firebase.storage
+            storage.reference.child("trips/${selectedTrip.id}.jpg").getFile(localFile).addOnSuccessListener {
+                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                holder.tripImageView.setImageBitmap(bitmap)
+            }
+        } else {
+            holder.tripImageView.setImageURI(Uri.parse("android.resource://it.polito.mad.car_pooling/drawable/car_default"))
+        }
+        /*val uri_input = if (tripImageUri.toString() == "android.resource://it.polito.mad.car_pooling/drawable/car_default"
+                || tripImageUri.toString().isEmpty()) "android.resource://it.polito.mad.car_pooling/drawable/car_default" else tripImageUri
+        holder.tripImageView.setImageURI(Uri.parse(uri_input))*/
+
+        holder.tripCardView.setOnClickListener {
+            // Handle navigation to Trip
+            val action = OthersTripListFragmentDirections.actionOthersTripListFragmentToNavTrip(tripId = selectedTrip.id, isOwner = false)
+            navController.navigate(action)
+        }
+
+        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
+            // Handle navigation to Owner Profile
+
+            val action = OthersTripListFragmentDirections.actionNavOtherListTripToNavProfile(userId=selectedTrip.owner,isOwner = false)
+            navController.navigate(action)
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return tripList.size
     }
 }

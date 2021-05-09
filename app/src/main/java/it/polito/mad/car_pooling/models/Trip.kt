@@ -19,4 +19,5 @@ data class Trip (var id: String) {
     var optional: String = ""
     var plate: String = ""
     var imageUri: String = ""
+    var owner: String=""
 }

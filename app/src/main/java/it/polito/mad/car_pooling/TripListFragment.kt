@@ -1,21 +1,29 @@
 package it.polito.mad.car_pooling
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
-import it.polito.mad.car_pooling.Adapter.TripCardAdapter
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
+import java.io.File
 
 class TripListFragment : Fragment() {
 
@@ -92,7 +100,7 @@ class TripListFragment : Fragment() {
     }
 }
 
-/*class TripCardAdapter (val tripList: List<Trip>,
+class TripCardAdapter (val tripList: List<Trip>,
                        val context: Context,
                        val navController: NavController): RecyclerView.Adapter<TripCardAdapter.TripCardViewHolder>() {
     class TripCardViewHolder(v: View): RecyclerView.ViewHolder (v) {
@@ -152,23 +160,18 @@ class TripListFragment : Fragment() {
 
         holder.tripCardView.setOnClickListener {
             //val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
-            //navController.navigate(tripDetailArguments)
-            val bundle = bundleOf( "tripId" to selectedTrip.id)
-            navController.navigate(R.id.action_nav_list_trip_to_nav_trip, bundle)
+            val action = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id, true)
+            navController.navigate(action/*R.id.action_nav_list_trip_to_nav_trip, bundle*/)
         }
 
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
             // Handle navigation to edit trip detail
-            // Toast.makeText(context, "Go to edit trip ${selectedTrip.id}", Toast.LENGTH_SHORT).show()
-            //val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id)
-            //navController.navigate(action)
-            val bundle = bundleOf( "tripId" to selectedTrip.id)
-            navController.navigate(R.id.action_nav_list_trip_to_tripEditFragment, bundle)
-            //Log.d("nav_list_trip", "${selectedTrip.id} yessssssss")
+            val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id, 0)
+            navController.navigate(action/*R.id.action_nav_list_trip_to_tripEditFragment, bundle*/)
         }
     }
 
     override fun getItemCount(): Int {
         return tripList.size
     }
-}*/
+}
