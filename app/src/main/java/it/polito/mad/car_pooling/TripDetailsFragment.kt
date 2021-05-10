@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
@@ -15,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -25,6 +27,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
 import java.io.File
@@ -51,61 +54,105 @@ class TripDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val requestFabView = view.findViewById<FloatingActionButton>(R.id.requestTripFAB)
-        if (args.isOwner) {
-            // If i am the owner i cant request my own trip
-            requestFabView.visibility = View.INVISIBLE
-        } else {
-            // If I am not the owner I can't see the
-            view.findViewById<TextView>(R.id.textPlate).visibility = View.INVISIBLE
-        }
-
         val tripId = args.tripId
         val db = FirebaseFirestore.getInstance()
-        db.collection("Trips").document(tripId.toString()).addSnapshotListener { value, error ->
-            if (error != null) throw error
-            if (value != null) {
-                selectedTrip = Trip(tripId)
-                selectedTrip.depLocation = value["depLocation"].toString()
-                selectedTrip.ariLocation = value["ariLocation"].toString()
-                selectedTrip.estDuration = value["estDuration"].toString()
-                selectedTrip.avaSeat = value["avaSeats"].toString()
-                selectedTrip.price = value["price"].toString()
-                selectedTrip.additional = value["additional"].toString()
-                selectedTrip.optional = value["optional"].toString()
-                selectedTrip.plate = value["plate"].toString()
-                selectedTrip.depDate = value["depDate"].toString()
-                selectedTrip.depTime = value["depTime"].toString()
-                selectedTrip.owner = value["owner"].toString()
 
-                view.findViewById<TextView>(R.id.textDepLocation).text = value["depLocation"].toString()
-                view.findViewById<TextView>(R.id.textAriLocation).text = value["ariLocation"].toString()
-                view.findViewById<TextView>(R.id.textEstDuration).text = value["estDuration"].toString()
-                view.findViewById<TextView>(R.id.textAvaSeat).text = value["avaSeats"].toString()
-                view.findViewById<TextView>(R.id.textPrice).text = value["price"].toString()
-                view.findViewById<TextView>(R.id.textAdditional).text = value["additional"].toString()
-                view.findViewById<TextView>(R.id.textOptional).text = value["optional"].toString()
-                view.findViewById<TextView>(R.id.textPlate).text = value["plate"].toString()
-                view.findViewById<TextView>(R.id.textDepDate).text = value["depDate"].toString()
-                view.findViewById<TextView>(R.id.textDepTime).text = value["depTime"].toString()
-                view.findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
-                view.findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
-                val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
-                val imageView = view.findViewById<ImageView>(R.id.imageviewCar)
-                if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
-                    imageTripUri = default_str_car
-                    imageView.setImageURI(Uri.parse(imageTripUri))
-                } else {
-                    val storage = Firebase.storage
-                    val imageRef = storage.reference.child("trips/$tripId.jpg")
-                    imageRef.downloadUrl.addOnSuccessListener { Uri ->
-                        val image_uri = Uri.toString()
-                        Glide.with(this).load(image_uri).into(imageView)
+        val requestFabView = view.findViewById<FloatingActionButton>(R.id.requestTripFAB)
+        val requestTitleView = view.findViewById<TextView>(R.id.requestTextView)
+        val requestListRV = view.findViewById<RecyclerView>(R.id.requestRV)
+        val noTripsMessageView = view.findViewById<TextView>(R.id.noTripsMessageTextView)
+        val tripRequestList = mutableListOf<TripRequest>()
+
+        requestListRV.layoutManager = LinearLayoutManager(requireContext())
+        if (args.isOwner) {
+            // If i am the owner i cant request my own trip
+            requestFabView.visibility = View.GONE
+            // requestListRV.visibility = View.GONE
+            db.collection("TripsRequests")
+                .whereEqualTo("tripId", tripId)
+                .whereIn("status", mutableListOf(TripRequest.ACCEPTED, TripRequest.PENDING))
+                .addSnapshotListener { documents, error ->
+                    if (error != null) {
+                        Log.w("ERRORS", "Listen failed.", error)
+                        throw error
+                        return@addSnapshotListener
                     }
+                    if (documents == null || documents.isEmpty) {
+                        // If there are no information or the requests are empty i make invisible the RV
+                        requestListRV.visibility = View.GONE
+                    } else {
+                        noTripsMessageView.visibility = View.GONE
+                        for (document in documents) {
+                            val requester = document.data["requester"].toString()
+                            val tripOwner = document.data["tripOwner"].toString()
+                            val tripId = document.data["tripId"].toString()
+                            val creationTS = document.get("creationTimestamp") as Timestamp //.data["creationTimestamp"]
+                            val updatedTS = document.get("updateTimestamp") as Timestamp //.toString()
+                            val status = document.data["status"].toString()
+
+                            val tripRequestToAdd = TripRequest(requester, tripOwner, tripId,  creationTS, updatedTS, status)
+                            tripRequestList.add(tripRequestToAdd)
+                        }
+                        Log.d("POLITO", "Item 0: ${tripRequestList.get(0)}")
+                        val tripRequestListAdapter = TripRequestsCardAdapter(tripRequestList, requireContext(), findNavController(), db)
+                        requestListRV.adapter = tripRequestListAdapter
+                    }
+
                 }
-            }
+        } else {
+            // If I am not the owner I can't see the
+            view.findViewById<TextView>(R.id.textPlate).visibility = View.GONE
+            requestTitleView.visibility = View.GONE
+            requestListRV.visibility = View.GONE
+            noTripsMessageView.visibility = View.GONE
         }
+
+        db.collection("Trips")
+            .document(tripId.toString())
+            .addSnapshotListener { value, error ->
+                if (error != null) throw error
+                if (value != null) {
+                    selectedTrip = Trip(tripId)
+                    selectedTrip.depLocation = value["depLocation"].toString()
+                    selectedTrip.ariLocation = value["ariLocation"].toString()
+                    selectedTrip.estDuration = value["estDuration"].toString()
+                    selectedTrip.avaSeat = value["avaSeats"].toString()
+                    selectedTrip.price = value["price"].toString()
+                    selectedTrip.additional = value["additional"].toString()
+                    selectedTrip.optional = value["optional"].toString()
+                    selectedTrip.plate = value["plate"].toString()
+                    selectedTrip.depDate = value["depDate"].toString()
+                    selectedTrip.depTime = value["depTime"].toString()
+                    selectedTrip.owner = value["owner"].toString()
+
+                    view.findViewById<TextView>(R.id.textDepLocation).text = value["depLocation"].toString()
+                    view.findViewById<TextView>(R.id.textAriLocation).text = value["ariLocation"].toString()
+                    view.findViewById<TextView>(R.id.textEstDuration).text = value["estDuration"].toString()
+                    view.findViewById<TextView>(R.id.textAvaSeat).text = value["avaSeats"].toString()
+                    view.findViewById<TextView>(R.id.textPrice).text = value["price"].toString()
+                    view.findViewById<TextView>(R.id.textAdditional).text = value["additional"].toString()
+                    view.findViewById<TextView>(R.id.textOptional).text = value["optional"].toString()
+                    view.findViewById<TextView>(R.id.textPlate).text = value["plate"].toString()
+                    view.findViewById<TextView>(R.id.textDepDate).text = value["depDate"].toString()
+                    view.findViewById<TextView>(R.id.textDepTime).text = value["depTime"].toString()
+                    view.findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
+                    view.findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
+                    val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
+                    val imageView = view.findViewById<ImageView>(R.id.imageviewCar)
+                    if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
+                        imageTripUri = default_str_car
+                        imageView.setImageURI(Uri.parse(imageTripUri))
+                    } else {
+                        val storage = Firebase.storage
+                        val imageRef = storage.reference.child("trips/$tripId.jpg")
+                        imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                            val image_uri = Uri.toString()
+                            Glide.with(this).load(image_uri).into(imageView)
+                        }
+                    }
+            }
+            }
+
 
         /*
         var storedTripList = ModelPreferencesManager.get<TripList>(getString(R.string.KeyTripList))
@@ -231,5 +278,37 @@ class TripDetailsFragment : Fragment() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+}
 
+class TripRequestsCardAdapter (val tripRequestList: List<TripRequest>,
+val context: Context,
+val navController: NavController,
+val dbInstance: FirebaseFirestore): RecyclerView.Adapter<TripRequestsCardAdapter.TripRequestsViewHolder>() {
+    class TripRequestsViewHolder(v: View): RecyclerView.ViewHolder (v) {
+        val requesterAvatar = v.findViewById<ImageView>(R.id.image_request_user)
+        val requesterUser = v.findViewById<TextView>(R.id.request_user)
+        val actionMenuView = v.findViewById<ImageButton>(R.id.imageButton_3dots)
+        fun bind(t: TripRequest) {}
+        fun unbind() {}
+    }
+
+    override fun getItemCount(): Int {
+        return tripRequestList.size
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripRequestsViewHolder {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.request_user_profile_card, parent, false)
+        return TripRequestsViewHolder(v)
+    }
+
+    override fun onViewRecycled(holder: TripRequestsViewHolder) {
+        super.onViewRecycled(holder)
+        holder.unbind()
+    }
+
+    override fun onBindViewHolder(holder: TripRequestsViewHolder, position: Int) {
+        val selectedRequest : TripRequest = tripRequestList[position]
+        // We have to add to the requestTripObject the name of the requester
+        holder.requesterUser.text = selectedRequest.requester;
+    }
 }
