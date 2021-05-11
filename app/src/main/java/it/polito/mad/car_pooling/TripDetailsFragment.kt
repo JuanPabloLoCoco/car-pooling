@@ -7,9 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -68,7 +66,7 @@ class TripDetailsFragment : Fragment() {
             // If i am the owner i cant request my own trip
             requestFabView.visibility = View.GONE
             // requestListRV.visibility = View.GONE
-            db.collection("TripsRequests")
+            db.collection(TripRequest.DATA_COLLECTION)
                 .whereEqualTo("tripId", tripId)
                 .whereIn("status", mutableListOf(TripRequest.ACCEPTED, TripRequest.PENDING))
                 .addSnapshotListener { documents, error ->
@@ -82,6 +80,9 @@ class TripDetailsFragment : Fragment() {
                         requestListRV.visibility = View.GONE
                     } else {
                         noTripsMessageView.visibility = View.GONE
+                        // Limpiamos la lista
+                        tripRequestList.clear()
+
                         for (document in documents) {
                             val requester = document.data["requester"].toString()
                             val tripOwner = document.data["tripOwner"].toString()
@@ -89,12 +90,13 @@ class TripDetailsFragment : Fragment() {
                             val creationTS = document.get("creationTimestamp") as Timestamp //.data["creationTimestamp"]
                             val updatedTS = document.get("updateTimestamp") as Timestamp //.toString()
                             val status = document.data["status"].toString()
-
-                            val tripRequestToAdd = TripRequest(requester, tripOwner, tripId,  creationTS, updatedTS, status)
+                            val tripRequestId = document.id
+                            val tripRequestToAdd = TripRequest(requester, tripOwner, tripId,  creationTS, updatedTS, status, tripRequestId)
+                            Log.d("POLITO", "TripRequest id: ${tripRequestId}")
                             tripRequestList.add(tripRequestToAdd)
                         }
                         Log.d("POLITO", "Item 0: ${tripRequestList.get(0)}")
-                        val tripRequestListAdapter = TripRequestsCardAdapter(tripRequestList, requireContext(), findNavController(), db)
+                        val tripRequestListAdapter = TripRequestsCardAdapter(tripRequestList, requireContext(), findNavController(), db, view)
                         requestListRV.adapter = tripRequestListAdapter
                     }
 
@@ -283,8 +285,10 @@ class TripDetailsFragment : Fragment() {
 class TripRequestsCardAdapter (val tripRequestList: List<TripRequest>,
 val context: Context,
 val navController: NavController,
-val dbInstance: FirebaseFirestore): RecyclerView.Adapter<TripRequestsCardAdapter.TripRequestsViewHolder>() {
+val dbInstance: FirebaseFirestore,
+val generalView: View): RecyclerView.Adapter<TripRequestsCardAdapter.TripRequestsViewHolder>() {
     class TripRequestsViewHolder(v: View): RecyclerView.ViewHolder (v) {
+        val requesterCard = v.findViewById<CardView>(R.id.requesterTripCard)
         val requesterAvatar = v.findViewById<ImageView>(R.id.image_request_user)
         val requesterUser = v.findViewById<TextView>(R.id.request_user)
         val actionMenuView = v.findViewById<ImageButton>(R.id.imageButton_3dots)
@@ -310,5 +314,84 @@ val dbInstance: FirebaseFirestore): RecyclerView.Adapter<TripRequestsCardAdapter
         val selectedRequest : TripRequest = tripRequestList[position]
         // We have to add to the requestTripObject the name of the requester
         holder.requesterUser.text = selectedRequest.requester;
+
+        // holder.actionMenuView.visibility = View.GONE
+        holder.requesterCard.setOnClickListener {
+
+            // Probably is better to have something here
+            val action = TripDetailsFragmentDirections.actionNavTripToNavProfile(selectedRequest.requester, false)
+            navController.navigate(action)
+        }
+
+        if (selectedRequest.status == TripRequest.ACCEPTED) {
+            // I will not show the menu
+            holder.actionMenuView.visibility = View.GONE
+        } else {
+            holder.actionMenuView.setOnClickListener{
+                val popup = PopupMenu(context, holder.actionMenuView)
+                popup.setOnMenuItemClickListener {
+                    onMenuItemClick(it, selectedRequest)
+                }
+                val inflater: MenuInflater = popup.menuInflater
+                inflater.inflate(R.menu.request_trip_options_menu, popup.menu)
+                popup.show()
+            }
+        }
+
+
+        // Add the menu for Accept or Deny the request
+        // Set onClickListener on button to display the menu
+
+    }
+
+    private fun onMenuItemClick(item: MenuItem, selectedRequest: TripRequest): Boolean {
+        return when (item.itemId) {
+            R.id.accept_request -> {
+                selectedRequest.status = TripRequest.ACCEPTED
+                updateTripRequest(selectedRequest)
+                //Snackbar.make(generalView, "Request accepted ${selectedRequest.tripId}", Snackbar.LENGTH_SHORT)
+                //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                //        .show()
+                return true
+            }
+            R.id.reject_request -> {
+                selectedRequest.status = TripRequest.REJECTED
+                updateTripRequest(selectedRequest)
+                //Snackbar.make(generalView, "Request Rejected", Snackbar.LENGTH_SHORT)
+                //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                //        .show()
+                true
+            }
+            else -> false
+        }
+    }
+
+    private fun updateTripRequest(tripRequest: TripRequest): Unit {
+        dbInstance.collection(TripRequest.DATA_COLLECTION).document(tripRequest.id)
+            .update(mapOf(
+                "status" to tripRequest.status,
+                "updateTimestamp" to Timestamp(Date())
+            ))
+            .addOnSuccessListener {
+                if (tripRequest.status == TripRequest.ACCEPTED){
+                    Snackbar.make(generalView, "Request accepted", Snackbar.LENGTH_SHORT)
+                            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                            .show()
+                }
+            }
+            .addOnFailureListener {
+                Snackbar.make(generalView, "An error happen while updating the request", Snackbar.LENGTH_SHORT)
+                    .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                    .show()
+            }
+
+        /*
+        val washingtonRef = db.collection("cities").document("DC")
+        // Set the "isCapital" field of the city 'DC'
+        washingtonRef
+                .update("capital", true)
+                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
+                .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+        */
     }
 }
