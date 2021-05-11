@@ -55,16 +55,21 @@ class TripDetailsFragment : Fragment() {
         val tripId = args.tripId
         val db = FirebaseFirestore.getInstance()
 
+        val sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")!!
+
         val requestFabView = view.findViewById<FloatingActionButton>(R.id.requestTripFAB)
         val requestTitleView = view.findViewById<TextView>(R.id.requestTextView)
         val requestListRV = view.findViewById<RecyclerView>(R.id.requestRV)
         val noTripsMessageView = view.findViewById<TextView>(R.id.noTripsMessageTextView)
+        val statusMessageView = view.findViewById<TextView>(R.id.requestStatusTextView)
         val tripRequestList = mutableListOf<TripRequest>()
 
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
         if (args.isOwner) {
             // If i am the owner i cant request my own trip
             requestFabView.visibility = View.GONE
+            statusMessageView.visibility = View.GONE
             // requestListRV.visibility = View.GONE
             db.collection(TripRequest.DATA_COLLECTION)
                 .whereEqualTo("tripId", tripId)
@@ -107,8 +112,32 @@ class TripDetailsFragment : Fragment() {
             requestTitleView.visibility = View.GONE
             requestListRV.visibility = View.GONE
             noTripsMessageView.visibility = View.GONE
-        }
+            db.collection(TripRequest.DATA_COLLECTION)
+                .whereEqualTo("tripId", tripId)
+                .whereEqualTo("requester", acc_email)
+                .addSnapshotListener { documents, error ->
+                    if (error != null) {
+                        Log.w("ERRORS", "Listen failed.", error)
+                        throw error
+                        return@addSnapshotListener
+                    }
+                    if (documents == null || documents.isEmpty()) {
+                        // If there are no information or the requests are empty i make invisible the RV
 
+                    } else {
+                        requestFabView.visibility = View.GONE
+                        val status = documents.documents.get(0)["status"].toString()
+                        statusMessageView.visibility = View.VISIBLE
+                        val message = when (status) {
+                            TripRequest.ACCEPTED -> "Your request was accepted"
+                            TripRequest.REJECTED -> "Your request was rejected"
+                            TripRequest.PENDING -> "Your request is in pending revision"
+                            else -> "Your request is in pending revision"
+                        }
+                        statusMessageView.text = message
+                    }
+                }
+        }
         db.collection("Trips")
             .document(tripId.toString())
             .addSnapshotListener { value, error ->
@@ -167,8 +196,7 @@ class TripDetailsFragment : Fragment() {
         }*/
         //loadTripInFields(selectedTrip, view)
 
-        val sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")!!
+
 
         requestFabView.setOnClickListener {
             // A new Request from the current user to the owner of the user,should be done
@@ -384,14 +412,5 @@ val generalView: View): RecyclerView.Adapter<TripRequestsCardAdapter.TripRequest
                     .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                     .show()
             }
-
-        /*
-        val washingtonRef = db.collection("cities").document("DC")
-        // Set the "isCapital" field of the city 'DC'
-        washingtonRef
-                .update("capital", true)
-                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
-                .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
-        */
     }
 }
