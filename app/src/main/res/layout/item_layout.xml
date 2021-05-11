@@ -195,6 +195,7 @@
                 android:layout_weight="1">
 
                 <com.google.android.material.button.MaterialButton
+
                     android:id="@+id/tripCardEditTripButton"
                     style="@style/Widget.MaterialComponents.Button.Icon"
                     android:layout_width="match_parent"
@@ -202,6 +203,20 @@
                     android:layout_gravity="center"
                     android:text="Edit" />
             </LinearLayout>
+<!--            <LinearLayout-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1">-->
+
+<!--                <com.google.android.material.button.MaterialButton-->
+
+<!--                    android:id="@+id/Profile"-->
+<!--                    style="@style/Widget.MaterialComponents.Button.Icon"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:text="Profile" />-->
+<!--            </LinearLayout>-->
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
