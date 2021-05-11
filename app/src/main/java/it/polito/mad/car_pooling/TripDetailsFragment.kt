@@ -182,7 +182,7 @@ class TripDetailsFragment : Fragment() {
                         }
                     }
             }
-            }
+        }
 
 
         /*
@@ -201,15 +201,23 @@ class TripDetailsFragment : Fragment() {
         requestFabView.setOnClickListener {
             // A new Request from the current user to the owner of the user,should be done
             var tripRequest = TripRequest(acc_email, selectedTrip.owner, selectedTrip.id)
-            db.collection("TripsRequests").add(tripRequest)
+
+            val newTripRequest = mapOf(
+                    "requester" to tripRequest.requester,
+                    "tripOwner" to tripRequest.requester,
+                    "tripId" to tripRequest.tripId,
+                    "creationTimestamp" to tripRequest.creationTimestamp,
+                    "updateTimestamp" to tripRequest.updateTimestamp,
+                    "status" to tripRequest.status)
+            db.collection("TripsRequests").add(newTripRequest)
                     .addOnSuccessListener { documentReference ->
                         // Show the message
                         // Return to main menu
-                        Log.d("POLITO", "DocumentSnapshot written with ID: ${documentReference.id}")
                         val message = "Trip requested!"
                         Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
                                 .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                                 .show()
+
                     }
                     .addOnFailureListener { e ->
                         // Show error
