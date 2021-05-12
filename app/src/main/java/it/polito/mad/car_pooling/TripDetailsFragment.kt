@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -155,7 +156,19 @@ class TripDetailsFragment : Fragment() {
                     selectedTrip.depDate = value["depDate"].toString()
                     selectedTrip.depTime = value["depTime"].toString()
                     selectedTrip.owner = value["owner"].toString()
+                    selectedTrip.status = value[Trip.FIELD_STATUS].toString()
 
+
+                    if (selectedTrip.status == Trip.BLOCKED || selectedTrip.status == Trip.FULL) {
+                        if (!args.isOwner) {
+                            requestFabView.visibility = View.GONE
+                            statusMessageView.visibility = View.GONE
+                        }
+                        statusMessageView.visibility = View.VISIBLE
+                        statusMessageView.setTextColor(ContextCompat.getColor(requireContext(), R.color.design_default_color_error))
+                        statusMessageView.text = if (selectedTrip.status == Trip.BLOCKED) "The trip is blocked" else "The trip is full"
+                    }
+                    
                     view.findViewById<TextView>(R.id.textDepLocation).text = value["depLocation"].toString()
                     view.findViewById<TextView>(R.id.textAriLocation).text = value["ariLocation"].toString()
                     view.findViewById<TextView>(R.id.textEstDuration).text = value["estDuration"].toString()

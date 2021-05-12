@@ -19,13 +19,16 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.*
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.fragment.app.Fragment
@@ -66,9 +69,58 @@ class TripEditFragment : Fragment() {
         //val tripId = args.tripId
         val tripId = arguments?.getString("tripId")
         val tripNewOrNot = arguments?.getString("newOrOld")
+        val db = FirebaseFirestore.getInstance()
 
-        if (tripNewOrNot == "new") (activity as AppCompatActivity).supportActionBar?.title = "Create new trip"
+        val editDepLocation = view.findViewById<TextInputLayout>(R.id.textEditDepLocation)
+        val editAriLocation = view.findViewById<TextInputLayout>(R.id.textEditAriLocation)
+        val editEstDuration = view.findViewById<TextInputLayout>(R.id.textEditEstDuration)
+        val editAvaSeat = view.findViewById<TextInputLayout>(R.id.textEditAvaSeat)
+        val editPrice = view.findViewById<TextInputLayout>(R.id.textEditPrice)
+        val editAdditional = view.findViewById<TextInputLayout>(R.id.textEditAdditional)
+        val editOptional = view.findViewById<TextInputLayout>(R.id.textEditOptional)
+        val editPlate = view.findViewById<TextInputLayout>(R.id.textEditPlate)
+        val editimageView = view.findViewById<ImageView>(R.id.imageEditCar)
+        val editDepDate = view.findViewById<TextView>(R.id.textEditDepDate)
+        val editDepTime = view.findViewById<TextView>(R.id.textEditDepTime)
+        val blockTripButton = view.findViewById<Button>(R.id.blockTripButton)
 
+        var input_idx : String
+        if (tripNewOrNot == "new") {
+            (activity as AppCompatActivity).supportActionBar?.title = "Create new trip"
+            check_status = "new"
+            input_idx = "default_trip"
+            blockTripButton.visibility = View.GONE
+        } else {
+            check_status = "old"
+            input_idx = tripId.toString()
+            //loadDataInFields(selectedTrip, view)
+            blockTripButton.setOnClickListener {
+                // Change status of trip to BLOCK
+                // Change all the request that have status PENDING -> REJECTED
+                // Do not display the requestFAB on the button
+                blockTripButton.isEnabled = false
+                db.collection(Trip.DATA_COLLECTION)
+                    .document(tripId!!)
+                    .update(
+                            mapOf(Trip.FIELD_STATUS to Trip.BLOCKED)
+                    )
+                    .addOnSuccessListener {
+                        // Change all the request that have status PENDING -> REJECT
+                        Snackbar.make(view, "The trip was succesfully blocked", Snackbar.LENGTH_SHORT)
+                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                                .show()
+
+                    }
+                    .addOnFailureListener {
+                        blockTripButton.isEnabled = true
+                        Snackbar.make(view, "An error happen while updating the trip", Snackbar.LENGTH_SHORT)
+                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                                .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.design_default_color_error))
+                                .show()
+                    }
+                Log.d("POLITO", "We need to block this trip")
+            }
+        }
         /*if (tripId == Trip.NEW_TRIP_ID) {
             selectedTrip = Trip(Trip.NEW_TRIP_ID)
             (activity as AppCompatActivity).supportActionBar?.title = "Create new trip"
@@ -83,29 +135,11 @@ class TripEditFragment : Fragment() {
             }
         } */
 
-        val editDepLocation = view.findViewById<TextInputLayout>(R.id.textEditDepLocation)
-        val editAriLocation = view.findViewById<TextInputLayout>(R.id.textEditAriLocation)
-        val editEstDuration = view.findViewById<TextInputLayout>(R.id.textEditEstDuration)
-        val editAvaSeat = view.findViewById<TextInputLayout>(R.id.textEditAvaSeat)
-        val editPrice = view.findViewById<TextInputLayout>(R.id.textEditPrice)
-        val editAdditional = view.findViewById<TextInputLayout>(R.id.textEditAdditional)
-        val editOptional = view.findViewById<TextInputLayout>(R.id.textEditOptional)
-        val editPlate = view.findViewById<TextInputLayout>(R.id.textEditPlate)
-        val editimageView = view.findViewById<ImageView>(R.id.imageEditCar)
-        val editDepDate = view.findViewById<TextView>(R.id.textEditDepDate)
-        val editDepTime = view.findViewById<TextView>(R.id.textEditDepTime)
 
-        var input_idx : String
-        if ((activity as AppCompatActivity).supportActionBar?.title == "Create new trip") {
-            check_status = "new"
-            input_idx = "default_trip"
-        } else {
-            check_status = "old"
-            input_idx = tripId.toString()
-            //loadDataInFields(selectedTrip, view)
-        }
 
-        val db = FirebaseFirestore.getInstance()
+
+
+
         val trips = db.collection("Trips")
         val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
         trips.document(input_idx).addSnapshotListener { value, error ->

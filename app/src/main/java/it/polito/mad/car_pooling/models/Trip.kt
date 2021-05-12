@@ -6,6 +6,11 @@ data class Trip (var id: String) {
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
         val NEW_TRIP_ID: Int = -1
+        val OPEN = "OPEN"
+        val BLOCKED = "BLOCKED"
+        val FULL = "FULL"
+        val DATA_COLLECTION = "Trips"
+        val FIELD_STATUS = "status"
     }
 
     var depLocation: String = ""
@@ -20,4 +25,5 @@ data class Trip (var id: String) {
     var plate: String = ""
     var imageUri: String = ""
     var owner: String=""
+    var status: String = OPEN
 }
