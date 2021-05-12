@@ -1,6 +1,9 @@
 package it.polito.mad.car_pooling
 
+import android.app.Activity
+import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -8,28 +11,25 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.clearFragmentResultListener
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
+import it.polito.mad.car_pooling.models.TripList
 import java.io.File
+import java.io.FilterReader
 
 
-class OthersTripListFragment : Fragment() ,SearchView.OnQueryTextListener{
+class OthersTripListFragment : Fragment() {
 
     var trip_count : Int = 0
     lateinit var  tripList :List<Trip>
-    lateinit var filterTripList:MutableList<Trip>
     lateinit var mSearchText: EditText
     private lateinit var itemList :MutableList <Trip>
     lateinit var adapter: OthersTripCardAdapter
@@ -82,12 +82,11 @@ class OthersTripListFragment : Fragment() ,SearchView.OnQueryTextListener{
 
                     }
                     tripList=tripListdb.toList()
-                    filterTripList=tripListdb.toMutableList()
             if (trip_count == 0){
                 super.onViewCreated(view, savedInstanceState)
             } else {
 
-                adapter = OthersTripCardAdapter(filterTripList, requireContext(), findNavController())
+                adapter = OthersTripCardAdapter(tripList, requireContext(), findNavController())
                 reciclerView.adapter = adapter
 
 
@@ -105,45 +104,59 @@ class OthersTripListFragment : Fragment() ,SearchView.OnQueryTextListener{
         }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
+        inflater.inflate(R.menu.search_menu, menu)
+         val searchMenuItem = menu.findItem(R.id.search_button)
+//        searchMenuItem.expandActionView()
+        //menu.findItem()
+        Log.d("POLITO", "search menu item ${searchMenuItem}")
+         val searchView =searchMenuItem.actionView as SearchView
+      //if (searchView != null) {
+          searchView.setQueryHint("search view hint")
+      //}
+      Log.d("POLITO", "Is null ${searchView}")
+      searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
 
-   inflater.inflate(R.menu.search_menu, menu)
+          override fun onQueryTextChange(newText: String?): Boolean {
+              Log.d("POLITO", "${newText}")
+              adapter.filter.filter(newText)
+              return false
+          }
+          override fun onQueryTextSubmit(charString: String?): Boolean {
+              return false
+          }
 
 
-         val search =menu?.findItem(R.id.searchbutton)
-         val searchView =search?.actionView as? SearchView
-         searchView?.isSubmitButtonEnabled =true
-         searchView?.setOnQueryTextListener(this)
-        return super.onCreateOptionsMenu(menu, inflater)
+      })
+            return super.onCreateOptionsMenu(menu, inflater)
 
    }
-    override fun onQueryTextSubmit(query: String?): Boolean {
-//        TODO("not yet implement")
-         if (query !=null){
-       searchDatabase(query)
-        }
-        return true
-
-    }
-
-    override fun onQueryTextChange(query: String?): Boolean {
-
-        if (query !=null){
-        searchDatabase(query)
-        }
-        return true
-
-        }
-    private  fun searchDatabase(query: String){
-        filterTripList=tripList.filter {
-            query in it.depLocation
-        }.toMutableList()
-        adapter.tripList= filterTripList.toList()
+//     fun onQueryTextSubmit(query: String?): Boolean {
+////        TODO("not yet implement")
+//         if (query !=null){
+//       searchDatabase(query)
+//        }
+//        return true
+//
+//    }
+//
+//     fun onQueryTextChange(query: String?): Boolean {
+//
+//        if (query !=null){
+//        searchDatabase(query)
+//        }
+//        return true
+//
+//        }
+//    private  fun searchDatabase(query: String){
+//        filterTripList=tripList.filter {
+//            query in it.depLocation
+//        }.toMutableList()
+//        adapter.tripList= filterTripList.toList()
 //        var searchList:MutableList<Trip> =ArrayList()
 //            for (d in itemList )
-
-
-
-     }
+//     }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -212,12 +225,17 @@ class OthersTripListFragment : Fragment() ,SearchView.OnQueryTextListener{
 //        })
 //    }
 
-class OthersTripCardAdapter (
-    var tripList: List<Trip>,
+class OthersTripCardAdapter(
+        var tripList: List<Trip>,
+        val context: Context,
+        val navController: NavController): RecyclerView.Adapter<OthersTripCardAdapter.TripCardViewHolder>(), Filterable {
+        var tripFilterList: List<Trip> = tripList
 
-    val context: Context,
-    val navController: NavController): RecyclerView.Adapter<OthersTripCardAdapter.TripCardViewHolder>() {
-    class TripCardViewHolder(v: View): RecyclerView.ViewHolder (v) {
+                init {
+                    tripFilterList = tripList
+                }
+
+    class TripCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
         val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
         val departureTimeView = v.findViewById<TextView>(R.id.timeview)
@@ -258,10 +276,11 @@ class OthersTripCardAdapter (
 //            list.let {
 //                myAdapeter.setDate(it)
 //            }
-
+//
 //        })
-
+//
 //    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripCardViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false)
         return TripCardViewHolder(v)
@@ -277,7 +296,7 @@ class OthersTripCardAdapter (
     }
 
     override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
-        val selectedTrip: Trip = tripList[position]
+        val selectedTrip: Trip = tripFilterList[position]
 
         holder.departureLocationView.text = getStringFromField(selectedTrip.depLocation)
         holder.arriveLocationView.text = getStringFromField(selectedTrip.ariLocation)
@@ -306,17 +325,101 @@ class OthersTripCardAdapter (
             val action = OthersTripListFragmentDirections.actionOthersTripListFragmentToNavTrip(tripId = selectedTrip.id, isOwner = false)
             navController.navigate(action)
         }
-        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).text= "Profile"
+        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).text = "Profile"
 
-        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
+        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener {
             // Handle navigation to Owner Profile
 
-            val action = OthersTripListFragmentDirections.actionNavOtherListTripToNavProfile(userId=selectedTrip.owner,isOwner = false)
+            val action = OthersTripListFragmentDirections.actionNavOtherListTripToNavProfile(userId = selectedTrip.owner, isOwner = false)
             navController.navigate(action)
+        }
+
+
+    }
+
+
+    override fun getItemCount(): Int {
+        return tripFilterList.size
+    }
+
+    override fun getFilter(): Filter {
+        return object :Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                var charSearch = constraint.toString().toLowerCase()
+                tripFilterList =tripList
+                if(charSearch.isEmpty()){
+
+                }else{
+                    tripFilterList=tripList.filter { it ->
+                        // Write more filterign conditions here
+                        charSearch in it.depLocation.toLowerCase() ||
+                        charSearch in it.ariLocation.toLowerCase() ||
+                        charSearch in it.depTime.toLowerCase()     ||
+                        charSearch in it.price.toLowerCase()
+                    }
+                }
+                var filterResults= FilterResults()
+                filterResults.values =tripFilterList
+                return filterResults
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                tripFilterList=results?.values as List<Trip>
+                notifyDataSetChanged()
+            }
+
         }
     }
 
-    override fun getItemCount(): Int {
-        return tripList.size
+//    override fun getFilter(): Filter {
+//        return object : Filter() {
+//            fun publishResults(charSequence: CharSequence?, filterResults: FilterResults) {
+//                    tripList =filterResults.values as List<Trip>
+//                    notifyDataSetChanged()
+//
+//            }
+//            fun performFiltering(charSequence: CharSequence: CharSequence):FilterResults {
+//                val queryString = charSequence.toStrung().toLowerCase()
+//                val filterResults =FilterResults()
+//                filterResults.values if (queryString== null||queryString.isEmpty())
+//                    tripList
+//                else{
+//                    tripList.filter{
+//                        it.depLocation?.toLowerCase()!.contains(queryString) ||
+//                        it.depDate?.toLowerCase()!.contains(queryString)||
+//                        it.avaSeat?.toLowerCase()!.contains(queryString)||
+//                        it.ariLocation?.toLowerCase()!.contains(queryString)
+//                    }
+//                    return filterResults
+//                }
+//            }
+//
+//        }
+
+//    }
+
+
+}
+
+class  SearchResultsActivity :Activity(){
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        handleIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent != null) {
+            if (Intent.ACTION_SEARCH == intent.action){
+                val query =intent.getStringExtra(SearchManager.QUERY)
+            }
+        }
+
     }
 }
+
+
+
