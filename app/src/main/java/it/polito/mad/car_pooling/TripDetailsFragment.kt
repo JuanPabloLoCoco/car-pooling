@@ -148,8 +148,8 @@ class TripDetailsFragment : Fragment() {
                     selectedTrip.depLocation = value["depLocation"].toString()
                     selectedTrip.ariLocation = value["ariLocation"].toString()
                     selectedTrip.estDuration = value["estDuration"].toString()
-                    selectedTrip.avaSeat = value["avaSeats"].toString()
-                    selectedTrip.price = value["price"].toString()
+                    selectedTrip.avaSeats = (value["avaSeats"] as Long).toInt()
+                    selectedTrip.price = value["price"] as Double
                     selectedTrip.additional = value["additional"].toString()
                     selectedTrip.optional = value["optional"].toString()
                     selectedTrip.plate = value["plate"].toString()
@@ -283,7 +283,7 @@ class TripDetailsFragment : Fragment() {
         val depDate = trip.depDate // sharedPreferences.getString(getString(R.string.KeyDepDateTime), "Departure Date&Time")
         val depTime = trip.depTime
         val EstDuration = trip.estDuration // sharedPreferences.getString(getString(R.string.KeyEstDuration), "Estimated Trip Duration")
-        val AvaSeat = trip.avaSeat // sharedPreferences.getString(getString(R.string.KeyAvaSeat), "Available Seats")
+        val AvaSeat = trip.avaSeats // sharedPreferences.getString(getString(R.string.KeyAvaSeat), "Available Seats")
         val Price = trip.price // sharedPreferences.getString(getString(R.string.KeyPrice), "Price")
         val Additional = trip.additional //sharedPreferences.getString(getString(R.string.KeyAdditional), "Additional Information")
         val Optional = trip.optional // sharedPreferences.getString(getString(R.string.KeyOptional), "Optional intermediates")
@@ -296,8 +296,8 @@ class TripDetailsFragment : Fragment() {
         requireView().findViewById<TextView>(R.id.textDepDate).text = if (depDate.isEmpty() || depDate.isBlank()) "Departure Date&Time" else depDate
         requireView().findViewById<TextView>(R.id.textDepTime).text = if (depTime.isEmpty() || depTime.isBlank()) "Departure Date&Time" else depTime
         requireView().findViewById<TextView>(R.id.textEstDuration).text = if (EstDuration.isEmpty() || EstDuration.isBlank()) "Estimated trip duration" else EstDuration
-        requireView().findViewById<TextView>(R.id.textAvaSeat).text = if (AvaSeat.isEmpty() || AvaSeat.isBlank()) "Available Seats" else AvaSeat
-        requireView().findViewById<TextView>(R.id.textPrice).text = if (Price.isEmpty() || Price.isBlank()) "Price" else Price
+        requireView().findViewById<TextView>(R.id.textAvaSeat).text = AvaSeat.toString()
+        requireView().findViewById<TextView>(R.id.textPrice).text = Price.toString()
         requireView().findViewById<TextView>(R.id.textAdditional).text = if (Additional.isEmpty() || Additional.isBlank()) "Additional Information" else Additional
         requireView().findViewById<TextView>(R.id.textOptional).text = if (Optional.isEmpty() || Optional.isBlank()) "Optional Intermediates" else Optional
         requireView().findViewById<TextView>(R.id.textPlate).text = if (Plate.isEmpty() || Plate.isBlank()) "Plate Number" else Plate
