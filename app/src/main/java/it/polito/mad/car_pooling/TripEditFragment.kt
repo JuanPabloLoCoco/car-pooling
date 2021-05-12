@@ -43,6 +43,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Trip
+import it.polito.mad.car_pooling.models.TripRequest
 import java.io.*
 import java.util.*
 
@@ -108,9 +109,21 @@ class TripEditFragment : Fragment() {
                     )
                     .addOnSuccessListener {
                         // Change all the request that have status PENDING -> REJECT
-                        Snackbar.make(view, "The trip was succesfully blocked", Snackbar.LENGTH_SHORT)
-                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                                .show()
+                        db.collection(TripRequest.DATA_COLLECTION)
+                            .whereEqualTo("status", TripRequest.PENDING)
+                            .whereEqualTo("tripId", tripId)
+                            .get()
+                            .addOnSuccessListener {documents ->
+                                for (document in documents) {
+                                    val tripRequestId = document.id
+                                    db.collection(TripRequest.DATA_COLLECTION)
+                                        .document(tripRequestId)
+                                        .update(mapOf("status" to TripRequest.REJECTED))
+                                }
+                                Snackbar.make(view, "The trip was succesfully blocked", Snackbar.LENGTH_SHORT)
+                                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                                        .show()
+                            }
 
                     }
                     .addOnFailureListener {

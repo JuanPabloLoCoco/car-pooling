@@ -71,6 +71,7 @@ class TripDetailsFragment : Fragment() {
 
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
 
+        // Read the Trip data
         db.collection("Trips")
             .document(tripId.toString())
             .addSnapshotListener { value, error ->
@@ -90,18 +91,7 @@ class TripDetailsFragment : Fragment() {
                     selectedTrip.owner = value["owner"].toString()
                     selectedTrip.status = value[Trip.FIELD_STATUS].toString()
 
-                    view.findViewById<TextView>(R.id.textDepLocation).text = value["depLocation"].toString()
-                    view.findViewById<TextView>(R.id.textAriLocation).text = value["ariLocation"].toString()
-                    view.findViewById<TextView>(R.id.textEstDuration).text = value["estDuration"].toString()
-                    view.findViewById<TextView>(R.id.textAvaSeat).text = value["avaSeats"].toString()
-                    view.findViewById<TextView>(R.id.textPrice).text = value["price"].toString()
-                    view.findViewById<TextView>(R.id.textAdditional).text = value["additional"].toString()
-                    view.findViewById<TextView>(R.id.textOptional).text = value["optional"].toString()
-                    view.findViewById<TextView>(R.id.textPlate).text = value["plate"].toString()
-                    view.findViewById<TextView>(R.id.textDepDate).text = value["depDate"].toString()
-                    view.findViewById<TextView>(R.id.textDepTime).text = value["depTime"].toString()
-                    view.findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
-                    view.findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
+                    loadTripInFields(selectedTrip, view)
                     val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
                     val imageView = view.findViewById<ImageView>(R.id.imageviewCar)
                     if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
@@ -116,6 +106,98 @@ class TripDetailsFragment : Fragment() {
                         }
                     }
 
+                    if (args.isOwner) {
+                        // Is owner
+                        // Get the request for the trip
+                        db.collection(TripRequest.DATA_COLLECTION)
+                            .whereEqualTo("tripId", tripId)
+                            .whereIn("status", mutableListOf(TripRequest.ACCEPTED, TripRequest.PENDING))
+                            .addSnapshotListener { documents, error ->
+                                if (error != null) {
+                                    Log.w("ERRORS", "Listen failed.", error)
+                                    throw error
+                                    return@addSnapshotListener
+                                }
+                                if (documents == null || documents.isEmpty) {
+                                    // If there are no information or the requests are empty i make invisible the RV
+                                    requestListRV.visibility = View.GONE
+                                } else {
+                                    noTripsMessageView.visibility = View.GONE
+                                    // Limpiamos la lista
+                                    tripRequestList.clear()
+                                    for (document in documents) {
+                                        val requester = document.data["requester"].toString()
+                                        val tripOwner = document.data["tripOwner"].toString()
+                                        val newTripId = document.data["tripId"].toString()
+                                        val creationTS = document.get("creationTimestamp") as Timestamp //.data["creationTimestamp"]
+                                        val updatedTS = document.get("updateTimestamp") as Timestamp //.toString()
+                                        val status = document.data["status"].toString()
+                                        val tripRequestId = document.id
+                                        val tripRequestToAdd = TripRequest(requester, tripOwner, newTripId,  creationTS, updatedTS, status, tripRequestId)
+                                        Log.d("POLITO", "TripRequest id: ${tripRequestId}")
+                                        tripRequestList.add(tripRequestToAdd)
+                                    }
+
+                                    Log.d("POLITO", "Item 0: ${tripRequestList.get(0)}")
+                                    val tripRequestListAdapter = TripRequestsCardAdapter(tripRequestList, requireContext(), findNavController(), db, view, selectedTrip)
+                                    requestListRV.adapter = tripRequestListAdapter
+
+
+                                }
+                            }
+
+                        // I dont want to request the trip
+                        requestFabView.visibility = View.GONE
+
+                        // I dont want to see the status of my Request
+                        statusMessageView.visibility = View.GONE
+
+                        if (selectedTrip.status == Trip.BLOCKED || selectedTrip.status == Trip.FULL) {
+                            statusMessageView.visibility = View.VISIBLE
+                            statusMessageView.setTextColor(ContextCompat.getColor(requireContext(), R.color.design_default_color_error))
+                            statusMessageView.text = if (selectedTrip.status == Trip.BLOCKED) "The trip is blocked" else "The trip is full"
+                        }
+
+                    } else {
+                        // Is not owner
+                        if (selectedTrip.status == Trip.BLOCKED || selectedTrip.status == Trip.FULL || selectedTrip.avaSeats == 0) {
+                            requestFabView.visibility = View.GONE
+                        }
+                        // I can't see owners messages
+                        requestTitleView.visibility = View.GONE
+                        requestListRV.visibility = View.GONE
+                        noTripsMessageView.visibility = View.GONE
+                        // I want to get my request.
+                        // If i have it, i want my status
+                        // If i don't, don't show status
+                        db.collection(TripRequest.DATA_COLLECTION)
+                            .whereEqualTo("tripId", tripId)
+                            .whereEqualTo("requester", acc_email)
+                            .addSnapshotListener { documents, error ->
+                                if (error != null) {
+                                    Log.w("ERRORS", "Listen failed.", error)
+                                    throw error
+                                    return@addSnapshotListener
+                                }
+                                if (documents == null || documents.isEmpty()) {
+                                    // If there are no information or the requests are empty i make invisible the RV
+                                } else {
+                                    requestFabView.visibility = View.GONE
+                                    val status = documents.documents.get(0)["status"].toString()
+                                    val message = when (status) {
+                                        TripRequest.ACCEPTED -> "Your request was accepted"
+                                        TripRequest.REJECTED -> "Your request was rejected"
+                                        TripRequest.PENDING -> "Your request is in pending revision"
+                                        else -> "Your request is in pending revision"
+                                    }
+                                    statusMessageView.text = message
+                                    statusMessageView.visibility = View.VISIBLE
+                                }
+                            }
+                    }
+
+                    //  ------------- TO see later --------------
+                    /*
                     if (selectedTrip.status == Trip.BLOCKED || selectedTrip.status == Trip.FULL) {
                         if (!args.isOwner) {
                             requestFabView.visibility = View.GONE
@@ -133,76 +215,9 @@ class TripDetailsFragment : Fragment() {
                         statusMessageView.text = "The trip is full"
                     }
 
-                    if (args.isOwner) {
-                        // If i am the owner i cant request my own trip
-                        requestFabView.visibility = View.GONE
-                        statusMessageView.visibility = View.GONE
-                        // requestListRV.visibility = View.GONE
-                        db.collection(TripRequest.DATA_COLLECTION)
-                            .whereEqualTo("tripId", tripId)
-                            .whereIn("status", mutableListOf(TripRequest.ACCEPTED, TripRequest.PENDING))
-                            .addSnapshotListener { documents, error ->
-                                if (error != null) {
-                                    Log.w("ERRORS", "Listen failed.", error)
-                                    throw error
-                                    return@addSnapshotListener
-                                }
-                                if (documents == null || documents.isEmpty) {
-                                    // If there are no information or the requests are empty i make invisible the RV
-                                    requestListRV.visibility = View.GONE
-                                } else {
-                                    noTripsMessageView.visibility = View.GONE
-                                    // Limpiamos la lista
-                                    tripRequestList.clear()
+                     */
+                    // -------------------------------------------
 
-                                    for (document in documents) {
-                                        val requester = document.data["requester"].toString()
-                                        val tripOwner = document.data["tripOwner"].toString()
-                                        val newTripId = document.data["tripId"].toString()
-                                        val creationTS = document.get("creationTimestamp") as Timestamp //.data["creationTimestamp"]
-                                        val updatedTS = document.get("updateTimestamp") as Timestamp //.toString()
-                                        val status = document.data["status"].toString()
-                                        val tripRequestId = document.id
-                                        val tripRequestToAdd = TripRequest(requester, tripOwner, newTripId,  creationTS, updatedTS, status, tripRequestId)
-                                        Log.d("POLITO", "TripRequest id: ${tripRequestId}")
-                                        tripRequestList.add(tripRequestToAdd)
-                                    }
-                                    Log.d("POLITO", "Item 0: ${tripRequestList.get(0)}")
-                                    val tripRequestListAdapter = TripRequestsCardAdapter(tripRequestList, requireContext(), findNavController(), db, view, selectedTrip)
-                                    requestListRV.adapter = tripRequestListAdapter
-                                }
-                            }
-                    } else {
-                        // If I am not the owner I can't see the
-                        view.findViewById<TextView>(R.id.textPlate).visibility = View.GONE
-                        requestTitleView.visibility = View.GONE
-                        requestListRV.visibility = View.GONE
-                        noTripsMessageView.visibility = View.GONE
-                        db.collection(TripRequest.DATA_COLLECTION)
-                            .whereEqualTo("tripId", tripId)
-                            .whereEqualTo("requester", acc_email)
-                            .addSnapshotListener { documents, error ->
-                                    if (error != null) {
-                                        Log.w("ERRORS", "Listen failed.", error)
-                                        throw error
-                                        return@addSnapshotListener
-                                    }
-                                    if (documents == null || documents.isEmpty()) {
-                                        // If there are no information or the requests are empty i make invisible the RV
-                                    } else {
-                                        requestFabView.visibility = View.GONE
-                                        val status = documents.documents.get(0)["status"].toString()
-                                        statusMessageView.visibility = View.VISIBLE
-                                        val message = when (status) {
-                                            TripRequest.ACCEPTED -> "Your request was accepted"
-                                            TripRequest.REJECTED -> "Your request was rejected"
-                                            TripRequest.PENDING -> "Your request is in pending revision"
-                                            else -> "Your request is in pending revision"
-                                        }
-                                        statusMessageView.text = message
-                                    }
-                                }
-                    }
                 }
             }
 
@@ -223,7 +238,7 @@ class TripDetailsFragment : Fragment() {
 
             val newTripRequest = mapOf(
                 "requester" to tripRequest.requester,
-                "tripOwner" to tripRequest.requester,
+                "tripOwner" to tripRequest.tripOwner,
                 "tripId" to tripRequest.tripId,
                 "creationTimestamp" to tripRequest.creationTimestamp,
                 "updateTimestamp" to tripRequest.updateTimestamp,
@@ -239,7 +254,6 @@ class TripDetailsFragment : Fragment() {
                     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
                             .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                             .show()
-
                 }
                 .addOnFailureListener { e ->
                     // Show error
@@ -284,41 +298,19 @@ class TripDetailsFragment : Fragment() {
     //}
 
     private fun loadTripInFields (trip: Trip, view: View) {
-        /*
-        // val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        view.findViewById<TextView>(R.id.textDepLocation).text = trip.depLocation //value["depLocation"].toString()
+        view.findViewById<TextView>(R.id.textAriLocation).text = trip.ariLocation //value["ariLocation"].toString()
+        view.findViewById<TextView>(R.id.textEstDuration).text = trip.estDuration // ["estDuration"].toString()
+        view.findViewById<TextView>(R.id.textAvaSeat).text = trip.avaSeats.toString() // ["avaSeats"].toString()
+        view.findViewById<TextView>(R.id.textPrice).text = trip.price.toString() //value["price"].toString()
+        view.findViewById<TextView>(R.id.textAdditional).text = trip.additional //value["additional"].toString()
+        view.findViewById<TextView>(R.id.textOptional).text = trip.optional //value["optional"].toString()
+        view.findViewById<TextView>(R.id.textPlate).text = trip.plate //value["plate"].toString()
+        view.findViewById<TextView>(R.id.textDepDate).text = trip.depDate //value["depDate"].toString()
+        view.findViewById<TextView>(R.id.textDepTime).text = trip.depTime //value["depTime"].toString()
+        view.findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
+        view.findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
 
-        val depLocation = trip.depLocation // sharedPreferences.getString(getString(R.string.KeyDepAriLocation), "Departure&Arrival Location")
-        val ariLocation = trip.ariLocation
-        val depDate = trip.depDate // sharedPreferences.getString(getString(R.string.KeyDepDateTime), "Departure Date&Time")
-        val depTime = trip.depTime
-        val EstDuration = trip.estDuration // sharedPreferences.getString(getString(R.string.KeyEstDuration), "Estimated Trip Duration")
-        val AvaSeat = trip.avaSeats // sharedPreferences.getString(getString(R.string.KeyAvaSeat), "Available Seats")
-        val Price = trip.price // sharedPreferences.getString(getString(R.string.KeyPrice), "Price")
-        val Additional = trip.additional //sharedPreferences.getString(getString(R.string.KeyAdditional), "Additional Information")
-        val Optional = trip.optional // sharedPreferences.getString(getString(R.string.KeyOptional), "Optional intermediates")
-        val Plate = trip.plate // sharedPreferences.getString(getString(R.string.KeyPlate), "Plate Number")
-        val TripImageUri = trip.imageUri // sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
-
-
-        requireView().findViewById<TextView>(R.id.textDepLocation).text = if (depLocation.isEmpty() || depLocation.isBlank()) "Departure Location" else depLocation
-        requireView().findViewById<TextView>(R.id.textAriLocation).text = if (ariLocation.isEmpty() || ariLocation.isBlank()) "Arrival Location" else ariLocation
-        requireView().findViewById<TextView>(R.id.textDepDate).text = if (depDate.isEmpty() || depDate.isBlank()) "Departure Date&Time" else depDate
-        requireView().findViewById<TextView>(R.id.textDepTime).text = if (depTime.isEmpty() || depTime.isBlank()) "Departure Date&Time" else depTime
-        requireView().findViewById<TextView>(R.id.textEstDuration).text = if (EstDuration.isEmpty() || EstDuration.isBlank()) "Estimated trip duration" else EstDuration
-        requireView().findViewById<TextView>(R.id.textAvaSeat).text = AvaSeat.toString()
-        requireView().findViewById<TextView>(R.id.textPrice).text = Price.toString()
-        requireView().findViewById<TextView>(R.id.textAdditional).text = if (Additional.isEmpty() || Additional.isBlank()) "Additional Information" else Additional
-        requireView().findViewById<TextView>(R.id.textOptional).text = if (Optional.isEmpty() || Optional.isBlank()) "Optional Intermediates" else Optional
-        requireView().findViewById<TextView>(R.id.textPlate).text = if (Plate.isEmpty() || Plate.isBlank()) "Plate Number" else Plate
-
-        requireView().findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
-        requireView().findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
-
-        val uri_input = if (TripImageUri != "android.resource://it.polito.mad.car_pooling/drawable/car_default") TripImageUri else "android.resource://it.polito.mad.car_pooling/drawable/car_default"
-        requireView().findViewById<ImageView>(R.id.imageviewCar).setImageURI(Uri.parse(uri_input))
-
-        imageTripUri = TripImageUri
-         */
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
