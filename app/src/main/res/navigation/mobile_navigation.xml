@@ -29,6 +29,9 @@
         <argument
             android:name="isOwner"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_nav_trip_to_nav_profile"
+            app:destination="@id/nav_profile" />
     </fragment>
     <fragment
         android:id="@+id/tripEditFragment"
@@ -56,6 +59,10 @@
         <action
             android:id="@+id/action_tripEditFragment_to_nav_trip"
             app:destination="@id/nav_trip" />
+        <argument
+            android:name="isNewTrip"
+            app:argType="boolean"
+            android:defaultValue="true" />
     </fragment>
     <fragment
         android:id="@+id/nav_list_trip"
@@ -94,10 +101,12 @@
             app:popExitAnim="@anim/to_right" />
         <argument
             android:name="userId"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue="no email" />
         <argument
             android:name="isOwner"
-            app:argType="boolean" />
+            app:argType="boolean"
+            android:defaultValue="true" />
     </fragment>
 
     <fragment

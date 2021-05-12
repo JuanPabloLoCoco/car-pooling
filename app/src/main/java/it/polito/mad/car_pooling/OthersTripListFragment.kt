@@ -56,13 +56,13 @@ class OthersTripListFragment : Fragment() {
                         new_trip.depLocation = document.data["depLocation"].toString()
                         new_trip.additional = document.data["additional"].toString()
                         new_trip.ariLocation = document.data["ariLocation"].toString()
-                        new_trip.avaSeat = document.data["avaSeats"].toString()
+                        new_trip.avaSeats = (document.data["avaSeats"] as Long).toInt()
                         new_trip.depDate = document.data["depDate"].toString()
                         new_trip.depTime = document.data["depTime"].toString()
                         new_trip.estDuration = document.data["estDuration"].toString()
                         new_trip.optional = document.data["optional"].toString()
                         new_trip.plate = document.data["plate"].toString()
-                        new_trip.price = document.data["price"].toString()
+                        new_trip.price = document.data["price"] as Double
                         new_trip.imageUri = document.data["image_uri"].toString()
                         new_trip.owner = document.data["owner"].toString()
                         tripList.add(new_trip)
@@ -148,8 +148,8 @@ class OthersTripCardAdapter (val tripList: List<Trip>,
         holder.departureLocationView.text = getStringFromField(selectedTrip.depLocation)
         holder.arriveLocationView.text = getStringFromField(selectedTrip.ariLocation)
         holder.departureTimeView.text = getStringFromField(selectedTrip.depDate + " " + selectedTrip.depTime)
-        holder.priceView.text = getStringFromField(selectedTrip.price)
-        holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeat)
+        holder.priceView.text = getStringFromField(selectedTrip.price.toString())
+        holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeats.toString())
 
         val tripImageUri = selectedTrip.imageUri //sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
         if (tripImageUri == "yes") {

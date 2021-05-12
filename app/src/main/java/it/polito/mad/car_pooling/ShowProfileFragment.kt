@@ -43,16 +43,17 @@ class ShowProfileFragment : Fragment() {
         profile = storedProfile
         loadProfileInFields(storedProfile, view)
          */
-        //val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val acc_email = args.userId //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        var acc_email = args.userId //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         val isOwner = args.isOwner
         if (!isOwner) {
             view.findViewById<TextView>(R.id.textViewLocation).visibility = View.INVISIBLE
             view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.INVISIBLE
             view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.INVISIBLE
-
         }
-
+        if (acc_email == "no email") {
+            acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")!!
+        }
 
         val db = FirebaseFirestore.getInstance()
 

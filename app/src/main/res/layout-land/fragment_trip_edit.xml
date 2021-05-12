@@ -266,6 +266,16 @@
                     android:textColor="#4D000000"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <Button
+                android:id="@+id/blockTripButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="10dp"
+                android:layout_gravity="center"
+                android:text="Block trip"
+                android:backgroundTint="@color/design_default_color_error"
+                />
         </LinearLayout>
 
     </ScrollView>
