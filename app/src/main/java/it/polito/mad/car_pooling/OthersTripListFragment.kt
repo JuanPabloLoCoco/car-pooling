@@ -24,6 +24,8 @@ import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripList
 import java.io.File
 import java.io.FilterReader
+import java.lang.Double.parseDouble
+import java.lang.NumberFormatException
 
 
 class OthersTripListFragment : Fragment() {
@@ -352,10 +354,20 @@ class OthersTripCardAdapter(
                 }else{
                     tripFilterList=tripList.filter { it ->
                         // Write more filterign conditions here
-                        charSearch in it.depLocation.toLowerCase() ||
-                        charSearch in it.ariLocation.toLowerCase() ||
-                        charSearch in it.depTime.toLowerCase()     ||
-                        charSearch in it.price.toLowerCase()
+                        var numeric =true
+                        try{
+                            val string = parseDouble(charSearch)}
+                        catch (e : NumberFormatException){
+                            numeric =false
+                        }
+                        if (numeric){
+                            charSearch.toDouble() >=it.price.toDouble()
+
+                        }else{
+                             charSearch in it.depLocation.toLowerCase() ||
+                             charSearch in it.ariLocation.toLowerCase() ||
+                             charSearch in it.depTime.toLowerCase()
+                        }
                     }
                 }
                 var filterResults= FilterResults()
