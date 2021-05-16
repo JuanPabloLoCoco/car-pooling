@@ -2,7 +2,6 @@ package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -17,6 +16,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.navigation.NavigationView
@@ -25,7 +25,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -94,8 +93,8 @@ class MainActivity : AppCompatActivity() {
                         if (imageUri == default_str_profile){
                             headerImage.setImageURI(Uri.parse(imageUri))
                         } else {
-                            val localFile = File.createTempFile("my_profile", "jpg")
                             val storage = Firebase.storage
+                            /*val localFile = File.createTempFile("my_profile", "jpg")
                             storage.reference.child("users/$acc_email.jpg").getFile(localFile).addOnSuccessListener {
                                 val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
                                 headerImage.setImageBitmap(bitmap)
@@ -105,6 +104,11 @@ class MainActivity : AppCompatActivity() {
                                     putString( getString(R.string.keyMyProfile), localFile.absolutePath.toString())
                                     commit()
                                 }
+                            }*/
+                            val imageRef = storage.reference.child("users/$acc_email.jpg")
+                            imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                                val image_uri = Uri.toString()
+                                Glide.with(this).load(image_uri).into(headerImage)
                             }
                         }
                     } else {
