@@ -4,44 +4,126 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
+import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.AppBarConfiguration
+import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Profile
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ShowProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
     private lateinit var profile: Profile
-
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    val args: ShowProfileFragmentArgs by navArgs()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        setHasOptionsMenu(true)
+        val isOwner = args.isOwner
+        setHasOptionsMenu(isOwner)
         imageUri = ""
         return inflater.inflate(R.layout.profile_layout, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        /*
         var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))
         if (storedProfile === null) {
             storedProfile = Profile("")
         }
         profile = storedProfile
         loadProfileInFields(storedProfile, view)
+         */
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        var acc_email = args.userId //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        val isOwner = args.isOwner
+        if (!isOwner) {
+            view.findViewById<TextView>(R.id.textViewLocation).visibility = View.INVISIBLE
+            view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.INVISIBLE
+            view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.INVISIBLE
+            /*val toolbar: Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+            (activity as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+            toolbar.setNavigationOnClickListener(View.OnClickListener(){
+                val drawerLayout: DrawerLayout = (activity as AppCompatActivity).findViewById(R.id.drawer_layout)
+                val navView: NavigationView = (activity as AppCompatActivity).findViewById(R.id.nav_view)
+                val navController = (activity as AppCompatActivity).findNavController(R.id.nav_host_fragment)
+                appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_other_list_trip, R.id.nav_list_trip, R.id.nav_profile), drawerLayout)
+                (activity as AppCompatActivity).setupActionBarWithNavController(navController, appBarConfiguration)
+                navView.setupWithNavController(navController)
+                requireActivity().onBackPressed()
+                //findNavController().popBackStack()
+            })*/
+        }
+        if (acc_email == "no email") {
+            acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")!!
+        }
+
+        val db = FirebaseFirestore.getInstance()
+
+        val users = db.collection("Users")
+        if (acc_email != "no email"){
+            val my_profile = users.document(acc_email.toString())
+            my_profile.addSnapshotListener { value, error ->
+                if (error != null) throw error
+                if (value != null) {
+                    if (value.exists()){
+                        view.findViewById<TextView>(R.id.textViewFullName).text = value["full_name"].toString()
+                        view.findViewById<TextView>(R.id.textViewNickName).text = value["nick_name"].toString()
+                        view.findViewById<TextView>(R.id.textViewEmail).text = value["email"].toString()
+                        view.findViewById<TextView>(R.id.textViewLocation).text = value["location"].toString()
+                        view.findViewById<TextView>(R.id.textViewBirthday).text = value["birthday"].toString()
+                        view.findViewById<TextView>(R.id.textViewPhoneNumber).text = value["phone_number"].toString()
+                        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+                        val imageView = view.findViewById<ImageView>(R.id.imageViewPhoto)
+                        if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
+                            imageUri = default_str_profile
+                            imageView.setImageURI(Uri.parse(imageUri))
+                        } else {
+                            val storage = Firebase.storage
+                            val imageRef = storage.reference.child("users/$acc_email.jpg")
+                            imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                                val image_uri = Uri.toString()
+                                Glide.with(this).load(image_uri).into(imageView)
+                            }
+                        }
+                    } else {
+                        writeTextView(view)
+                        Log.d("showProfile", "${value.exists()} 11111111")
+                    }
+                }
+            }
+        }
+
+        else {
+            Log.d("showProfile", "22222222222")
+            writeTextView(view)
+        }
     }
 
+    private fun writeTextView(view: View){
+        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+        view.findViewById<TextView>(R.id.textViewFullName).text = "Full Name"
+        view.findViewById<TextView>(R.id.textViewNickName).text = "Nick Name"
+        view.findViewById<TextView>(R.id.textViewEmail).text = "Email@Address"
+        view.findViewById<TextView>(R.id.textViewLocation).text = "Location"
+        view.findViewById<TextView>(R.id.textViewBirthday).text = "Birthday"
+        view.findViewById<TextView>(R.id.textViewPhoneNumber).text = "PhoneNumber"
+        imageUri = default_str_profile
+        view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(imageUri))
+    }
+
+    /*
     private fun loadProfileInFields(profile: Profile, view: View) {
         val fullName = profile.fullName //sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName))
         val nickname = profile.nickName //sharedPreferences.getString(getString(R.string.KeyNickName), getString(R.string.nickName))
@@ -60,7 +142,7 @@ class ShowProfileFragment : Fragment() {
 
         view.findViewById<ImageView>(R.id.imageViewPhoto).setImageURI(Uri.parse(storedImageUri))
         imageUri = storedImageUri.toString()
-    }
+    } */
 
     /* This code will be deleted
     private fun readSharedPreferences (view: View) {
@@ -97,8 +179,9 @@ class ShowProfileFragment : Fragment() {
         return when (item.itemId){
             R.id.edit_profile -> {
                 // Here comes the arguments
-                val editProfileArgs = ShowProfileFragmentDirections.actionShowProfileFragmentToEditProfileFragment(profile.id)
-                findNavController().navigate(editProfileArgs)
+                //val editProfileArgs = ShowProfileFragmentDirections.actionShowProfileFragmentToEditProfileFragment(profile.id)
+                //findNavController().navigate(editProfileArgs)
+                findNavController().navigate(R.id.nav_edit_profile)
                 true
             }
             else -> super.onOptionsItemSelected(item)

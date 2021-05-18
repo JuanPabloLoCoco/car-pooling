@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+<!--    <item android:id="@+id/Search"-->
+<!--        android:title="Search"-->
+<!--        android:icon="@drawable/ic_baseline_search_24"-->
+
+<!--        app:showAsAction="ifRoom"-->
+<!--        />-->
+<!--    <item android:id="@+id/depLocationSearch"-->
+<!--        android:title="depLocationSearch"-->
+
+
+<!--        app:showAsAction="never"-->
+<!--        />-->
+<!--    <item android:id="@+id/ariLocationSearch"-->
+<!--        android:title="arrive location"-->
+<!--        app:showAsAction="never"-->
+<!--        />-->
+<!--    <item android:id="@+id/depDateTimeSearch"-->
+<!--        android:title="departure location"-->
+<!--        app:showAsAction="never"-->
+<!--        />-->
+<!--    <item android:id="@+id/avaSeatsSearch"-->
+<!--        android:title="available seats"-->
+<!--        app:showAsAction="never"-->
+<!--        />-->
+<!--    <item android:id="@+id/priceSearch"-->
+<!--        android:title="Price"-->
+<!--        app:showAsAction="never"-->
+<!--        />-->
+    <item
+        android:id="@+id/search_button"
+        android:icon="@drawable/ic_baseline_search_24"
+        android:iconTint="@color/white"
+        android:title="Search"
+        app:showAsAction="always"
+        app:actionViewClass="android.widget.SearchView"/>
+
+
+<!--        <menu>-->
+
+<!--            <item-->
+<!--                android:id="@+id/depLocationSearch"-->
+<!--                android:title="departure location"-->
+<!--                app:actionViewClass="androidx.appcompat.widget.SearchView" />-->
+
+<!--            <item-->
+<!--                android:id="@+id/ariLocationSearch"-->
+<!--                android:title="arrival location"-->
+<!--                app:actionViewClass="androidx.appcompat.widget.SearchView"/>-->
+
+<!--            <item-->
+<!--                android:id="@+id/depDateTimeSearch"-->
+<!--                android:title="departure date&amp;time"-->
+<!--                app:actionViewClass="androidx.appcompat.widget.SearchView"/>-->
+
+<!--            <item-->
+<!--                android:id="@+id/avaSeatsSearch"-->
+<!--                android:title="available seats"-->
+<!--                app:actionViewClass="androidx.appcompat.widget.SearchView"/>-->
+
+<!--            <item-->
+<!--                android:id="@+id/priceSearch"-->
+<!--                android:title="price"-->
+<!--                app:actionViewClass="androidx.appcompat.widget.SearchView"/>-->
+<!--            -->
+<!--        </menu>-->
+
+
+
+</menu>

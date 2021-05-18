@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
 import android.icu.text.SimpleDateFormat
 import android.media.ExifInterface
 import android.net.Uri
@@ -18,46 +19,25 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.navigation.fragment.findNavController
-import java.util.*
-import androidx.appcompat.app.AppCompatActivity
-import android.view.*
-import android.widget.*
-import android.widget.Toast.makeText
-import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
-import com.google.android.material.navigation.NavigationView
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
+import java.io.*
 import java.util.*
-
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [EditProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 
 class EditProfileFragment : Fragment() {
 
@@ -70,6 +50,8 @@ class EditProfileFragment : Fragment() {
     private var photoFile: File? = null
 
     private lateinit var profile: Profile
+
+    private lateinit var acc_email: String
 
     // ---------------------------- Life Cycle -----------------------
     @RequiresApi(Build.VERSION_CODES.N)
@@ -102,15 +84,98 @@ class EditProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        /*
         var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))
         if (storedProfile === null) {
             storedProfile = Profile("")
-
         }
         profile = storedProfile
         loadProfileInFields(storedProfile, view)
+
+        val etFullName = view.findViewById<TextInputLayout>(R.id.editViewFullName)
+        val etNickname = view.findViewById<TextInputLayout>(R.id.editViewNickName)
+        val etEmail = view.findViewById<TextInputLayout>(R.id.editViewEmail)
+        val etLocation = view.findViewById<TextInputLayout>(R.id.editViewLocation)
+        val etBirthday = view.findViewById<TextView>(R.id.editViewBirthday)
+        val etPhoneNumber = view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber)
+        val editPhotoView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
+
+        val db = FirebaseFirestore.getInstance()
+        val user = db.collection("user")
+        val my_profile = user.document("my_profile")
+
+        db.collection("user").document("my_profile").get().addOnFailureListener {
+            Toast.makeText(requireContext(), "Internet Connection Error", Toast.LENGTH_LONG).show()
+        }
+
+        my_profile.addSnapshotListener { value, error ->
+            if (error != null) throw error
+            if (value != null) {
+                etFullName.editText?.setText(value["full_name"].toString())
+                etNickname.editText?.setText(value["nick_name"].toString())
+                etEmail.editText?.setText(value["email"].toString())
+                etLocation.editText?.setText(value["location"].toString())
+                etBirthday.text = value["birthday"].toString()
+                etPhoneNumber.editText?.setText(value["phone_number"].toString())
+                val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+                imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) Uri.parse(default_str_car)
+                           else Uri.parse(value["image_uri"].toString())
+                editPhotoView.setImageURI(imageUri)
+            }
+        }*/
+
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        var acc_emailone =sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+
+        acc_email = if (acc_emailone == null) "" else acc_emailone
+        val db = FirebaseFirestore.getInstance()
+        val users = db.collection("Users")
+        if (acc_email != "no email"){
+            val my_profile = users.document(acc_email.toString())
+            my_profile.addSnapshotListener { value, error ->
+                if (error != null) throw error
+                if (value != null) {
+                    if (value.exists()) {
+                        view.findViewById<TextInputLayout>(R.id.editViewFullName).editText?.setText(value["full_name"].toString())
+                        view.findViewById<TextInputLayout>(R.id.editViewNickName).editText?.setText(value["nick_name"].toString())
+                        view.findViewById<TextInputLayout>(R.id.editViewEmail).editText?.setText(value["email"].toString())
+                        view.findViewById<TextInputLayout>(R.id.editViewLocation).editText?.setText(value["location"].toString())
+                        view.findViewById<TextView>(R.id.editViewBirthday).text = value["birthday"].toString()
+                        view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.setText(value["phone_number"].toString())
+                        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+                        val imageView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
+                        if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
+                            imageUri = Uri.parse(default_str_profile)
+                            imageView.setImageURI(imageUri)
+                        } else {
+                            val storage = Firebase.storage
+                            val imageRef = storage.reference.child("users/$acc_email.jpg")
+                            imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                                val image_uri = Uri.toString()
+                                Glide.with(this).load(image_uri).into(imageView)
+                            }
+                        }
+                    } else {
+                        writeTextView(view)
+                    }
+                }
+            }
+        } else {
+            writeTextView(view)
+        }
     }
 
+    private fun writeTextView(view: View){
+        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+        view.findViewById<TextInputLayout>(R.id.editViewFullName).editText?.setText("Full Name")
+        view.findViewById<TextInputLayout>(R.id.editViewNickName).editText?.setText("Nick Name")
+        view.findViewById<TextInputLayout>(R.id.editViewEmail).editText?.setText("Email@Address")
+        view.findViewById<TextInputLayout>(R.id.editViewLocation).editText?.setText("Location")
+        view.findViewById<TextView>(R.id.editViewBirthday).text = "Birthday"
+        view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.setText("PhoneNumber")
+        imageUri = Uri.parse(default_str_profile)
+        view.findViewById<ImageView>(R.id.imageViewEditPhoto).setImageURI(imageUri)
+    }
 
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -192,7 +257,6 @@ class EditProfileFragment : Fragment() {
             editPhotoView.setImageURI(imageUri);
         }
     }
-    */
 
     private fun loadProfileInFields(profile: Profile, view: View) {
         val etFullName = view.findViewById<TextInputLayout>(R.id.editViewFullName)
@@ -232,10 +296,10 @@ class EditProfileFragment : Fragment() {
 
         if (storedImageUri != null && storedImageUri.isNotEmpty()) {
             imageUri = Uri.parse(storedImageUri)
-            editPhotoView.setImageURI(imageUri);
+            editPhotoView.setImageURI(imageUri)
         }
     }
-
+    */
 
     private fun savedProfileData () {
         //val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
@@ -266,12 +330,47 @@ class EditProfileFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.saveItem -> {
-                savedProfileData()
+                val inputFullName = requireView().findViewById<TextInputLayout>(R.id.editViewFullName).editText?.text.toString()
+                val inputNickname =  requireView().findViewById<TextInputLayout>(R.id.editViewNickName).editText?.text.toString()
+                val inputEmail =  requireView().findViewById<TextInputLayout>(R.id.editViewEmail).editText?.text.toString()
+                val inputLocation =  requireView().findViewById<TextInputLayout>(R.id.editViewLocation).editText?.text.toString()
+                val inputBirthday =  requireView().findViewById<TextView>(R.id.editViewBirthday).text.toString()
+                val inputPhoneNumber =  requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString()
+                val inputPhotoView =  imageUri.toString()
+
+                val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+                val db = FirebaseFirestore.getInstance()
+                val users = db.collection("Users")
+                val my_profile = users.document(acc_email.toString())
+
+                val imageView = requireView().findViewById<ImageView>(R.id.imageViewEditPhoto)
+                imageView.isDrawingCacheEnabled = true
+                imageView.buildDrawingCache()
+                val bitmap = (imageView.drawable as BitmapDrawable).bitmap
+                val baos = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                val data = baos.toByteArray()
+                val storage = Firebase.storage
+                val storageRef = storage.reference
+                storageRef.child("users/$acc_email.jpg").putBytes(data)
+
+                my_profile.set(mapOf("full_name" to inputFullName,
+                                     "nick_name" to inputNickname,
+                                     "email" to acc_email.toString(),
+                                     //"email" to inputEmail,
+                                     "location" to inputLocation,
+                                     "birthday" to inputBirthday,
+                                     "phone_number" to inputPhoneNumber,
+                                     //"image_uri" to inputPhotoView
+                                     "image_uri" to "yes"))
+
+                //savedProfileData()
                 Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
                         .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                         .show()
 
-                val showProfileArgs = EditProfileFragmentDirections.actionEditProfileFragmentToShowProfileFragment()
+                val showProfileArgs = EditProfileFragmentDirections.actionEditProfileFragmentToShowProfileFragment(userId = acc_email!!,isOwner=true)
 
                 if (!findNavController().popBackStack()) {
                     findNavController().navigate(showProfileArgs)
