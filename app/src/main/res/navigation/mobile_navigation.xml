@@ -107,6 +107,9 @@
             android:name="isOwner"
             app:argType="boolean"
             android:defaultValue="true" />
+        <action
+            android:id="@+id/action_nav_profile_to_nav_other_list_trip2"
+            app:destination="@id/nav_other_list_trip" />
     </fragment>
 
     <fragment
@@ -139,10 +142,14 @@
         android:label="@string/CarPoolingApp">
         <action
             android:id="@+id/action_othersTripListFragment_to_nav_trip"
-            app:destination="@id/nav_trip" />
+            app:destination="@id/nav_trip"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"/>
         <action
             android:id="@+id/action_nav_other_list_trip_to_nav_profile"
-            app:destination="@id/nav_profile" />
+            app:destination="@id/nav_profile"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"/>
     </fragment>
 
 </navigation>

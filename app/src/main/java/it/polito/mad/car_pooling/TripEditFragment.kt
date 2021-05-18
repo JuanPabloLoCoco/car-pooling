@@ -155,27 +155,37 @@ class TripEditFragment : Fragment() {
         // Get the trip data
         val trips = db.collection("Trips")
         val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
-        trips.document(input_idx).addSnapshotListener { value, error ->
-            if (error != null) throw error
-            if (value != null) {
-                editDepLocation.editText?.setText(value["depLocation"].toString())
-                editAriLocation.editText?.setText(value["ariLocation"].toString())
-                editEstDuration.editText?.setText(value["estDuration"].toString())
-                editAvaSeat.editText?.setText(value["avaSeats"].toString())
-                editPrice.editText?.setText(value["price"].toString())
-                editAdditional.editText?.setText(value["additional"].toString())
-                editOptional.editText?.setText(value["optional"].toString())
-                editPlate.editText?.setText(value["plate"].toString())
-                editDepDate.text = value["depDate"].toString()
-                editDepTime.text = value["depTime"].toString()
-                editDepDate.setTextColor(Color.parseColor("#54150808"))
-                editDepTime.setTextColor(Color.parseColor("#54150808"))
-                /*imageUri = if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) Uri.parse(default_str_car)
-                           else Uri.parse(value["image_uri"].toString())
-                editimageView.setImageURI(imageUri)*/
-                if (check_status == "new"){
-                    editimageView.setImageURI(Uri.parse(default_str_car))
-                } else {
+        if (input_idx == "default_trip"){
+            editDepLocation.editText?.setText("Departure Location")
+            editAriLocation.editText?.setText("Arrival Location")
+            editEstDuration.editText?.setText("Estimated Duration")
+            editAvaSeat.editText?.setText("0")
+            editPrice.editText?.setText("0")
+            editAdditional.editText?.setText("Additional Information")
+            editOptional.editText?.setText("Optional Intermediates")
+            editPlate.editText?.setText("Plate Number")
+            editDepDate.text = "Departure Date"
+            editDepTime.text = "Time"
+            editDepDate.setTextColor(Color.parseColor("#54150808"))
+            editDepTime.setTextColor(Color.parseColor("#54150808"))
+            editimageView.setImageURI(Uri.parse(default_str_car))
+        } else {
+            trips.document(input_idx).addSnapshotListener { value, error ->
+                if (error != null) throw error
+                if (value != null) {
+                    editDepLocation.editText?.setText(value["depLocation"].toString())
+                    editAriLocation.editText?.setText(value["ariLocation"].toString())
+                    editEstDuration.editText?.setText(value["estDuration"].toString())
+                    editAvaSeat.editText?.setText(value["avaSeats"].toString())
+                    editPrice.editText?.setText(value["price"].toString())
+                    editAdditional.editText?.setText(value["additional"].toString())
+                    editOptional.editText?.setText(value["optional"].toString())
+                    editPlate.editText?.setText(value["plate"].toString())
+                    editDepDate.text = value["depDate"].toString()
+                    editDepTime.text = value["depTime"].toString()
+                    editDepDate.setTextColor(Color.parseColor("#54150808"))
+                    editDepTime.setTextColor(Color.parseColor("#54150808"))
+
                     val storage = Firebase.storage
                     /*val localFile = File.createTempFile("my_trip", "jpg")
                     storage.reference.child("trips/$input_idx.jpg").getFile(localFile).addOnSuccessListener {
@@ -186,6 +196,7 @@ class TripEditFragment : Fragment() {
                     imageRef.downloadUrl.addOnSuccessListener { Uri ->
                         val image_uri = Uri.toString()
                         Glide.with(this).load(image_uri).into(editimageView)
+
                     }
                 }
             }

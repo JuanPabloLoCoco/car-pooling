@@ -3,7 +3,6 @@ package it.polito.mad.car_pooling
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -11,8 +10,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.AppBarConfiguration
+import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -21,6 +21,7 @@ import it.polito.mad.car_pooling.models.Profile
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
     private lateinit var profile: Profile
+    private lateinit var appBarConfiguration: AppBarConfiguration
     val args: ShowProfileFragmentArgs by navArgs()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +51,19 @@ class ShowProfileFragment : Fragment() {
             view.findViewById<TextView>(R.id.textViewLocation).visibility = View.INVISIBLE
             view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.INVISIBLE
             view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.INVISIBLE
+            /*val toolbar: Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+            (activity as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+            toolbar.setNavigationOnClickListener(View.OnClickListener(){
+                val drawerLayout: DrawerLayout = (activity as AppCompatActivity).findViewById(R.id.drawer_layout)
+                val navView: NavigationView = (activity as AppCompatActivity).findViewById(R.id.nav_view)
+                val navController = (activity as AppCompatActivity).findNavController(R.id.nav_host_fragment)
+                appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_other_list_trip, R.id.nav_list_trip, R.id.nav_profile), drawerLayout)
+                (activity as AppCompatActivity).setupActionBarWithNavController(navController, appBarConfiguration)
+                navView.setupWithNavController(navController)
+                requireActivity().onBackPressed()
+                //findNavController().popBackStack()
+            })*/
         }
         if (acc_email == "no email") {
             acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")!!
