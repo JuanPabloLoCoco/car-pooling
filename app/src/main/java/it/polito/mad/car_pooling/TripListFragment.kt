@@ -23,12 +23,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
+import it.polito.mad.car_pooling.viewModels.MyTripListViewModel
 import java.io.File
 
 class TripListFragment : Fragment() {
 
     var trip_count : Int = 0
     var trip_total : Int = 0
+    private lateinit var myTripListViewModel: MyTripListViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -38,6 +40,9 @@ class TripListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        //myTripListViewModel = ViewModelProviders.of(this).get(MyTripListViewModel::class.java)
+        //myTripListViewModel = ViewModelProviders(activity).get(MyTripListViewModel::class.java)
 
         val fabView = view.findViewById<FloatingActionButton>(R.id.addTripFAB)
 

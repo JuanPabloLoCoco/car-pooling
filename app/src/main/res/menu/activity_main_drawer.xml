@@ -20,6 +20,16 @@
             android:icon="@drawable/ic_baseline_view_headline_24"
             android:title="My Trips" />
 
+        <item
+            android:id="@+id/nav_list_interest_trip"
+            android:icon="@drawable/ic_baseline_star_24"
+            android:title="Interest Trips" />
+
+        <item
+            android:id="@+id/nav_list_bought_trip"
+            android:icon="@drawable/ic_baseline_done_24"
+            android:title="Bought Trips" />
+
     </group>
     
 </menu>
