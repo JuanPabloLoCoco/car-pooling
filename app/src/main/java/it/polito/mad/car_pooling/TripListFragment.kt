@@ -48,8 +48,9 @@ class TripListFragment : Fragment() {
         // val  rv= requireView().findViewById<RecyclerView>(R.id.rv)
 
         val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        var acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
 
+        //acc_email = "palitolococo@gmail.com"
         viewModelFactory = ViewModelFactory(acc_email!!)
         viewModel = viewModelFactory.create(MyTripListViewModel::class.java)
             //ViewModelProvider(this, viewModelFactory).get(MyTripListViewModel::class.java)

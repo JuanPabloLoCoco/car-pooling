@@ -1,7 +1,6 @@
 package it.polito.mad.car_pooling
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -16,9 +15,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
+import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -26,12 +24,9 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
-import java.io.File
 import java.util.*
-import kotlin.properties.Delegates
 
 
 @Suppress("UNREACHABLE_CODE")
@@ -265,6 +260,13 @@ class TripDetailsFragment : Fragment() {
                             .show()
                     Log.w("POLITO", "Error adding document", e)
                 }
+        }
+
+        val buttonCheckLocationMap = view.findViewById<Button>(R.id.buttonCheckLocationMap)
+        buttonCheckLocationMap.setOnClickListener {
+            val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation")
+            findNavController().navigate(action)
+            //findNavController().navigate(R.id.action_nav_trip_to_mapFragment)
         }
     }
 

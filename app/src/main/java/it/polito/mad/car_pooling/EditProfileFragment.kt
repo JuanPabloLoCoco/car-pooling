@@ -19,6 +19,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -36,6 +37,10 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
+import it.polito.mad.car_pooling.viewModels.EditProfileViewModel
+import it.polito.mad.car_pooling.viewModels.EditProfileViewModelFactory
+import it.polito.mad.car_pooling.viewModels.MyTripListViewModel
+import it.polito.mad.car_pooling.viewModels.ViewModelFactory
 import java.io.*
 import java.util.*
 
@@ -52,6 +57,9 @@ class EditProfileFragment : Fragment() {
     private lateinit var profile: Profile
 
     private lateinit var acc_email: String
+
+    private lateinit var viewModel: EditProfileViewModel
+    private lateinit var viewModelFactory: EditProfileViewModelFactory
 
     // ---------------------------- Life Cycle -----------------------
     @RequiresApi(Build.VERSION_CODES.N)
@@ -78,6 +86,14 @@ class EditProfileFragment : Fragment() {
         editBithday.setOnClickListener {
             DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
+
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        var acc_emailone =sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+
+        acc_email = if (acc_emailone == null) "" else acc_emailone
+
+        viewModelFactory = EditProfileViewModelFactory(acc_email)
+        viewModel = viewModelFactory.create(EditProfileViewModel::class.java)
 
         return view
     }
@@ -123,6 +139,15 @@ class EditProfileFragment : Fragment() {
                 editPhotoView.setImageURI(imageUri)
             }
         }*/
+
+        viewModel.user.observe( viewLifecycleOwner, {
+            val thisUser = it
+            if (thisUser != null) {
+                Log.d("POLITO", "MyUser from viewMode = ${thisUser.fullName}")
+            } else {
+                Log.d("POLITO", "MyUser from viewMode is null")
+            }
+        })
 
         val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         var acc_emailone =sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
@@ -364,7 +389,7 @@ class EditProfileFragment : Fragment() {
                                      "phone_number" to inputPhoneNumber,
                                      //"image_uri" to inputPhotoView
                                      "image_uri" to "yes"))
-
+                viewModel.saveUser()
                 //savedProfileData()
                 Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
                         .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)

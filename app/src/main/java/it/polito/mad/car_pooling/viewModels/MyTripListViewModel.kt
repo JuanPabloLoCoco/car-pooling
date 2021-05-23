@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import it.polito.mad.car_pooling.models.Trip
-import it.polito.mad.car_pooling.repositories.TripRepository
 import it.polito.mad.car_pooling.services.FirebaseTripService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
