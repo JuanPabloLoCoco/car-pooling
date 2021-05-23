@@ -39,8 +39,6 @@ import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.viewModels.EditProfileViewModel
 import it.polito.mad.car_pooling.viewModels.EditProfileViewModelFactory
-import it.polito.mad.car_pooling.viewModels.MyTripListViewModel
-import it.polito.mad.car_pooling.viewModels.ViewModelFactory
 import java.io.*
 import java.util.*
 

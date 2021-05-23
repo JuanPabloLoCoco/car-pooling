@@ -17,8 +17,6 @@ class EditProfileViewModel(userId: String): ViewModel() {
         } else {
             Log.d("POLITO", "Updating user in the viewModel")
         }
-
-
     }
 
     private val _user = MutableLiveData<Profile>()
