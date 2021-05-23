@@ -156,18 +156,18 @@ class TripEditFragment : Fragment() {
         val trips = db.collection("Trips")
         val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
         if (input_idx == "default_trip"){
-            editDepLocation.editText?.setText("Departure Location")
+            /*editDepLocation.editText?.setText("Departure Location")
             editAriLocation.editText?.setText("Arrival Location")
             editEstDuration.editText?.setText("Estimated Duration")
-            editAvaSeat.editText?.setText("0")
-            editPrice.editText?.setText("0")
             editAdditional.editText?.setText("Additional Information")
             editOptional.editText?.setText("Optional Intermediates")
-            editPlate.editText?.setText("Plate Number")
+            editPlate.editText?.setText("Plate Number")*/
+            editAvaSeat.editText?.setText("0")
+            editPrice.editText?.setText("0")
             editDepDate.text = "Departure Date"
             editDepTime.text = "Time"
-            editDepDate.setTextColor(Color.parseColor("#54150808"))
-            editDepTime.setTextColor(Color.parseColor("#54150808"))
+            //editDepDate.setTextColor(Color.parseColor("#54150808"))
+            //editDepTime.setTextColor(Color.parseColor("#54150808"))
             editimageView.setImageURI(Uri.parse(default_str_car))
         } else {
             trips.document(input_idx).addSnapshotListener { value, error ->
@@ -223,6 +223,25 @@ class TripEditFragment : Fragment() {
         }
         editDepTime.setOnClickListener {
             TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+        }
+
+        val imageButtonMapDep = view.findViewById<ImageButton>(R.id.mapDepImageButton)
+        imageButtonMapDep.setOnClickListener{
+            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("departure")
+            findNavController().navigate(action)
+            //findNavController().navigate(R.id.action_tripEditFragment_to_mapFragment)
+        }
+        val imageButtonMapArr = view.findViewById<ImageButton>(R.id.mapArrImageButton)
+        imageButtonMapArr.setOnClickListener{
+            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("arrival")
+            findNavController().navigate(action)
+            //findNavController().navigate(R.id.action_tripEditFragment_to_mapFragment)
+        }
+        val imageButtonMapAddInter = view.findViewById<ImageButton>(R.id.mapAddInterImageButton)
+        imageButtonMapAddInter.setOnClickListener{
+            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter")
+            findNavController().navigate(action)
+            //findNavController().navigate(R.id.action_tripEditFragment_to_mapFragment)
         }
 
         return view

@@ -46,43 +46,79 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textEditDepLocation"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="60dp"
-                android:hint="Departure Location"
-                android:layout_marginBottom="10dp"
-                app:startIconDrawable="@drawable/ic_baseline_edit_location_24"
-                app:startIconContentDescription="temp"
-                app:endIconMode="clear_text">
+                android:layout_marginBottom="10dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textSize="20sp"
-                    android:textColor="#4D000000"
-                    android:inputType="textMultiLine"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textEditDepLocation"
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
+                    android:hint="Departure Location"
+                    app:startIconDrawable="@drawable/ic_baseline_edit_location_24"
+                    app:startIconContentDescription="temp"
+                    app:endIconMode="clear_text">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textEditAriLocation"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="20sp"
+                        android:textColor="#4D000000"
+                        android:inputType="textMultiLine"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/mapDepImageButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:background="@color/white"
+                    android:layout_gravity="center"
+                    android:src="@drawable/default_map"
+                    android:scaleType="fitXY"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="60dp"
-                android:hint="Arrival Location"
-                android:layout_marginBottom="10dp"
-                app:startIconDrawable="@drawable/ic_baseline_edit_location_24"
-                app:startIconContentDescription="temp"
-                app:endIconMode="clear_text">
+                android:layout_marginBottom="10dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textSize="20sp"
-                    android:textColor="#4D000000"
-                    android:inputType="textMultiLine"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textEditAriLocation"
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
+                    android:hint="Arrival Location"
+                    app:startIconDrawable="@drawable/ic_baseline_edit_location_24"
+                    app:startIconContentDescription="temp"
+                    app:endIconMode="clear_text">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="20sp"
+                        android:textColor="#4D000000"
+                        android:inputType="textMultiLine"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/mapArrImageButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:background="@color/white"
+                    android:layout_gravity="center"
+                    android:src="@drawable/default_map"
+                    android:scaleType="fitXY"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -228,24 +264,41 @@
                     android:inputType="textMultiLine"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textEditOptional"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="60dp"
-                android:hint="Optional intermediates"
-                android:layout_marginBottom="10dp"
-                app:startIconDrawable="@drawable/ic_baseline_share_location_24"
-                app:startIconContentDescription="temp"
-                app:endIconMode="clear_text">
+                android:layout_marginBottom="10dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textSize="20sp"
-                    android:inputType="textMultiLine"
-                    android:textColor="#4D000000"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textEditOptional"
+                    android:layout_width="0dp"
+                    android:layout_weight="7"
+                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
+                    android:hint="Optional intermediates"
+                    app:startIconDrawable="@drawable/ic_baseline_share_location_24"
+                    app:startIconContentDescription="temp"
+                    app:endIconMode="clear_text">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="20sp"
+                        android:textColor="#4D000000"
+                        android:inputType="textMultiLine"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/mapAddInterImageButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:background="@color/white"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_baseline_add_location_alt_24"
+                    android:scaleType="fitXY"/>
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textEditPlate"
