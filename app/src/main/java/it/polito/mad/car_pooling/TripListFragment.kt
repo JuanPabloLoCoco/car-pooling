@@ -13,6 +13,9 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +26,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
+import it.polito.mad.car_pooling.viewModels.MyTripListViewModel
+import it.polito.mad.car_pooling.viewModels.ViewModelFactory
 import java.io.File
 
 class TripListFragment : Fragment() {
@@ -30,16 +35,50 @@ class TripListFragment : Fragment() {
     var trip_count : Int = 0
     var trip_total : Int = 0
 
+    private lateinit var viewModel: MyTripListViewModel
+    private lateinit var viewModelFactory: ViewModelFactory
+
+    // private lateinit var myTripListViewModel: MyTripListViewModel
+    private val myTripListVIewModel: MyTripListViewModel by viewModels(
+            /* factoryProducer = { savedStateRegistry(this) } */
+    )
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // val  rv= requireView().findViewById<RecyclerView>(R.id.rv)
+
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+
+        viewModelFactory = ViewModelFactory(acc_email!!)
+        viewModel = viewModelFactory.create(MyTripListViewModel::class.java)
+            //ViewModelProvider(this, viewModelFactory).get(MyTripListViewModel::class.java)
+
+        viewModel.myTrips.observe(viewLifecycleOwner, Observer {
+            Log.d("POLITO", "TRIP LIST BY VIEW MODEL size: ${it.size}" )
+        })
         return inflater.inflate(R.layout.fragment_trip_list, container, false)
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        //myTripListViewModel = ViewModelProviders.of(this).get(MyTripListViewModel::class.java)
+        //myTripListViewModel = ViewModelProviders(activity).get(MyTripListViewModel::class.java)
+
+
 
         val fabView = view.findViewById<FloatingActionButton>(R.id.addTripFAB)
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        //viewModelFactory = ViewModelFactory(acc_email!!)
+        //viewModel = ViewModelProvider(this, viewModelFactory).get(MyTripListViewModel::class.java)
+
+            //ViewModelProvider(this)[MyTripListViewModel(acc_email!!)::class.java]
+
+
 
         /*var storedTripList = ModelPreferencesManager.get<TripList>(getString(R.string.KeyTripList))
         var dataList: List<Trip>
@@ -52,8 +91,6 @@ class TripListFragment : Fragment() {
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         val db = FirebaseFirestore.getInstance()
         val trips = db.collection("Trips")
         val tripList = mutableListOf<Trip>()

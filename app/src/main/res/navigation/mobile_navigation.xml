@@ -151,5 +151,23 @@
             app:enterAnim="@anim/from_right"
             app:exitAnim="@anim/to_left"/>
     </fragment>
+    <fragment
+        android:id="@+id/nav_list_bought_trip"
+        android:name="it.polito.mad.car_pooling.BoughtTripsListFragment"
+        android:label="Bought Trips"
+        tools:layout="@layout/fragment_bought_trips_list" >
+        <action
+            android:id="@+id/action_nav_list_bought_trip_to_nav_profile"
+            app:destination="@id/nav_profile" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_list_interest_trip"
+        android:name="it.polito.mad.car_pooling.TripsOfInterestListFragment"
+        android:label="Interest Trips"
+        tools:layout="@layout/fragment_trips_of_interest_list" >
+        <action
+            android:id="@+id/action_nav_list_interest_trip_to_nav_profile"
+            app:destination="@id/nav_profile" />
+    </fragment>
 
 </navigation>
