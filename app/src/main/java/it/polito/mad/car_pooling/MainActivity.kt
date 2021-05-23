@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val viewModel = ViewModelProviders.of(this).get(MyTripListViewModel::class.java)
+        // val viewModel = ViewModelProviders.of(this).get(MyTripListViewModel::class.java)
 
         imageUri = ""
         fullName = ""
