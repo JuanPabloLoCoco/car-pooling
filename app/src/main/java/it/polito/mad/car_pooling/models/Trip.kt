@@ -31,7 +31,7 @@ data class Trip (var id: String) {
                 new_trip.optional = getString("optional")!!
                 new_trip.plate = getString("plate")!!
                 new_trip.price = (getDouble("price")!!)
-                new_trip.imageUri = getString("image_uri")!!
+                // new_trip.imageUri = getString("image_uri")!!
                 return new_trip
             } catch (e: Exception) {
                 Log.e(TAG, "Error converting trip with id ${new_trip.id}", e)

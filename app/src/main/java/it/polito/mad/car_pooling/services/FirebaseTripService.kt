@@ -18,24 +18,7 @@ object FirebaseTripService {
 
     @ExperimentalCoroutinesApi
     suspend fun getMyTrips(userId: String): Flow<List<Trip>> {
-        /*
         val db = FirebaseFirestore.getInstance()
-        try {
-            return db.collection(TRIP_COLLECTION)
-                .whereEqualTo("owner", userId)
-                .get()
-                .await()
-                .documents
-                .mapNotNull{
-                    it.toTrip()
-                }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting my Trips", e)
-            return emptyList()
-        }*/
-
-        val db = FirebaseFirestore.getInstance()
-
         return callbackFlow {
             val listenerRegistration = db.collection(TRIP_COLLECTION)
                 .whereEqualTo("owner", userId)

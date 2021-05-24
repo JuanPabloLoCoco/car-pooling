@@ -46,7 +46,6 @@ class TripListFragment : Fragment() {
         // var acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
 
         userId = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
-        //acc_email = "palitolococo@gmail.com"
 
         myTripListViewModelFactory = MyTripListViewModelFactory(userId)
         viewModel = myTripListViewModelFactory.create(MyTripListViewModel::class.java)
@@ -58,78 +57,27 @@ class TripListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        //myTripListViewModel = ViewModelProviders.of(this).get(MyTripListViewModel::class.java)
-        //myTripListViewModel = ViewModelProviders(activity).get(MyTripListViewModel::class.java)
-
-        val fabView = view.findViewById<FloatingActionButton>(R.id.addTripFAB)
-        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
-        //viewModelFactory = ViewModelFactory(acc_email!!)
-        //viewModel = ViewModelProvider(this, viewModelFactory).get(MyTripListViewModel::class.java)
-        //ViewModelProvider(this)[MyTripListViewModel(acc_email!!)::class.java]
-
-        /*var storedTripList = ModelPreferencesManager.get<TripList>(getString(R.string.KeyTripList))
-        var dataList: List<Trip>
-        if (storedTripList == null) {
-            dataList = listOf()
-        } else {
-            dataList = storedTripList.tripList
-        }*/
 
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        //val db = FirebaseFirestore.getInstance()
-        //val trips = db.collection("Trips")
         val tripList = mutableListOf<Trip>()
-        /*
-        trips.whereEqualTo("owner", acc_email)
-            .get()
-            .addOnSuccessListener { documents ->
-                trip_count = 0
-                for (document in documents) {
-                    trip_count += 1
-                    val new_trip = Trip(document.id)
-                    new_trip.depLocation = document.data["depLocation"].toString()
-                    new_trip.additional = document.data["additional"].toString()
-                    new_trip.ariLocation = document.data["ariLocation"].toString()
-                    new_trip.avaSeats = (document.data["avaSeats"] as Long).toInt()
-                    new_trip.depDate = document.data["depDate"].toString()
-                    new_trip.depTime = document.data["depTime"].toString()
-                    new_trip.estDuration = document.data["estDuration"].toString()
-                    new_trip.optional = document.data["optional"].toString()
-                    new_trip.plate = document.data["plate"].toString()
-                    new_trip.price = (document.data["price"] as Double)
-                    new_trip.imageUri = document.data["image_uri"].toString()
-                    tripList.add(new_trip)
-                }
-                if (trip_count == 0){
-                    super.onViewCreated(view, savedInstanceState)
-                } else {
-                    val rvAdapter = TripCardAdapter(tripList, requireContext(), findNavController())
-                    reciclerView.adapter = rvAdapter
-                    requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
-                }
-            }.addOnFailureListener { exception ->
-            Log.d("nav_list_trip", "Error getting documents: ", exception)
-        }
-        */
+
         val rvAdapter = TripCardAdapter(tripList, requireContext(), findNavController())
         reciclerView.adapter = rvAdapter
         viewModel.myTrips.observe(viewLifecycleOwner, Observer {
             rvAdapter.tripList = it
+            if (it.size > 0) {
+                requireView().findViewById<TextView>(R.id.empty_triplist).visibility = View.INVISIBLE
+            } else {
+                requireView().findViewById<TextView>(R.id.empty_triplist).visibility = View.VISIBLE
+            }
             rvAdapter.notifyDataSetChanged()
             Log.d("POLITO", "TRIP LIST BY VIEW MODEL size: ${it.size}" )
         })
 
-        //val tripCount = arguments?.getInt("tripCount")!!.toInt()
-
+        val fabView = view.findViewById<FloatingActionButton>(R.id.addTripFAB)
         fabView.setOnClickListener {
-            //Toast.makeText(context, "A click on FAB", Toast.LENGTH_SHORT).show()
-            //val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(Trip.NEW_TRIP_ID)
-            //findNavController().navigate(action)
-            //Log.d("nav_list_trip", "${trip_total} yesssssssss")
             val bundle = bundleOf( "newOrOld" to "new")
             findNavController().navigate(R.id.action_nav_list_trip_to_tripEditFragment, bundle)
         }
@@ -147,13 +95,6 @@ class TripCardAdapter (var tripList: List<Trip>,
         val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
         val tripImageView = v.findViewById<ImageView>(R.id.imageview)
         val tripCardView = v.findViewById<CardView>(R.id.tripCard)
-        fun bind(t: Trip) {
-
-        }
-
-        fun unbind() {
-
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripCardViewHolder {
@@ -163,7 +104,6 @@ class TripCardAdapter (var tripList: List<Trip>,
 
     override fun onViewRecycled(holder: TripCardViewHolder) {
         super.onViewRecycled(holder)
-        holder.unbind()
     }
 
     fun getStringFromField(field: String?): String {
@@ -190,9 +130,6 @@ class TripCardAdapter (var tripList: List<Trip>,
         } else {
             holder.tripImageView.setImageURI(Uri.parse("android.resource://it.polito.mad.car_pooling/drawable/car_default"))
         }
-        /*val uri_input = if (tripImageUri.toString() == "android.resource://it.polito.mad.car_pooling/drawable/car_default"
-                || tripImageUri.toString().isEmpty()) "android.resource://it.polito.mad.car_pooling/drawable/car_default" else tripImageUri
-        holder.tripImageView.setImageURI(Uri.parse(uri_input))*/
 
         holder.tripCardView.setOnClickListener {
             //val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
