@@ -44,7 +44,6 @@ object FirebaseTripService {
         return callbackFlow {
             val listenerRegistration = db.collection(TRIP_COLLECTION)
                 .whereNotEqualTo("owner", userId)
-                .limit(20L)
                 .addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
                     if (firebaseFirestoreException != null || querySnapshot == null) {
                         cancel(message = "Error fetching other trips", cause = firebaseFirestoreException)
@@ -53,8 +52,6 @@ object FirebaseTripService {
                     val map = querySnapshot?.documents
                         .mapNotNull { it.toTrip() }
                     offer(map)
-
-
                 }
             awaitClose{
                 Log.d(TAG, "Cancelling Others trips listener")

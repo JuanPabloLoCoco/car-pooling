@@ -20,8 +20,13 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripList
+import it.polito.mad.car_pooling.viewModels.MyTripListViewModel
+import it.polito.mad.car_pooling.viewModels.MyTripListViewModelFactory
+import it.polito.mad.car_pooling.viewModels.OthersTripListViewModel
+import it.polito.mad.car_pooling.viewModels.OthersTripListViewModelFactory
 import java.io.File
 import java.io.FilterReader
 import java.lang.Double.parseDouble
@@ -31,35 +36,51 @@ import java.lang.NumberFormatException
 class OthersTripListFragment : Fragment() {
 
     var trip_count : Int = 0
-    lateinit var  tripList :List<Trip>
+    // lateinit var tripList :List<Trip>
     lateinit var mSearchText: EditText
     private lateinit var itemList :MutableList <Trip>
     lateinit var adapter: OthersTripCardAdapter
+    private lateinit var viewModel: OthersTripListViewModel
+    private lateinit var otherTripListViewMOdelFactory: OthersTripListViewModelFactory
+    private lateinit var userId: String
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
 
+        userId = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
+        otherTripListViewMOdelFactory = OthersTripListViewModelFactory(userId)
+        viewModel = otherTripListViewMOdelFactory.create(OthersTripListViewModel::class.java)
+
         return inflater.inflate(R.layout.fragment_others_trip_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // super.onViewCreated(view, savedInstanceState)
+
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
-
-
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
+        val tripList = mutableListOf<Trip>()
+        adapter = OthersTripCardAdapter(tripList, requireContext(), findNavController(), viewModel)
+        reciclerView.adapter = adapter
 
-
-        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
-        val db = FirebaseFirestore.getInstance()
-        val trips = db.collection("Trips")
-        val tripListdb = mutableListOf<Trip>()
+        viewModel.othersTrips.observe(viewLifecycleOwner, {
+            adapter.tripList = it
+            adapter.updateTripList(it)
+            Log.d("POLITO", "Others Trips size ${it.size}")
+            if (it.size > 0) {
+                view.findViewById<TextView>(R.id.empty_triplist).visibility=View.VISIBLE
+            } else {
+                view.findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
+            }
+        })
 
 
 //        requireView().findViewById<MaterialButton>(R.id.tripCardEditTripButton).visibility=View.INVISIBLE
 
+        /*
         trips.whereNotEqualTo("owner", acc_email)
                 .limit(20L)
                 .get()
@@ -87,53 +108,45 @@ class OthersTripListFragment : Fragment() {
             if (trip_count == 0){
                 super.onViewCreated(view, savedInstanceState)
             } else {
-
                 adapter = OthersTripCardAdapter(tripList, requireContext(), findNavController())
                 reciclerView.adapter = adapter
 
-
-
                 view.findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
-//                requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
-//                requireView().findViewById<MaterialButton>(R.id.tripCardEditTripButton).visibility=View.INVISIBLE
-
-
+                // requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
+                // requireView().findViewById<MaterialButton>(R.id.tripCardEditTripButton).visibility=View.INVISIBLE
             }
         }.addOnFailureListener { exception ->
             Log.d("nav_list_trip", "Error getting documents: ", exception)
         }
+         */
 
-        }
+    }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         menu.clear()
         inflater.inflate(R.menu.search_menu, menu)
-         val searchMenuItem = menu.findItem(R.id.search_button)
-//        searchMenuItem.expandActionView()
+        val searchMenuItem = menu.findItem(R.id.search_button)
+        // searchMenuItem.expandActionView()
         //menu.findItem()
         Log.d("POLITO", "search menu item ${searchMenuItem}")
-         val searchView =searchMenuItem.actionView as SearchView
-      //if (searchView != null) {
-          searchView.setQueryHint("search view hint")
-      //}
-      Log.d("POLITO", "Is null ${searchView}")
-      searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
-
-          override fun onQueryTextChange(newText: String?): Boolean {
-              Log.d("POLITO", "${newText}")
-              adapter.filter.filter(newText)
-              return false
-          }
-          override fun onQueryTextSubmit(charString: String?): Boolean {
-              return false
-          }
-
-
-      })
-            return super.onCreateOptionsMenu(menu, inflater)
-
-   }
+        val searchView =searchMenuItem.actionView as SearchView
+        //if (searchView != null) {
+        searchView.setQueryHint("search view hint")
+        //}
+        Log.d("POLITO", "Is null ${searchView}")
+        searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
+            override fun onQueryTextChange(newText: String?): Boolean {
+                Log.d("POLITO", "${newText}")
+                adapter.filter.filter(newText)
+                return false
+            }
+            override fun onQueryTextSubmit(charString: String?): Boolean {
+                return false
+            }
+        })
+        return super.onCreateOptionsMenu(menu, inflater)
+    }
 //     fun onQueryTextSubmit(query: String?): Boolean {
 ////        TODO("not yet implement")
 //         if (query !=null){
@@ -194,9 +207,6 @@ class OthersTripListFragment : Fragment() {
 //        return super.onOptionsItemSelected(item)
 //    }
 
-
-
-
 }
 
 
@@ -228,14 +238,15 @@ class OthersTripListFragment : Fragment() {
 //    }
 
 class OthersTripCardAdapter(
-        var tripList: List<Trip>,
-        val context: Context,
-        val navController: NavController): RecyclerView.Adapter<OthersTripCardAdapter.TripCardViewHolder>(), Filterable {
-        var tripFilterList: List<Trip> = tripList
+    var tripList: List<Trip>,
+    val context: Context,
+    val navController: NavController,
+    val viewModel: OthersTripListViewModel): RecyclerView.Adapter<OthersTripCardAdapter.TripCardViewHolder>(), Filterable {
+    var tripFilterList: List<Trip> = tripList
 
-                init {
-                    tripFilterList = tripList
-                }
+    init {
+        tripFilterList = tripList
+    }
 
     class TripCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
@@ -307,14 +318,18 @@ class OthersTripCardAdapter(
         holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeats.toString())
 
 
+
         val tripImageUri = selectedTrip.imageUri //sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
-        if (tripImageUri == "yes") {
+        if (selectedTrip.hasImage == true) {
             val localFile = File.createTempFile("trip_${selectedTrip.id}", "jpg")
             val storage = Firebase.storage
-            storage.reference.child("trips/${selectedTrip.id}.jpg").getFile(localFile).addOnSuccessListener {
-                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
-                holder.tripImageView.setImageBitmap(bitmap)
-            }
+            storage.reference
+                .child("trips/${selectedTrip.id}.jpg")
+                .getFile(localFile)
+                .addOnSuccessListener {
+                    val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                    holder.tripImageView.setImageBitmap(bitmap)
+                }
         } else {
             holder.tripImageView.setImageURI(Uri.parse("android.resource://it.polito.mad.car_pooling/drawable/car_default"))
         }
@@ -339,7 +354,6 @@ class OthersTripCardAdapter(
 
     }
 
-
     override fun getItemCount(): Int {
         return tripFilterList.size
     }
@@ -348,7 +362,7 @@ class OthersTripCardAdapter(
         return object :Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 var charSearch = constraint.toString().toLowerCase()
-                tripFilterList =tripList
+                tripFilterList = tripList
                 if(charSearch.isEmpty()){
 
                 }else{
@@ -371,65 +385,20 @@ class OthersTripCardAdapter(
                     }
                 }
                 var filterResults= FilterResults()
-                filterResults.values =tripFilterList
+                filterResults.values = tripFilterList
                 return filterResults
             }
-
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 tripFilterList=results?.values as List<Trip>
                 notifyDataSetChanged()
             }
-
         }
     }
 
-//    override fun getFilter(): Filter {
-//        return object : Filter() {
-//            fun publishResults(charSequence: CharSequence?, filterResults: FilterResults) {
-//                    tripList =filterResults.values as List<Trip>
-//                    notifyDataSetChanged()
-//
-//            }
-//            fun performFiltering(charSequence: CharSequence: CharSequence):FilterResults {
-//                val queryString = charSequence.toStrung().toLowerCase()
-//                val filterResults =FilterResults()
-//                filterResults.values if (queryString== null||queryString.isEmpty())
-//                    tripList
-//                else{
-//                    tripList.filter{
-//                        it.depLocation?.toLowerCase()!.contains(queryString) ||
-//                        it.depDate?.toLowerCase()!.contains(queryString)||
-//                        it.avaSeat?.toLowerCase()!.contains(queryString)||
-//                        it.ariLocation?.toLowerCase()!.contains(queryString)
-//                    }
-//                    return filterResults
-//                }
-//            }
-//
-//        }
-
-//    }
-
-
-}
-
-class  SearchResultsActivity :Activity(){
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        handleIntent(intent)
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        handleIntent(intent)
-    }
-
-    private fun handleIntent(intent: Intent?) {
-        if (intent != null) {
-            if (Intent.ACTION_SEARCH == intent.action){
-                val query =intent.getStringExtra(SearchManager.QUERY)
-            }
-        }
-
+    public fun updateTripList (tripList: List<Trip>) {
+        this.tripList = tripList
+        tripFilterList = tripList
+        notifyDataSetChanged()
     }
 }
 

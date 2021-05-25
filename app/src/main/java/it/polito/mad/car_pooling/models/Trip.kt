@@ -31,6 +31,7 @@ data class Trip (var id: String) {
                 new_trip.optional = getString("optional")!!
                 new_trip.plate = getString("plate")!!
                 new_trip.price = (getDouble("price")!!)
+                new_trip.hasImage = getBoolean("hasImage")
                 // new_trip.imageUri = getString("image_uri")!!
                 return new_trip
             } catch (e: Exception) {
@@ -80,4 +81,5 @@ data class Trip (var id: String) {
     var imageUri: String = ""
     var owner: String=""
     var status: String = OPEN
+    var hasImage: Boolean? = false
 }
