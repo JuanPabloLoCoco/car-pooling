@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.tasks.Task
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.services.FirebaseUserService
 import kotlinx.coroutines.flow.collect
@@ -17,5 +18,9 @@ class ProfileViewModel(private val userId: String): ViewModel() {
         viewModelScope.launch {
             FirebaseUserService.getUserById(userId).collect { _profile.value = it }
         }
+    }
+
+    fun saveUser(profileToSave: Profile): Task<Void> {
+        return FirebaseUserService.saveUser(profileToSave)
     }
 }

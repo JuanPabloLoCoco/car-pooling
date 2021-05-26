@@ -4,17 +4,6 @@ import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 
 class Profile (var fullName: String){
-    fun toMap(): Map<String, Any>{
-        return mapOf(
-                "full_name" to fullName,
-                "nick_name" to nickName,
-                "email" to email,
-                //"email" to inputEmail,
-                "location" to location,
-                "birthday" to birthday,
-                "phone_number" to phoneNumber)
-    }
-
     var nickName: String = ""
     var email: String = ""
     var location: String = ""
@@ -43,6 +32,18 @@ class Profile (var fullName: String){
                 return null
             }
         }
+    }
+
+    fun toMap(): Map<String, Any>{
+        return mapOf(
+                "full_name" to fullName,
+                "nick_name" to nickName,
+                "email" to email,
+                //"email" to inputEmail,
+                "location" to location,
+                "birthday" to birthday,
+                "phone_number" to phoneNumber,
+                "hasImage" to hasImage)
     }
 
 }

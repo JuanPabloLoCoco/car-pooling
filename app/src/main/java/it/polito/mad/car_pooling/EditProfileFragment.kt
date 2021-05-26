@@ -7,10 +7,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
-import android.graphics.Matrix
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.icu.text.SimpleDateFormat
 import android.media.ExifInterface
@@ -37,8 +34,8 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
-import it.polito.mad.car_pooling.viewModels.EditProfileViewModel
-import it.polito.mad.car_pooling.viewModels.EditProfileViewModelFactory
+import it.polito.mad.car_pooling.viewModels.ProfileViewModel
+import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
 import java.io.*
 import java.util.*
 
@@ -56,8 +53,8 @@ class EditProfileFragment : Fragment() {
 
     private lateinit var acc_email: String
 
-    private lateinit var viewModel: EditProfileViewModel
-    private lateinit var viewModelFactory: EditProfileViewModelFactory
+    private lateinit var viewModel: ProfileViewModel
+    private lateinit var viewModelFactory: ProfileViewModelFactory
 
     // ---------------------------- Life Cycle -----------------------
     @RequiresApi(Build.VERSION_CODES.N)
@@ -85,13 +82,13 @@ class EditProfileFragment : Fragment() {
             DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        var acc_emailone =sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
+        // val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        // var acc_emailone = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
 
-        acc_email = if (acc_emailone == null) "" else acc_emailone
+        acc_email = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
 
-        viewModelFactory = EditProfileViewModelFactory(acc_email)
-        viewModel = viewModelFactory.create(EditProfileViewModel::class.java)
+        viewModelFactory = ProfileViewModelFactory(acc_email)
+        viewModel = viewModelFactory.create(ProfileViewModel::class.java)
 
         return view
     }
@@ -137,12 +134,27 @@ class EditProfileFragment : Fragment() {
                 editPhotoView.setImageURI(imageUri)
             }
         }*/
+        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
+        val imageView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
 
-        viewModel.user.observe( viewLifecycleOwner, {
+        viewModel.profile.observe( viewLifecycleOwner, {
             val thisUser = it
             if (thisUser != null) {
+                loadProfileInFields(it, view)
                 Log.d("POLITO", "MyUser from viewMode = ${thisUser.fullName}")
+                if (it.hasImage == true) {
+                    val storage = Firebase.storage
+                    val imageRef = storage.reference.child("users/$acc_email.jpg")
+                    imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                        val image_uri = Uri.toString()
+                        Glide.with(this).load(image_uri).into(imageView)
+                    }
+                } else {
+                    imageUri = Uri.parse(default_str_profile)
+                    imageView.setImageURI(imageUri)
+                }
             } else {
+                writeTextView(view)
                 Log.d("POLITO", "MyUser from viewMode is null")
             }
         })
@@ -150,6 +162,7 @@ class EditProfileFragment : Fragment() {
         val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         var acc_emailone =sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
 
+        /*
         acc_email = if (acc_emailone == null) "" else acc_emailone
         val db = FirebaseFirestore.getInstance()
         val users = db.collection("Users")
@@ -186,6 +199,7 @@ class EditProfileFragment : Fragment() {
         } else {
             writeTextView(view)
         }
+        */
     }
 
     private fun writeTextView(view: View){
@@ -200,6 +214,14 @@ class EditProfileFragment : Fragment() {
         view.findViewById<ImageView>(R.id.imageViewEditPhoto).setImageURI(imageUri)
     }
 
+    private fun loadProfileInFields(profile: Profile, view: View) {
+        view.findViewById<TextInputLayout>(R.id.editViewFullName).editText?.setText(profile.fullName)
+        view.findViewById<TextInputLayout>(R.id.editViewNickName).editText?.setText(profile.nickName)
+        view.findViewById<TextInputLayout>(R.id.editViewEmail).editText?.setText(profile.email)
+        view.findViewById<TextInputLayout>(R.id.editViewLocation).editText?.setText(profile.location)
+        view.findViewById<TextView>(R.id.editViewBirthday).text = profile.birthday
+        view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.setText(profile.phoneNumber)
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -280,49 +302,9 @@ class EditProfileFragment : Fragment() {
             editPhotoView.setImageURI(imageUri);
         }
     }
-
-    private fun loadProfileInFields(profile: Profile, view: View) {
-        val etFullName = view.findViewById<TextInputLayout>(R.id.editViewFullName)
-        val etNickname = view.findViewById<TextInputLayout>(R.id.editViewNickName)
-        val etEmail = view.findViewById<TextInputLayout>(R.id.editViewEmail)
-        val etLocation = view.findViewById<TextInputLayout>(R.id.editViewLocation)
-        val etBirthday = view.findViewById<TextView>(R.id.editViewBirthday)
-        val etPhoneNumber = view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber)
-        val editPhotoView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
-
-        // val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-
-        // Get stored data
-        val fullName = profile.fullName //sharedPreferences.getString(getString(R.string.KeyFullName), getString(R.string.fullName))
-        val nickName = profile.nickName //sharedPreferences.getString(getString(R.string.KeyNickName), getString(R.string.nickName))
-        val email = profile.email //sharedPreferences.getString(getString(R.string.KeyEmail), getString(R.string.email))
-        val location = profile.location //sharedPreferences.getString(getString(R.string.KeyLocation), getString(R.string.location))
-        val phoneNumber = profile.phoneNumber //sharedPreferences.getString(getString(R.string.KeyPhoneNumber), getString(R.string.phoneNumber))
-        val birthday = profile.birthday //sharedPreferences.getString(getString(R.string.KeyBirthday), getString(R.string.birthday))
-        val storedImageUri =  if (profile.imageUri.isEmpty()) getUriFromResource(R.drawable.default_image).toString() else profile.imageUri //sharedPreferences.getString(getString(R.string.KeyImage), getUriFromResource(R.drawable.default_image).toString())
-
-        // Set Text
-        val etFullNameInput = if (fullName == getString(R.string.fullName)) "" else fullName
-        val etNicknameInput = if (nickName == getString(R.string.nickName)) "" else nickName
-        val etEmailInput = if (email == getString(R.string.email)) "" else email
-        val etLocationInput = if (location == getString(R.string.location)) "" else location
-        val etBirthdayInput = if (birthday == getString(R.string.birthday)) "" else birthday
-        val etPhoneNumberInput = if (phoneNumber == getString(R.string.phoneNumber)) "" else phoneNumber
-
-        etFullName.editText?.setText(etFullNameInput)
-        etNickname.editText?.setText(etNicknameInput)
-        etEmail.editText?.setText(etEmailInput)
-        etLocation.editText?.setText(etLocationInput)
-        etBirthday.text = etBirthdayInput
-        etPhoneNumber.editText?.setText(etPhoneNumberInput)
-
-
-        if (storedImageUri != null && storedImageUri.isNotEmpty()) {
-            imageUri = Uri.parse(storedImageUri)
-            editPhotoView.setImageURI(imageUri)
-        }
-    }
     */
+
+
 
     private fun savedProfileData () {
         //val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
@@ -378,6 +360,28 @@ class EditProfileFragment : Fragment() {
                 val storageRef = storage.reference
                 storageRef.child("users/$acc_email.jpg").putBytes(data)
 
+                val profileToSave = Profile(inputFullName)
+                profileToSave.nickName = inputNickname
+                profileToSave.phoneNumber = inputPhoneNumber
+                profileToSave.location = inputLocation
+                profileToSave.birthday = inputBirthday
+                profileToSave.email = acc_email.toString()
+                profileToSave.hasImage = true
+                viewModel.saveUser(profileToSave)
+                    .addOnSuccessListener {
+
+
+                    }
+                    .addOnFailureListener {
+                        Log.d("POLITO", "An error ocurrs updating profile")
+                        //Snackbar.make(requireView(), R.string. , Snackbar.LENGTH_SHORT)
+                        //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                        //        .show()
+                    }
+                Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
+                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                        .show()
+                /*
                 my_profile.set(mapOf("full_name" to inputFullName,
                                      "nick_name" to inputNickname,
                                      "email" to acc_email.toString(),
@@ -387,17 +391,13 @@ class EditProfileFragment : Fragment() {
                                      "phone_number" to inputPhoneNumber,
                                      //"image_uri" to inputPhotoView
                                      "image_uri" to "yes"))
-                viewModel.saveUser()
                 //savedProfileData()
-                Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
-                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                        .show()
-
+                */
                 val showProfileArgs = EditProfileFragmentDirections.actionEditProfileFragmentToShowProfileFragment(userId = acc_email!!,isOwner=true)
 
                 if (!findNavController().popBackStack()) {
                     findNavController().navigate(showProfileArgs)
-                //navigate(showProfileArgs)
+                    //navigate(showProfileArgs)
                 }
                 return true
             }
