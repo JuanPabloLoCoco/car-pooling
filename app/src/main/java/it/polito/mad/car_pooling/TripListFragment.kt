@@ -15,7 +15,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -200,7 +199,7 @@ class TripCardAdapter (val tripList: List<Trip>,
 
         holder.tripCardView.setOnClickListener {
             //val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
-            val action = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id, true)
+            val action = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id, true, "myTrips")
             navController.navigate(action/*R.id.action_nav_list_trip_to_nav_trip, bundle*/)
         }
 

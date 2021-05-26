@@ -27,6 +27,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -34,6 +35,8 @@ import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -58,6 +61,7 @@ class TripEditFragment : Fragment() {
 
     lateinit var selectedTrip: Trip
     lateinit var check_status: String
+    lateinit var adapter: OptionalIntermediatesCardAdapter
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -242,6 +246,32 @@ class TripEditFragment : Fragment() {
             val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter")
             findNavController().navigate(action)
             //findNavController().navigate(R.id.action_tripEditFragment_to_mapFragment)
+        }
+
+        val optionalInterRV = view.findViewById<RecyclerView>(R.id.optional_intermediates_RV)
+        optionalInterRV.layoutManager = LinearLayoutManager(requireContext())
+        val testList = mutableListOf<String>()
+        val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
+        if (testList.size == 0) {
+            optionalInterRV.visibility = View.GONE
+            noOpInterView.visibility = View.VISIBLE
+        }
+        val addOptionalIntermediatesButton = view.findViewById<ImageView>(R.id.mapAddInterImageButtonTest)
+        addOptionalIntermediatesButton.setOnClickListener {
+            //val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter")
+            //findNavController().navigate(action)
+            val randomNum = Random().nextInt(100)
+            Log.d("Trip!!!!!!!!!!!", "$randomNum")
+            testList.add(randomNum.toString())
+            if (testList.size == 0) {
+                optionalInterRV.visibility = View.GONE
+                noOpInterView.visibility = View.VISIBLE
+            } else {
+                optionalInterRV.visibility = View.VISIBLE
+                noOpInterView.visibility = View.GONE
+            }
+            val adapter = OptionalIntermediatesCardAdapter(testList, requireContext(), view)
+            optionalInterRV.adapter = adapter
         }
 
         return view
@@ -635,6 +665,47 @@ class TripEditFragment : Fragment() {
             }
             else -> {
                 // Nothing
+            }
+        }
+    }
+}
+
+class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableList<String>,
+                                        val context: Context,
+                                        val view: View) :
+    RecyclerView.Adapter<OptionalIntermediatesCardAdapter.OptionalIntermediatesViewHolder>() {
+    class OptionalIntermediatesViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val optionalInterCard = v.findViewById<CardView>(R.id.optionalInterTripCard)
+        val optionalInterText = v.findViewById<TextView>(R.id.optional_intermediates_text)
+        val deleteCardImageButton = v.findViewById<ImageButton>(R.id.imageButton_delete_card)
+        fun bind(t: String) {}
+        fun unbind() {}
+    }
+
+    override fun getItemCount(): Int {
+        return optionalIntermediatesList.size
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OptionalIntermediatesViewHolder {
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.optional_intermediates_card, parent, false)
+        return OptionalIntermediatesViewHolder(v)
+    }
+
+    override fun onViewRecycled(holder: OptionalIntermediatesViewHolder) {
+        super.onViewRecycled(holder)
+        holder.unbind()
+    }
+
+    override fun onBindViewHolder(holder: OptionalIntermediatesViewHolder, position: Int) {
+        val selectedRequest: String = optionalIntermediatesList[position]
+        holder.optionalInterText.text = selectedRequest
+        holder.deleteCardImageButton.setOnClickListener {
+            optionalIntermediatesList.removeAt(position)
+            notifyDataSetChanged()
+            val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
+            if (getItemCount() == 0) {
+                noOpInterView.visibility = View.VISIBLE
             }
         }
     }

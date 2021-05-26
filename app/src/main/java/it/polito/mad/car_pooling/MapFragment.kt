@@ -28,6 +28,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import java.util.*
 
@@ -91,7 +92,7 @@ class MapFragment : Fragment() {
         })
 
         //37.4219983,-122.084
-        /*val origin = GeoPoint(37.4219983,-122.084)
+        val origin = GeoPoint(37.4219983,-122.084)
         val p1 = GeoPoint(40.4219983,-115.084)
         val p2 = GeoPoint(45.4219983,-110.084)
         var geoPoints = ArrayList<GeoPoint>()
@@ -101,7 +102,7 @@ class MapFragment : Fragment() {
         Log.d("map!!!", "${geoPoints}")
         val line = Polyline()
         line.setPoints(geoPoints)
-        map.overlays.add(line)*/
+        map.overlays.add(line)
 
         val buttonSaveLocation = view.findViewById<Button>(R.id.buttonSaveLocation)
         buttonSaveLocation.setOnClickListener{

@@ -29,6 +29,9 @@
         <argument
             android:name="isOwner"
             app:argType="boolean" />
+        <argument
+            android:name="sourceFragment"
+            app:argType="string" />
         <action
             android:id="@+id/action_nav_trip_to_nav_profile"
             app:destination="@id/nav_profile" />
@@ -167,6 +170,9 @@
         <action
             android:id="@+id/action_nav_list_bought_trip_to_nav_profile"
             app:destination="@id/nav_profile" />
+        <action
+            android:id="@+id/action_nav_list_bought_trip_to_nav_trip"
+            app:destination="@id/nav_trip" />
     </fragment>
     <fragment
         android:id="@+id/nav_list_interest_trip"
@@ -176,6 +182,9 @@
         <action
             android:id="@+id/action_nav_list_interest_trip_to_nav_profile"
             app:destination="@id/nav_profile" />
+        <action
+            android:id="@+id/action_nav_list_interest_trip_to_nav_trip"
+            app:destination="@id/nav_trip" />
     </fragment>
     <fragment
         android:id="@+id/mapFragment"

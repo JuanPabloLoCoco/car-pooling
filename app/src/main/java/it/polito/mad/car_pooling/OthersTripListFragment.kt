@@ -21,11 +21,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
-import it.polito.mad.car_pooling.models.TripList
 import java.io.File
-import java.io.FilterReader
 import java.lang.Double.parseDouble
-import java.lang.NumberFormatException
 
 
 class OthersTripListFragment : Fragment() {
@@ -324,7 +321,7 @@ class OthersTripCardAdapter(
 
         holder.tripCardView.setOnClickListener {
             // Handle navigation to Trip
-            val action = OthersTripListFragmentDirections.actionOthersTripListFragmentToNavTrip(tripId = selectedTrip.id, isOwner = false)
+            val action = OthersTripListFragmentDirections.actionOthersTripListFragmentToNavTrip(tripId = selectedTrip.id, isOwner = false, sourceFragment = "otherTrips")
             navController.navigate(action)
         }
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).text = "Profile"

@@ -39,8 +39,7 @@
         android:layout_weight="2"
         android:layout_marginHorizontal="16dp"
         android:paddingTop="10dp"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="20dp">
+        android:paddingHorizontal="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -320,6 +319,50 @@
                     android:textColor="#4D000000"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="#20000000"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_baseline_share_location_24"
+                    tools:ignore="VectorDrawableCompat"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/optionalIntermediatesTextView"
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textSize="20dp"
+                    android:text="Optional Intermediates"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+
+                <ImageButton
+                    android:background="#20000000"
+                    android:id="@+id/mapAddInterImageButtonTest"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_baseline_add_location_alt_24"
+                    android:scaleType="fitXY"
+                    android:layout_marginRight="5dp"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/noLocationMessageTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="There are no optional intermediates for this trip"
+                android:gravity="center"
+                android:layout_marginBottom="10dp"/>
+
             <Button
                 android:id="@+id/blockTripButton"
                 android:layout_width="match_parent"
@@ -328,8 +371,7 @@
                 android:layout_marginBottom="10dp"
                 android:layout_gravity="center"
                 android:text="Block trip"
-                android:backgroundTint="@color/design_default_color_error"
-                />
+                android:backgroundTint="@color/design_default_color_error" />
         </LinearLayout>
 
     </ScrollView>
