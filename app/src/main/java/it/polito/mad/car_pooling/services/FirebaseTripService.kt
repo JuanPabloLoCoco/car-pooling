@@ -1,9 +1,12 @@
 package it.polito.mad.car_pooling.services
 
 import android.util.Log
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
+import it.polito.mad.car_pooling.models.Profile.Companion.toUser
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.Trip.Companion.toTrip
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +30,7 @@ object FirebaseTripService {
                         cancel(message = "Error fetching other trips", cause = firebaseFirestoreException)
                         return@addSnapshotListener
                     }
-                    val map = querySnapshot?.documents
+                    val map = querySnapshot.documents
                         .mapNotNull { it.toTrip() }
                     offer(map)
                 }
@@ -49,7 +52,7 @@ object FirebaseTripService {
                         cancel(message = "Error fetching other trips", cause = firebaseFirestoreException)
                         return@addSnapshotListener
                     }
-                    val map = querySnapshot?.documents
+                    val map = querySnapshot.documents
                         .mapNotNull { it.toTrip() }
                     offer(map)
                 }
@@ -58,5 +61,32 @@ object FirebaseTripService {
                 listenerRegistration.remove()
             }
         }
+    }
+
+    @ExperimentalCoroutinesApi
+    suspend fun getTripById(tripId: String): Flow<Trip?> {
+        val db = FirebaseFirestore.getInstance()
+        return callbackFlow {
+            val listenerRegistration = db.collection(TRIP_COLLECTION)
+                    .document(tripId)
+                    .addSnapshotListener { documentSnapshot: DocumentSnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                        if (firebaseFirestoreException != null || documentSnapshot == null) {
+                            cancel(message = "Error fetching trip with id = $tripId", cause = firebaseFirestoreException)
+                            return@addSnapshotListener
+                        }
+                        val user = documentSnapshot.toTrip()
+                        offer(user)
+                    }
+            awaitClose {
+                Log.d(TAG, "Cancelling trip with id $tripId listener")
+                listenerRegistration.remove()
+            }
+        }
+    }
+
+    suspend fun updateTrip(trip: Trip): Task<Void> {
+        val db = FirebaseFirestore.getInstance()
+        return db.document(trip.id)
+                .update(trip.toMap())
     }
 }

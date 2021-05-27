@@ -6,6 +6,8 @@ import java.lang.Exception
 
 // data class  Model(val name: String= "", val count: Int = 0)
 data class Trip (var id: String) {
+
+
     companion object {
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
@@ -83,4 +85,20 @@ data class Trip (var id: String) {
     var owner: String=""
     var status: String = OPEN
     var hasImage: Boolean? = false
+
+    fun toMap(): Map<String, Any> {
+        return mapOf<String, Any>(
+                "depLocation" to depLocation,
+                "additional" to additional,
+                "ariLocation" to ariLocation,
+                "avaSeats" to avaSeats,
+                "depDate" to depDate,
+                "depTime" to depTime,
+                "estDuration" to estDuration,
+                "optional" to optional,
+                "plate" to plate,
+                "price" to price,
+                "owner" to owner
+        )
+    }
 }
