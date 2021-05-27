@@ -264,8 +264,8 @@ class TripDetailsFragment : Fragment() {
 
         val buttonCheckLocationMap = view.findViewById<Button>(R.id.buttonCheckLocationMap)
         buttonCheckLocationMap.setOnClickListener {
-            val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation")
-            findNavController().navigate(action)
+            //val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation")
+            //findNavController().navigate(action)
             //findNavController().navigate(R.id.action_nav_trip_to_mapFragment)
         }
 

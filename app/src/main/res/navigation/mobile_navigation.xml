@@ -71,8 +71,7 @@
             android:defaultValue="true" />
         <action
             android:id="@+id/action_tripEditFragment_to_mapFragment"
-            app:destination="@id/mapFragment" >
-
+            app:destination="@id/mapFragment">
         </action>
 
     </fragment>
@@ -193,6 +192,9 @@
         tools:layout="@layout/fragment_map">
         <argument
             android:name="source"
+            app:argType="string" />
+        <argument
+            android:name="sourceLocation"
             app:argType="string" />
     </fragment>
 
