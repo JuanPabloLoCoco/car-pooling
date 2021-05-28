@@ -44,7 +44,8 @@ class MapFragment : Fragment() {
     val PERMISSION_ID = 1010
     val args: MapFragmentArgs by navArgs()
     val args2: TripEditFragmentArgs by navArgs()
-    private lateinit var originListLocation: MutableList<StopLocation>
+    lateinit var originListLocation: MutableList<Map<String, String>>
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -58,9 +59,15 @@ class MapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val source = args.source
-        val type = object: TypeToken<MutableList<StopLocation>>(){}.type
-        originListLocation = Gson().fromJson<MutableList<StopLocation>>(args.sourceLocation, type)
-        //Log.d("map!!!", "${source}")
+        /*val type = object: TypeToken<MutableList<StopLocation>>(){}.type
+        originListLocation = Gson().fromJson<MutableList<StopLocation>>(args.sourceLocation, type)*/
+        val type = object: TypeToken<MutableList<Map<String, String>>>(){}.type
+        originListLocation = Gson().fromJson(args.sourceLocation, type)
+        Log.d("map!!!args!!!!", "${args.sourceLocation}")
+        Log.d("map!!!args!!!!", "${originListLocation}")
+        if (originListLocation.size != 0) {
+            Log.d("map!!!args!!!!", "${originListLocation[0].get("address")}")
+        }
 
         Configuration.getInstance().load(activity, PreferenceManager.getDefaultSharedPreferences(activity))
         map = view.findViewById<MapView>(R.id.map)
@@ -101,11 +108,24 @@ class MapFragment : Fragment() {
                     tempLocation.address = address.get(0).getAddressLine(0)
                     tempLocation.latitude = geoPoint.latitude.toString()
                     tempLocation.longitude = geoPoint.longitude.toString()
-                    //val tempLocation = listOf(address, geoPoint.latitude.toString(), geoPoint.longitude.toString())
-                    var newList = originListLocation.toMutableList()
-                    Log.d("map!!!!!", "$newList")
+                    val newList : MutableList<StopLocation> = emptyList<StopLocation>().toMutableList()
+                    for (i in 0..originListLocation.size - 1) {
+                        val temp = StopLocation(originListLocation[i]["address"]!!)
+                        temp.address = (originListLocation[i]["address"]!!)//.split(",")[0]
+                        temp.city = city
+                        temp.country = country
+                        temp.latitude = originListLocation[i]["latitude"]!!
+                        temp.longitude = originListLocation[i]["latitude"]!!
+                        newList.add(temp)
+                        Log.d("map!!!!!newList", "${originListLocation[i]["address"]}")
+                        Log.d("map!!!!!newList", "$temp")
+                        Log.d("map!!!!!newList", "$newList")
+                    }
+                    Log.d("map!!!!!newList", "$tempLocation")
+                    Log.d("map!!!!!newList", "$originListLocation")
+                    Log.d("map!!!!!newList", "$newList")
                     newList.add(tempLocation)
-                    Log.d("map!!!!!!", "$newList")
+                    Log.d("map!!!!!newList", "$newList")
                     findNavController().previousBackStackEntry?.savedStateHandle?.set("location", Gson().toJson(newList))
                     findNavController().popBackStack()
                 }

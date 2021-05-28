@@ -270,26 +270,24 @@ class TripEditFragment : Fragment() {
         optionalInterRV.adapter = adapter
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("location")?.observe(
             viewLifecycleOwner) { result ->
-            Log.d("trip!!!!!!!!!", "${locationList.size}")
+            Log.d("trip!!!!!!!!", "${locationList.size}")
             val randomNum = Random().nextInt(100)
             val type = object: TypeToken<MutableList<StopLocation>>(){}.type
             val jsonList = Gson().fromJson<MutableList<StopLocation>>(result, type)
-            val insertLocation = StopLocation("")
+            Log.d("trip!!!!!!!!", "${jsonList}")
             Log.d("trip!!!!!!!!", "${jsonList[0]}")
             Log.d("trip!!!!!!!!", "${jsonList[0].address}")
-            /*insertLocation.address = jsonList[0].toString()
-            insertLocation.latitude = jsonList[1].toString()
-            insertLocation.longitude = jsonList[2].toString()*/
-            //locationList.add(insertLocation)
-            for (item in jsonList) {
-                Log.d("trip!!!!!!!!", "$item")
-                insertLocation.address = item.address
-                insertLocation.latitude = item.latitude
-                insertLocation.longitude = item.longitude
+            for (i in 0..jsonList.size - 1) {
+                val insertLocation = StopLocation(jsonList[i].fullAddress)
+                insertLocation.address = jsonList[i].address
+                insertLocation.city = jsonList[i].city
+                insertLocation.country = jsonList[i].country
+                insertLocation.latitude = jsonList[i].latitude
+                insertLocation.longitude = jsonList[i].longitude
                 locationList.add(insertLocation)
             }
-            Log.d("trip!!!!!!!!!", "${locationList.size}")
-            Log.d("trip!!!!!!!!!", "$tripNewOrNot")
+            Log.d("trip!!!!!!!!", "${locationList}")
+            Log.d("trip!!!!!!!!", "${locationList.size}")
             val adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
             optionalInterRV.adapter = adapter
             if (locationList.size == 0) {
@@ -736,8 +734,8 @@ class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableLi
     }
 
     override fun onBindViewHolder(holder: OptionalIntermediatesViewHolder, position: Int) {
-        val selectedRequest: String = optionalIntermediatesList[position].address
-        holder.optionalInterText.text = selectedRequest
+        val address: String = optionalIntermediatesList[position].address
+        holder.optionalInterText.text = address
         holder.deleteCardImageButton.setOnClickListener {
             optionalIntermediatesList.removeAt(position)
             notifyDataSetChanged()
