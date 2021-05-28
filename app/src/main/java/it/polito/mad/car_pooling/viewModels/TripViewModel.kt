@@ -2,6 +2,7 @@ package it.polito.mad.car_pooling.viewModels
 
 import androidx.lifecycle.*
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import it.polito.mad.car_pooling.models.Trip
@@ -53,15 +54,38 @@ class TripViewModel (private val tripId: String): ViewModel() {
                     val tripToUpdate = trip.value
                     tripToUpdate!!.status = Trip.FULL
                     viewModelScope.launch {
+                        /*
                         FirebaseTripService.updateTrip(tripToUpdate!!)
                                 .addOnSuccessListener {
                                     FirebaseTripRequestService.cancellAllPendingRequest(tripId)
                                 }
+
+                         */
+                        updateTripStatus(Trip.FULL)
                     }
 
                 }
         }
         return FirebaseTripRequestService.updateTripRequest(tripRequest)
+    }
 
+    suspend fun updateTripStatus(status: String): Task<Void> {
+        val tripToUpdate = trip.value
+        tripToUpdate!!.status = status
+        return FirebaseTripService.updateTrip(tripToUpdate)
+                .addOnSuccessListener {
+                    if (status == Trip.FULL || status == Trip.BLOCKED) {
+                        FirebaseTripRequestService.cancellAllPendingRequest(tripId)
+                    }
+                    return@addOnSuccessListener
+                }
+    }
+
+    fun createTrip(trip: Trip): Task<DocumentReference> {
+        return FirebaseTripService.createTrip(trip)
+    }
+
+    fun updateTrip(trip: Trip): Task<Void> {
+        return FirebaseTripService.updateTrip(trip)
     }
 }

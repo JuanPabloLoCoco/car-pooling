@@ -78,8 +78,9 @@ class TripListFragment : Fragment() {
 
         val fabView = view.findViewById<FloatingActionButton>(R.id.addTripFAB)
         fabView.setOnClickListener {
-            val bundle = bundleOf( "newOrOld" to "new")
-            findNavController().navigate(R.id.action_nav_list_trip_to_tripEditFragment, bundle)
+            // val bundle = bundleOf( "newOrOld" to "new")
+            val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(tripId = null)
+            findNavController().navigate(action)
         }
     }
 }
@@ -139,7 +140,7 @@ class TripCardAdapter (var tripList: List<Trip>,
 
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener{
             // Handle navigation to edit trip detail
-            val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id, 0)
+            val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(selectedTrip.id)
             navController.navigate(action/*R.id.action_nav_list_trip_to_tripEditFragment, bundle*/)
         }
     }

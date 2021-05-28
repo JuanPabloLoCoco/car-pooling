@@ -414,11 +414,12 @@ class TripDetailsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId){
             R.id.edit_trip -> {
-                val tripId = arguments?.getString("tripId")
+                val tripId = args.tripId
                 //val editTripFragmentArguments = TripDetailsFragmentDirections.actionTripDetailsFragmentToTripEditFragment(tripId)
                 //findNavController().navigate(editTripFragmentArguments)
-                val bundle = bundleOf( "tripId" to tripId)
-                findNavController().navigate(R.id.action_tripDetailsFragment_to_tripEditFragment, bundle)
+                // val bundle = bundleOf( "tripId" to tripId)
+                val action = TripDetailsFragmentDirections.actionTripDetailsFragmentToTripEditFragment(tripId!!)
+                findNavController().navigate(action)
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -2,10 +2,7 @@ package it.polito.mad.car_pooling.services
 
 import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import it.polito.mad.car_pooling.models.Profile.Companion.toUser
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.Trip.Companion.toTrip
@@ -84,9 +81,21 @@ object FirebaseTripService {
         }
     }
 
-    suspend fun updateTrip(trip: Trip): Task<Void> {
+    fun updateTrip(trip: Trip): Task<Void> {
         val db = FirebaseFirestore.getInstance()
-        return db.document(trip.id)
+        val tripId = trip.id
+        return db.collection(TRIP_COLLECTION)
+                .document(tripId)
                 .update(trip.toMap())
     }
+
+    fun createTrip(trip: Trip): Task<DocumentReference> {
+        val db = FirebaseFirestore.getInstance()
+        return db.collection(TRIP_COLLECTION)
+                .add(trip.toMap())
+    }
+
+
+
+
 }

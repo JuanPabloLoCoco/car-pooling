@@ -6,8 +6,6 @@ import java.lang.Exception
 
 // data class  Model(val name: String= "", val count: Int = 0)
 data class Trip (var id: String) {
-
-
     companion object {
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
@@ -23,24 +21,42 @@ data class Trip (var id: String) {
             val new_trip = Trip("0")
             try {
                 new_trip.id = id
-                new_trip.depLocation = getString("depLocation")!!
-                new_trip.additional = getString("additional")!!
-                new_trip.ariLocation = getString("ariLocation")!!
-                new_trip.avaSeats = (getLong("avaSeats")!!).toInt()
-                new_trip.depDate = getString("depDate")!!
-                new_trip.depTime = getString("depTime")!!
-                new_trip.estDuration = getString("estDuration")!!
-                new_trip.optional = getString("optional")!!
-                new_trip.plate = getString("plate")!!
-                new_trip.price = (getDouble("price")!!)
-                new_trip.owner = getString("owner")!!
-                new_trip.hasImage = getBoolean("hasImage")
+                new_trip.depLocation = getString("depLocation")?: ""
+                new_trip.additional = getString("additional")?:""
+                new_trip.ariLocation = getString("ariLocation")?:""
+                new_trip.avaSeats = (getLong("avaSeats")?: 0).toInt()
+                new_trip.depDate = getString("depDate")?:""
+                new_trip.depTime = getString("depTime")?:""
+                new_trip.estDuration = getString("estDuration")?:""
+                new_trip.optional = getString("optional")?:""
+                new_trip.plate = getString("plate")?:""
+                new_trip.price = (getDouble("price")?: 0.0).toDouble()
+                new_trip.owner = getString("owner")?:""
+                new_trip.hasImage = getBoolean("hasImage")?: false
                 // new_trip.imageUri = getString("image_uri")!!
                 return new_trip
             } catch (e: Exception) {
-                Log.e(TAG, "Error converting trip with id ${new_trip.id}", e)
+                Log.d(TAG, "Error converting trip with id ${new_trip.id}", e)
                 return null
             }
+        }
+
+        fun NewTrip(): Trip {
+            var newTrip = Trip("0")
+            newTrip.depLocation = ""
+            newTrip.ariLocation = ""
+            newTrip.depTime = ""
+            newTrip.depDate = ""
+            newTrip.estDuration = ""
+            newTrip.avaSeats = 0
+            newTrip.price = 10.0
+            newTrip.additional = ""
+            newTrip.optional = ""
+            newTrip.plate = ""
+            newTrip.owner = ""
+            newTrip.status = OPEN
+            newTrip.hasImage = false
+            return newTrip
         }
     }
 
@@ -69,6 +85,8 @@ data class Trip (var id: String) {
         this.plate = plate
         this.imageUri = imageUri
         this.owner = owner
+        this.status = OPEN
+
     }
 
     var depLocation: String = ""
@@ -84,7 +102,7 @@ data class Trip (var id: String) {
     var imageUri: String = ""
     var owner: String=""
     var status: String = OPEN
-    var hasImage: Boolean? = false
+    var hasImage: Boolean = false
 
     fun toMap(): Map<String, Any> {
         return mapOf<String, Any>(
@@ -98,7 +116,9 @@ data class Trip (var id: String) {
                 "optional" to optional,
                 "plate" to plate,
                 "price" to price,
-                "owner" to owner
+                "owner" to owner,
+                "status" to status,
+                "hasImage" to hasImage
         )
     }
 }
