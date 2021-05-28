@@ -134,7 +134,7 @@ class TripCardAdapter (var tripList: List<Trip>,
 
         holder.tripCardView.setOnClickListener {
             //val tripDetailArguments = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id)
-            val action = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id, true)
+            val action = TripListFragmentDirections.actionNavListTripToNavTrip(selectedTrip.id, true, "myTrips")
             navController.navigate(action/*R.id.action_nav_list_trip_to_nav_trip, bundle*/)
         }
 

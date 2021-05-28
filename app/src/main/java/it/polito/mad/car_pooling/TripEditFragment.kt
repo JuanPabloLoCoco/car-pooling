@@ -27,6 +27,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -35,6 +36,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -69,6 +72,8 @@ class TripEditFragment : Fragment() {
 
     private lateinit var tripId: String
     private val NEW_TRIP: String = "NEW_TRIP"
+    lateinit var check_status: String
+    lateinit var adapter: OptionalIntermediatesCardAdapter
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -81,134 +86,6 @@ class TripEditFragment : Fragment() {
 
         viewModelFactory = TripViewModelFactory(tripId)
         viewModel = viewModelFactory.create(TripViewModel::class.java)
-
-
-        // Instanciate the database
-        // val db = FirebaseFirestore.getInstance()
-
-        // Get the views
-        /*
-        val editDepLocation = view.findViewById<TextInputLayout>(R.id.textEditDepLocation)
-        val editAriLocation = view.findViewById<TextInputLayout>(R.id.textEditAriLocation)
-        val editEstDuration = view.findViewById<TextInputLayout>(R.id.textEditEstDuration)
-        val editAvaSeat = view.findViewById<TextInputLayout>(R.id.textEditAvaSeat)
-        val editPrice = view.findViewById<TextInputLayout>(R.id.textEditPrice)
-        val editAdditional = view.findViewById<TextInputLayout>(R.id.textEditAdditional)
-        val editOptional = view.findViewById<TextInputLayout>(R.id.textEditOptional)
-        val editPlate = view.findViewById<TextInputLayout>(R.id.textEditPlate)
-        */
-
-        //if (isNewTrip == true) {
-
-        //} else {
-            //check_status = "old"
-            //input_idx = tripId
-            /*
-            blockTripButton.setOnClickListener {
-                // Change status of trip to BLOCK
-                // Change all the request that have status PENDING -> REJECTED
-                // Do not display the requestFAB on the button
-                blockTripButton.isEnabled = false
-                db.collection(Trip.DATA_COLLECTION)
-                        .document(tripId!!)
-                        .update(
-                                mapOf(Trip.FIELD_STATUS to Trip.BLOCKED)
-                        )
-                        .addOnSuccessListener {
-                            // Change all the request that have status PENDING -> REJECT
-                            db.collection(TripRequest.DATA_COLLECTION)
-                                    .whereEqualTo("status", TripRequest.PENDING)
-                                    .whereEqualTo("tripId", tripId)
-                                    .get()
-                                    .addOnSuccessListener {documents ->
-                                        for (document in documents) {
-                                            val tripRequestId = document.id
-                                            db.collection(TripRequest.DATA_COLLECTION)
-                                                    .document(tripRequestId)
-                                                    .update(mapOf("status" to TripRequest.REJECTED))
-                                        }
-                                        Snackbar.make(view, "The trip was succesfully blocked", Snackbar.LENGTH_SHORT)
-                                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                                                .show()
-                                    }
-
-                        }
-                        .addOnFailureListener {
-                            blockTripButton.isEnabled = true
-                            Snackbar.make(view, "An error happen while updating the trip", Snackbar.LENGTH_SHORT)
-                                    .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                                    .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.design_default_color_error))
-                                    .show()
-                        }
-                Log.d("POLITO", "We need to block this trip")
-            }
-            */
-        //}
-
-        /*if (tripId == Trip.NEW_TRIP_ID) {
-            selectedTrip = Trip(Trip.NEW_TRIP_ID)
-            (activity as AppCompatActivity).supportActionBar?.title = "Create new trip"
-        } else {
-            var storedTripList = ModelPreferencesManager.get<TripList>(getString(R.string.KeyTripList))
-            if (storedTripList == null) {
-                // An imposible case
-                Log.e("POLITO_ERRORS", "You are accesing an invalid id")
-            } else {
-                val tripList = storedTripList.tripList
-                selectedTrip = tripList.get(tripId)
-            }
-        } */
-
-
-        // Get the trip data
-        // val trips = db.collection("Trips")
-        /*
-        if (input_idx == "default_trip"){
-            /*editDepLocation.editText?.setText("Departure Location")
-            editAriLocation.editText?.setText("Arrival Location")
-            editEstDuration.editText?.setText("Estimated Duration")
-            editAdditional.editText?.setText("Additional Information")
-            editOptional.editText?.setText("Optional Intermediates")
-            editPlate.editText?.setText("Plate Number")*/
-            editAvaSeat.editText?.setText("0")
-            editPrice.editText?.setText("0")
-            editDepDate.text = "Departure Date"
-            editDepTime.text = "Time"
-            //editDepDate.setTextColor(Color.parseColor("#54150808"))
-            //editDepTime.setTextColor(Color.parseColor("#54150808"))
-            editimageView.setImageURI(Uri.parse(default_str_car))
-        } else {
-            trips.document(input_idx).addSnapshotListener { value, error ->
-                if (error != null) throw error
-                if (value != null) {
-                    editDepLocation.editText?.setText(value["depLocation"].toString())
-                    editAriLocation.editText?.setText(value["ariLocation"].toString())
-                    editEstDuration.editText?.setText(value["estDuration"].toString())
-                    editAvaSeat.editText?.setText(value["avaSeats"].toString())
-                    editPrice.editText?.setText(value["price"].toString())
-                    editAdditional.editText?.setText(value["additional"].toString())
-                    editOptional.editText?.setText(value["optional"].toString())
-                    editPlate.editText?.setText(value["plate"].toString())
-                    editDepDate.text = value["depDate"].toString()
-                    editDepTime.text = value["depTime"].toString()
-                    editDepDate.setTextColor(Color.parseColor("#54150808"))
-                    editDepTime.setTextColor(Color.parseColor("#54150808"))
-
-                    val storage = Firebase.storage
-                    /*val localFile = File.createTempFile("my_trip", "jpg")
-                    storage.reference.child("trips/$input_idx.jpg").getFile(localFile).addOnSuccessListener {
-                        val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
-                        editimageView.setImageBitmap(bitmap)
-                    }*/
-                    val imageRef = storage.reference.child("trips/$input_idx.jpg")
-                    imageRef.downloadUrl.addOnSuccessListener { Uri ->
-                        val image_uri = Uri.toString()
-                        Glide.with(this).load(image_uri).into(editimageView)
-                    }
-                }
-            }
-        }
-        */
 
         return inflater!!.inflate(R.layout.fragment_trip_edit, container, false)
     }
@@ -354,6 +231,34 @@ class TripEditFragment : Fragment() {
             findNavController().navigate(action)
             //findNavController().navigate(R.id.action_tripEditFragment_to_mapFragment)
         }
+
+        val optionalInterRV = view.findViewById<RecyclerView>(R.id.optional_intermediates_RV)
+        optionalInterRV.layoutManager = LinearLayoutManager(requireContext())
+        val testList = mutableListOf<String>()
+        val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
+        if (testList.size == 0) {
+            optionalInterRV.visibility = View.GONE
+            noOpInterView.visibility = View.VISIBLE
+        }
+        val addOptionalIntermediatesButton = view.findViewById<ImageView>(R.id.mapAddInterImageButtonTest)
+        addOptionalIntermediatesButton.setOnClickListener {
+            //val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter")
+            //findNavController().navigate(action)
+            val randomNum = Random().nextInt(100)
+            Log.d("Trip!!!!!!!!!!!", "$randomNum")
+            testList.add(randomNum.toString())
+            if (testList.size == 0) {
+                optionalInterRV.visibility = View.GONE
+                noOpInterView.visibility = View.VISIBLE
+            } else {
+                optionalInterRV.visibility = View.VISIBLE
+                noOpInterView.visibility = View.GONE
+            }
+            val adapter = OptionalIntermediatesCardAdapter(testList, requireContext(), view)
+            optionalInterRV.adapter = adapter
+        }
+
+        // return view
     }
 
     private fun loadDataInFields(trip: Trip, view: View) {
@@ -744,6 +649,47 @@ class TripEditFragment : Fragment() {
             }
             else -> {
                 // Nothing
+            }
+        }
+    }
+}
+
+class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableList<String>,
+                                        val context: Context,
+                                        val view: View) :
+    RecyclerView.Adapter<OptionalIntermediatesCardAdapter.OptionalIntermediatesViewHolder>() {
+    class OptionalIntermediatesViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val optionalInterCard = v.findViewById<CardView>(R.id.optionalInterTripCard)
+        val optionalInterText = v.findViewById<TextView>(R.id.optional_intermediates_text)
+        val deleteCardImageButton = v.findViewById<ImageButton>(R.id.imageButton_delete_card)
+        fun bind(t: String) {}
+        fun unbind() {}
+    }
+
+    override fun getItemCount(): Int {
+        return optionalIntermediatesList.size
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OptionalIntermediatesViewHolder {
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.optional_intermediates_card, parent, false)
+        return OptionalIntermediatesViewHolder(v)
+    }
+
+    override fun onViewRecycled(holder: OptionalIntermediatesViewHolder) {
+        super.onViewRecycled(holder)
+        holder.unbind()
+    }
+
+    override fun onBindViewHolder(holder: OptionalIntermediatesViewHolder, position: Int) {
+        val selectedRequest: String = optionalIntermediatesList[position]
+        holder.optionalInterText.text = selectedRequest
+        holder.deleteCardImageButton.setOnClickListener {
+            optionalIntermediatesList.removeAt(position)
+            notifyDataSetChanged()
+            val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
+            if (getItemCount() == 0) {
+                noOpInterView.visibility = View.VISIBLE
             }
         }
     }

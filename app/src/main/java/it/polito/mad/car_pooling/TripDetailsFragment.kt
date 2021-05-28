@@ -359,6 +359,41 @@ class TripDetailsFragment : Fragment() {
             findNavController().navigate(action)
             //findNavController().navigate(R.id.action_nav_trip_to_mapFragment)
         }
+
+        var current_status : Boolean = true
+        val sourceFragment = args.sourceFragment
+        val likeButton = activity?.findViewById<ImageButton>(R.id.likeButton)
+        if (sourceFragment == "otherTrips") {
+            likeButton?.setBackgroundResource(R.drawable.ic_baseline_favorite_border_24)
+            //likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24)
+        } else if (sourceFragment == "boughtTrips") {
+
+        }
+        likeButton?.setOnClickListener{
+            if (current_status) {
+                likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24)
+                current_status = false
+            } else {
+                likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_border_24)
+                current_status= true
+            }
+        }
+
+        val optionalInterRV = view.findViewById<RecyclerView>(R.id.trip_optional_intermediates_RV)
+        optionalInterRV.layoutManager = LinearLayoutManager(activity)
+        val testList = mutableListOf<String>()
+        testList.add("11111111111111111111111111111111111111111111")
+        testList.add("2")
+        val noOpInterView = view.findViewById<TextView>(R.id.tripNoLocationMessageTextView)
+        if (testList.size == 0) {
+            optionalInterRV.visibility = View.GONE
+            noOpInterView.visibility = View.VISIBLE
+        } else {
+            optionalInterRV.visibility = View.VISIBLE
+            noOpInterView.visibility = View.GONE
+        }
+        val adapter = TripOptionalIntermediatesCardAdapter(testList, requireContext())
+        optionalInterRV.adapter = adapter
     }
 
    // override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -389,6 +424,12 @@ class TripDetailsFragment : Fragment() {
         imageTripUri = TripImageUri.toString()
          */
     //}
+
+    override fun onPause() {
+        super.onPause()
+        val likeButton = requireActivity().findViewById<ImageButton>(R.id.likeButton)
+        likeButton.setBackgroundDrawable(null)
+    }
 
     private fun loadTripInFields (trip: Trip, view: View) {
         view.findViewById<TextView>(R.id.textDepLocation).text = trip.depLocation //value["depLocation"].toString()
@@ -563,5 +604,37 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
                     .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                     .show()
             }*/
+    }
+}
+
+class TripOptionalIntermediatesCardAdapter (val tripOptionalIntermediatesList: MutableList<String>,
+                                            val context: Context) :
+    RecyclerView.Adapter<TripOptionalIntermediatesCardAdapter.TripOptionalIntermediatesViewHolder>() {
+    class TripOptionalIntermediatesViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val optionalInterText = v.findViewById<TextView>(R.id.optional_intermediates_text)
+        val deleteCardImageButton = v.findViewById<ImageButton>(R.id.imageButton_delete_card)
+        fun bind(t: String) {}
+        fun unbind() {}
+    }
+
+    override fun getItemCount(): Int {
+        return tripOptionalIntermediatesList.size
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripOptionalIntermediatesViewHolder {
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.optional_intermediates_card, parent, false)
+        return TripOptionalIntermediatesViewHolder(v)
+    }
+
+    override fun onViewRecycled(holder: TripOptionalIntermediatesViewHolder) {
+        super.onViewRecycled(holder)
+        holder.unbind()
+    }
+
+    override fun onBindViewHolder(holder: TripOptionalIntermediatesViewHolder, position: Int) {
+        val selectedRequest: String = tripOptionalIntermediatesList[position]
+        holder.optionalInterText.text = selectedRequest
+        holder.deleteCardImageButton.setVisibility(View.GONE)
     }
 }

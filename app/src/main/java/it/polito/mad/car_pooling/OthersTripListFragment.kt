@@ -28,9 +28,7 @@ import it.polito.mad.car_pooling.viewModels.MyTripListViewModelFactory
 import it.polito.mad.car_pooling.viewModels.OthersTripListViewModel
 import it.polito.mad.car_pooling.viewModels.OthersTripListViewModelFactory
 import java.io.File
-import java.io.FilterReader
 import java.lang.Double.parseDouble
-import java.lang.NumberFormatException
 
 
 class OthersTripListFragment : Fragment() {
@@ -71,9 +69,9 @@ class OthersTripListFragment : Fragment() {
             adapter.updateTripList(it)
             Log.d("POLITO", "Others Trips size ${it.size}")
             if (it.size > 0) {
-                view.findViewById<TextView>(R.id.empty_triplist).visibility=View.VISIBLE
-            } else {
                 view.findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
+            } else {
+                view.findViewById<TextView>(R.id.empty_triplist).visibility=View.VISIBLE
             }
         })
 
@@ -339,7 +337,7 @@ class OthersTripCardAdapter(
 
         holder.tripCardView.setOnClickListener {
             // Handle navigation to Trip
-            val action = OthersTripListFragmentDirections.actionOthersTripListFragmentToNavTrip(tripId = selectedTrip.id, isOwner = false)
+            val action = OthersTripListFragmentDirections.actionOthersTripListFragmentToNavTrip(tripId = selectedTrip.id, isOwner = false, "otherTrips")
             navController.navigate(action)
         }
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).text = "Profile"
