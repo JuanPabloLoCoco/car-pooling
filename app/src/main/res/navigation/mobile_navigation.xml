@@ -52,11 +52,7 @@
         <argument
             android:name="tripId"
             app:argType="string"
-            android:defaultValue="-1" />
-        <argument
-            android:name="tripCount"
-            app:argType="integer"
-            android:defaultValue="0" />
+            app:nullable="true" />
         <action
             android:id="@+id/action_tripEditFragment_to_nav_list_trip"
             app:destination="@id/nav_list_trip"
@@ -65,10 +61,6 @@
         <action
             android:id="@+id/action_tripEditFragment_to_nav_trip"
             app:destination="@id/nav_trip" />
-        <argument
-            android:name="isNewTrip"
-            app:argType="boolean"
-            android:defaultValue="true" />
         <action
             android:id="@+id/action_tripEditFragment_to_mapFragment"
             app:destination="@id/mapFragment" >
