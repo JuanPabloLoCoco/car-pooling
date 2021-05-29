@@ -86,132 +86,133 @@ class TripsOfInterestListFragment : Fragment() {
         return super.onCreateOptionsMenu(menu, inflater)
 
     }
+}
 
-    class InterestTripCardAdapter(
-        var tripList: List<Trip>,
-        val context: Context,
-        val navController: NavController
-    ): RecyclerView.Adapter<InterestTripCardAdapter.TripCardViewHolder>(), Filterable {
-        var tripFilterList: List<Trip> = tripList
-        init {
-            tripFilterList = tripList
+class InterestTripCardAdapter(
+    var tripList: List<Trip>,
+    val context: Context,
+    val navController: NavController
+): RecyclerView.Adapter<InterestTripCardAdapter.TripCardViewHolder>(), Filterable {
+    var tripFilterList: List<Trip> = tripList
+    init {
+        tripFilterList = tripList
+    }
+
+    class TripCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
+        val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
+        val departureTimeView = v.findViewById<TextView>(R.id.timeview)
+        val priceView = v.findViewById<TextView>(R.id.priceview)
+        val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
+        val tripImageView = v.findViewById<ImageView>(R.id.imageview)
+        val tripCardView = v.findViewById<CardView>(R.id.tripCard)
+
+        fun bind(t: Trip) {
+
         }
 
-        class TripCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-            val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
-            val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
-            val departureTimeView = v.findViewById<TextView>(R.id.timeview)
-            val priceView = v.findViewById<TextView>(R.id.priceview)
-            val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
-            val tripImageView = v.findViewById<ImageView>(R.id.imageview)
-            val tripCardView = v.findViewById<CardView>(R.id.tripCard)
+        fun unbind() {
 
-            fun bind(t: Trip) {
-
-            }
-
-            fun unbind() {
-
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripCardViewHolder {
-            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false)
-            return TripCardViewHolder(v)
-        }
-
-        override fun onViewRecycled(holder: TripCardViewHolder) {
-            super.onViewRecycled(holder)
-            holder.unbind()
-        }
-
-        fun getStringFromField(field: String?): String {
-            return if (field == null) "" else field
-        }
-
-        override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
-            val selectedTrip: Trip = tripFilterList[position]
-
-            holder.departureLocationView.text = getStringFromField(selectedTrip.depLocation)
-            holder.arriveLocationView.text = getStringFromField(selectedTrip.ariLocation)
-            holder.departureTimeView.text = getStringFromField(selectedTrip.depDate + " " + selectedTrip.depTime)
-            holder.priceView.text = getStringFromField(selectedTrip.price.toString())
-            holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeats.toString())
-
-
-            val tripImageUri = selectedTrip.imageUri //sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
-            if (tripImageUri == "yes") {
-                val localFile = File.createTempFile("trip_${selectedTrip.id}", "jpg")
-                val storage = Firebase.storage
-                storage.reference.child("trips/${selectedTrip.id}.jpg").getFile(localFile).addOnSuccessListener {
-                    val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
-                    holder.tripImageView.setImageBitmap(bitmap)
-                }
-            } else {
-                holder.tripImageView.setImageURI(Uri.parse("android.resource://it.polito.mad.car_pooling/drawable/car_default"))
-            }
-
-            holder.tripCardView.setOnClickListener {
-                // Handle navigation to Trip
-                val action = TripsOfInterestListFragmentDirections.actionNavListInterestTripToNavTrip(tripId = selectedTrip.id, isOwner = false, sourceFragment = "interestTrips")
-                navController.navigate(action)
-            }
-            holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).text = "Profile"
-
-            holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener {
-                // Handle navigation to Owner Profile
-                val action = TripsOfInterestListFragmentDirections.actionNavListInterestTripToNavProfile(userId = selectedTrip.owner, isOwner = false)
-                navController.navigate(action)
-            }
-        }
-
-
-        override fun getItemCount(): Int {
-            return tripFilterList.size
-        }
-
-        override fun getFilter(): Filter {
-            return object : Filter() {
-                override fun performFiltering(constraint: CharSequence?): FilterResults {
-                    var charSearch = constraint.toString().toLowerCase()
-                    tripFilterList =tripList
-                    if(charSearch.isEmpty()){
-
-                    }else{
-                        tripFilterList=tripList.filter { it ->
-                            // Write more filterign conditions here
-                            var numeric =true
-                            try{
-                                val string = java.lang.Double.parseDouble(charSearch)
-                            }
-                            catch (e : NumberFormatException){
-                                numeric =false
-                            }
-                            if (numeric){
-                                charSearch.toDouble() >=it.price.toDouble()
-
-                            }else{
-                                charSearch in it.depLocation.toLowerCase() ||
-                                        charSearch in it.ariLocation.toLowerCase() ||
-                                        charSearch in it.depTime.toLowerCase()
-                            }
-                        }
-                    }
-                    var filterResults= FilterResults()
-                    filterResults.values =tripFilterList
-                    return filterResults
-                }
-                override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                    tripFilterList=results?.values as List<Trip>
-                    notifyDataSetChanged()
-                }
-            }
-        }
-
-        fun updateTripList (tripList: List<Trip>) {
-            this.tripList = tripList
-            tripFilterList = tripList
-            notifyDataSetChanged()
         }
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripCardViewHolder {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false)
+        return TripCardViewHolder(v)
+    }
+
+    override fun onViewRecycled(holder: TripCardViewHolder) {
+        super.onViewRecycled(holder)
+        holder.unbind()
+    }
+
+    fun getStringFromField(field: String?): String {
+        return if (field == null) "" else field
+    }
+
+    override fun onBindViewHolder(holder: TripCardViewHolder, position: Int) {
+        val selectedTrip: Trip = tripFilterList[position]
+
+        holder.departureLocationView.text = getStringFromField(selectedTrip.depLocation)
+        holder.arriveLocationView.text = getStringFromField(selectedTrip.ariLocation)
+        holder.departureTimeView.text = getStringFromField(selectedTrip.depDate + " " + selectedTrip.depTime)
+        holder.priceView.text = getStringFromField(selectedTrip.price.toString())
+        holder.availableSeatsView.text = getStringFromField(selectedTrip.avaSeats.toString())
+
+
+        val tripImageUri = selectedTrip.imageUri //sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
+        if (tripImageUri == "yes") {
+            val localFile = File.createTempFile("trip_${selectedTrip.id}", "jpg")
+            val storage = Firebase.storage
+            storage.reference.child("trips/${selectedTrip.id}.jpg").getFile(localFile).addOnSuccessListener {
+                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                holder.tripImageView.setImageBitmap(bitmap)
+            }
+        } else {
+            holder.tripImageView.setImageURI(Uri.parse("android.resource://it.polito.mad.car_pooling/drawable/car_default"))
+        }
+
+        holder.tripCardView.setOnClickListener {
+            // Handle navigation to Trip
+            val action = TripsOfInterestListFragmentDirections.actionNavListInterestTripToNavTrip(tripId = selectedTrip.id, isOwner = false, sourceFragment = "interestTrips")
+            navController.navigate(action)
+        }
+        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).text = "Profile"
+
+        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener {
+            // Handle navigation to Owner Profile
+            val action = TripsOfInterestListFragmentDirections.actionNavListInterestTripToNavProfile(userId = selectedTrip.owner, isOwner = false)
+            navController.navigate(action)
+        }
+    }
+
+
+    override fun getItemCount(): Int {
+        return tripFilterList.size
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                var charSearch = constraint.toString().toLowerCase()
+                tripFilterList =tripList
+                if(charSearch.isEmpty()){
+
+                }else{
+                    tripFilterList=tripList.filter { it ->
+                        // Write more filterign conditions here
+                        var numeric =true
+                        try{
+                            val string = java.lang.Double.parseDouble(charSearch)
+                        }
+                        catch (e : NumberFormatException){
+                            numeric =false
+                        }
+                        if (numeric){
+                            charSearch.toDouble() >=it.price.toDouble()
+
+                        }else{
+                            charSearch in it.depLocation.toLowerCase() ||
+                                    charSearch in it.ariLocation.toLowerCase() ||
+                                    charSearch in it.depTime.toLowerCase()
+                        }
+                    }
+                }
+                var filterResults= FilterResults()
+                filterResults.values =tripFilterList
+                return filterResults
+            }
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                tripFilterList=results?.values as List<Trip>
+                notifyDataSetChanged()
+            }
+        }
+    }
+
+    fun updateTripList (tripList: List<Trip>) {
+        this.tripList = tripList
+        tripFilterList = tripList
+        notifyDataSetChanged()
+    }
 }
+
