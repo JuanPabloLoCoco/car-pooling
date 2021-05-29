@@ -38,6 +38,27 @@ object FirebaseTripService {
         }
     }
 
+    suspend fun findTripsByIdInList (listTripId: List<String>): Flow<List<Trip>> {
+        val db = FirebaseFirestore.getInstance()
+        return callbackFlow {
+            val listenerRegistration = db.collection(TRIP_COLLECTION)
+                    .whereIn("__name__", listTripId)
+                    .addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                        if (firebaseFirestoreException != null || querySnapshot == null) {
+                            cancel(message = "Error fetching trips in id List", cause = firebaseFirestoreException)
+                            return@addSnapshotListener
+                        }
+                        val map = querySnapshot.documents
+                                .mapNotNull { it.toTrip() }
+                        offer(map)
+                    }
+            awaitClose{
+                Log.d(TAG, "Cancelling trips in id list listener")
+                listenerRegistration.remove()
+            }
+        }
+    }
+
     @ExperimentalCoroutinesApi
     suspend fun getOthersTrips(userId: String): Flow<List<Trip>> {
         val db = FirebaseFirestore.getInstance()

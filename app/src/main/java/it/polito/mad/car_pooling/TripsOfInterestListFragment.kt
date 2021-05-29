@@ -20,13 +20,19 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Trip
+import it.polito.mad.car_pooling.viewModels.TripListViewModel
+import it.polito.mad.car_pooling.viewModels.TripListViewModelFactory
 import java.io.File
 
 class TripsOfInterestListFragment : Fragment() {
 
-    var trip_count : Int = 0
-    lateinit var  tripList :List<Trip>
+    private lateinit var userId: String
+    private lateinit var viewModel: TripListViewModel
+    private lateinit var viewModelFactory: TripListViewModelFactory
+    private var TAG = "TripsOfInterestListFragment"
+
     lateinit var adapter: InterestTripCardAdapter
 
     override fun onCreateView(
@@ -34,57 +40,31 @@ class TripsOfInterestListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
+        userId = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
+        viewModelFactory = TripListViewModelFactory(userId)
+        viewModel = viewModelFactory.create(TripListViewModel::class.java)
         return inflater.inflate(R.layout.fragment_trips_of_interest_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         val reciclerView = view.findViewById<RecyclerView>(R.id.rv)
-
-
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        val tripList = mutableListOf<Trip>()
+        adapter = InterestTripCardAdapter(tripList, requireContext(), findNavController())
+        reciclerView.adapter = adapter
 
-        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
-        val db = FirebaseFirestore.getInstance()
-        val trips = db.collection("Trips")
-        val tripListdb = mutableListOf<Trip>()
-
-        trips.whereNotEqualTo("owner", acc_email)
-            .limit(20L)
-            .get()
-            .addOnSuccessListener { documents ->
-                trip_count = 0
-                for (document in documents) {
-                    trip_count += 1
-                    val new_trip = Trip(document.id)
-                    new_trip.depLocation = document.data["depLocation"].toString()
-                    new_trip.additional = document.data["additional"].toString()
-                    new_trip.ariLocation = document.data["ariLocation"].toString()
-                    new_trip.avaSeats = (document.data["avaSeats"] as Long).toInt()
-                    new_trip.depDate = document.data["depDate"].toString()
-                    new_trip.depTime = document.data["depTime"].toString()
-                    new_trip.estDuration = document.data["estDuration"].toString()
-                    new_trip.optional = document.data["optional"].toString()
-                    new_trip.plate = document.data["plate"].toString()
-                    new_trip.price = document.data["price"] as Double
-                    new_trip.imageUri = document.data["image_uri"].toString()
-                    new_trip.owner = document.data["owner"].toString()
-                    tripListdb.add(new_trip)
-
-                }
-                tripList=tripListdb.toList()
-                if (trip_count == 0){
-                    super.onViewCreated(view, savedInstanceState)
-                } else {
-                    adapter = InterestTripCardAdapter(tripList, requireContext(), findNavController())
-                    reciclerView.adapter = adapter
-                    view.findViewById<TextView>(R.id.empty_tripInterestList).visibility=View.INVISIBLE
-                }
-            }.addOnFailureListener { exception ->
-                Log.d("nav_list_trip", "Error getting documents: ", exception)
+        viewModel.interestTrips.observe(viewLifecycleOwner, {
+            adapter.tripList = it
+            adapter.updateTripList(it)
+            if (it.size > 0) {
+                view.findViewById<TextView>(R.id.empty_tripInterestList).visibility=View.INVISIBLE
+            } else {
+                view.findViewById<TextView>(R.id.empty_tripInterestList).visibility=View.VISIBLE
             }
-
+            Log.d(TAG, "Trip list by View Model size = ${it.size}")
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -113,7 +93,6 @@ class TripsOfInterestListFragment : Fragment() {
         val navController: NavController
     ): RecyclerView.Adapter<InterestTripCardAdapter.TripCardViewHolder>(), Filterable {
         var tripFilterList: List<Trip> = tripList
-
         init {
             tripFilterList = tripList
         }
@@ -228,24 +207,11 @@ class TripsOfInterestListFragment : Fragment() {
                 }
             }
         }
-    }
 
-    class  SearchResultsActivity : Activity(){
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            handleIntent(intent)
-        }
-
-        override fun onNewIntent(intent: Intent?) {
-            handleIntent(intent)
-        }
-
-        private fun handleIntent(intent: Intent?) {
-            if (intent != null) {
-                if (Intent.ACTION_SEARCH == intent.action){
-                    val query =intent.getStringExtra(SearchManager.QUERY)
-                }
-            }
+        fun updateTripList (tripList: List<Trip>) {
+            this.tripList = tripList
+            tripFilterList = tripList
+            notifyDataSetChanged()
         }
     }
 }
