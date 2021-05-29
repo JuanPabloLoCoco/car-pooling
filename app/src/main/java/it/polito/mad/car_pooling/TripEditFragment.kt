@@ -19,7 +19,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.ImageButton
@@ -42,14 +41,12 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import it.polito.mad.car_pooling.models.StopLocation
 import it.polito.mad.car_pooling.models.Trip
-import it.polito.mad.car_pooling.models.TripRequest
-import it.polito.mad.car_pooling.viewModels.ProfileViewModel
-import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
 import it.polito.mad.car_pooling.viewModels.TripViewModel
 import it.polito.mad.car_pooling.viewModels.TripViewModelFactory
 import kotlinx.coroutines.launch
@@ -74,6 +71,9 @@ class TripEditFragment : Fragment() {
     private val NEW_TRIP: String = "NEW_TRIP"
     lateinit var check_status: String
     lateinit var adapter: OptionalIntermediatesCardAdapter
+    lateinit var locationList : MutableList<StopLocation>
+    lateinit var arrLocation : StopLocation
+    lateinit var depLocation : StopLocation
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -100,6 +100,25 @@ class TripEditFragment : Fragment() {
         val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
         editimageView.setImageURI(Uri.parse(default_str_car))
 
+/*<<<<<<< HEAD
+        var input_idx : String
+        if (tripNewOrNot == "new") {
+            (activity as AppCompatActivity).supportActionBar?.title = "Create new trip"
+            check_status = "new"
+            input_idx = "default_trip"
+            blockTripButton.visibility = View.GONE
+            locationList = emptyList<StopLocation>().toMutableList()
+        } else {
+            check_status = "old"
+            input_idx = tripId.toString()
+            blockTripButton.setOnClickListener {
+                // Change status of trip to BLOCK
+                // Change all the request that have status PENDING -> REJECTED
+                // Do not display the requestFAB on the button
+                blockTripButton.isEnabled = false
+                db.collection(Trip.DATA_COLLECTION)
+=======*/
+        locationList = emptyList<StopLocation>().toMutableList()
         viewModel.trip.observe(viewLifecycleOwner, {
 
             if (it != null) {
@@ -145,6 +164,7 @@ class TripEditFragment : Fragment() {
 
             /*
             db.collection(Trip.DATA_COLLECTION)
+>>>>>>> origin/test
                     .document(tripId!!)
                     .update(
                             mapOf(Trip.FIELD_STATUS to Trip.BLOCKED)
@@ -183,7 +203,6 @@ class TripEditFragment : Fragment() {
             // Create data for newTrip
             (activity as AppCompatActivity).supportActionBar?.title = "Create new trip"
             blockTripButton.visibility = View.GONE
-
         }
 
 
@@ -215,50 +234,58 @@ class TripEditFragment : Fragment() {
 
         val imageButtonMapDep = view.findViewById<ImageButton>(R.id.mapDepImageButton)
         imageButtonMapDep.setOnClickListener{
-            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("departure")
+            val emptyList : List<StopLocation> = emptyList()
+            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("departure", Gson().toJson(emptyList))
             findNavController().navigate(action)
-            //findNavController().navigate(R.id.action_tripEditFragment_to_mapFragment)
         }
         val imageButtonMapArr = view.findViewById<ImageButton>(R.id.mapArrImageButton)
         imageButtonMapArr.setOnClickListener{
-            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("arrival")
+            val emptyList : List<StopLocation> = emptyList()
+            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("arrival", Gson().toJson(emptyList))
             findNavController().navigate(action)
-            //findNavController().navigate(R.id.action_tripEditFragment_to_mapFragment)
         }
-        val imageButtonMapAddInter = view.findViewById<ImageButton>(R.id.mapAddInterImageButton)
-        imageButtonMapAddInter.setOnClickListener{
-            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter")
+        val addOptionalIntermediatesButton = view.findViewById<ImageView>(R.id.mapAddInterImageButtonTest)
+        addOptionalIntermediatesButton.setOnClickListener {
+            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter", Gson().toJson(locationList))
             findNavController().navigate(action)
-            //findNavController().navigate(R.id.action_tripEditFragment_to_mapFragment)
         }
 
         val optionalInterRV = view.findViewById<RecyclerView>(R.id.optional_intermediates_RV)
         optionalInterRV.layoutManager = LinearLayoutManager(requireContext())
-        val testList = mutableListOf<String>()
         val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
-        if (testList.size == 0) {
+        if (locationList.size == 0) {
             optionalInterRV.visibility = View.GONE
             noOpInterView.visibility = View.VISIBLE
+        } else {
+            optionalInterRV.visibility = View.VISIBLE
+            noOpInterView.visibility = View.GONE
         }
-        val addOptionalIntermediatesButton = view.findViewById<ImageView>(R.id.mapAddInterImageButtonTest)
-        addOptionalIntermediatesButton.setOnClickListener {
-            //val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter")
-            //findNavController().navigate(action)
-            val randomNum = Random().nextInt(100)
-            Log.d("Trip!!!!!!!!!!!", "$randomNum")
-            testList.add(randomNum.toString())
-            if (testList.size == 0) {
+        val adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
+        optionalInterRV.adapter = adapter
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("location")?.observe(
+            viewLifecycleOwner) { result ->
+            val type = object: TypeToken<MutableList<StopLocation>>(){}.type
+            val jsonList = Gson().fromJson<MutableList<StopLocation>>(result, type)
+            for (i in 0..jsonList.size - 1) {
+                val insertLocation = StopLocation(jsonList[i].fullAddress)
+                insertLocation.address = jsonList[i].address
+                insertLocation.city = jsonList[i].city
+                insertLocation.country = jsonList[i].country
+                insertLocation.latitude = jsonList[i].latitude
+                insertLocation.longitude = jsonList[i].longitude
+                locationList.add(insertLocation)
+            }
+            val adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
+            optionalInterRV.adapter = adapter
+            if (locationList.size == 0) {
                 optionalInterRV.visibility = View.GONE
                 noOpInterView.visibility = View.VISIBLE
             } else {
                 optionalInterRV.visibility = View.VISIBLE
                 noOpInterView.visibility = View.GONE
             }
-            val adapter = OptionalIntermediatesCardAdapter(testList, requireContext(), view)
-            optionalInterRV.adapter = adapter
         }
 
-        // return view
     }
 
     private fun loadDataInFields(trip: Trip, view: View) {
@@ -289,6 +316,21 @@ class TripEditFragment : Fragment() {
         imageUri = Uri.parse(uri_input)
         editimageView.setImageURI(imageUri)
          */
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("arrLocation")?.observe(
+            viewLifecycleOwner) { result ->
+            val type = object: TypeToken<StopLocation>(){}.type
+            val arrLocation = Gson().fromJson<StopLocation>(result, type)
+            selectedTrip.ariLocation = arrLocation.address
+            view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(arrLocation.address)
+        }
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("depLocation")?.observe(
+            viewLifecycleOwner) { result ->
+            val type = object: TypeToken<StopLocation>(){}.type
+            val depLocation = Gson().fromJson<StopLocation>(result, type)
+            selectedTrip.depLocation = depLocation.address
+            view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(depLocation.address)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -652,9 +694,11 @@ class TripEditFragment : Fragment() {
             }
         }
     }
+
+
 }
 
-class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableList<String>,
+class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableList<StopLocation>,
                                         val context: Context,
                                         val view: View) :
     RecyclerView.Adapter<OptionalIntermediatesCardAdapter.OptionalIntermediatesViewHolder>() {
@@ -682,8 +726,8 @@ class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableLi
     }
 
     override fun onBindViewHolder(holder: OptionalIntermediatesViewHolder, position: Int) {
-        val selectedRequest: String = optionalIntermediatesList[position]
-        holder.optionalInterText.text = selectedRequest
+        val address: String = optionalIntermediatesList[position].address
+        holder.optionalInterText.text = address
         holder.deleteCardImageButton.setOnClickListener {
             optionalIntermediatesList.removeAt(position)
             notifyDataSetChanged()
