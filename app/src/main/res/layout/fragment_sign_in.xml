@@ -19,6 +19,18 @@
         android:gravity="center"
         android:textColor="@color/purple_700"/>
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:layout_constraintBottom_toTopOf="@+id/google_sign_in"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:lottie_rawRes="@raw/car"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true"
+        app:lottie_speed="3"/>
+
     <com.google.android.gms.common.SignInButton
         android:id="@+id/google_sign_in"
         android:layout_width="wrap_content"
