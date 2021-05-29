@@ -57,6 +57,16 @@
                     android:layout_height="wrap_content"
                     android:text="There are no request for this trip"
                     android:gravity="center" />
+                <Button
+                    android:id="@+id/ratingTripButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center"
+                    android:text="Rating trip"
+                    android:backgroundTint="@color/design_default_color_error"
+                    />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/requestRV"

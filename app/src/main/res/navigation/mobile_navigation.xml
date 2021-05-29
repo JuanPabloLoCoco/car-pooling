@@ -35,6 +35,9 @@
         <action
             android:id="@+id/action_nav_trip_to_mapFragment"
             app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_nav_trip_to_rating"
+            app:destination="@id/rating" />
     </fragment>
     <fragment
         android:id="@+id/tripEditFragment"
@@ -184,6 +187,15 @@
         tools:layout="@layout/fragment_map">
         <argument
             android:name="source"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/rating"
+        android:name="it.polito.mad.car_pooling.Rating"
+        android:label="fragment_rating"
+        tools:layout="@layout/fragment_rating" >
+        <argument
+            android:name="tripRequestId"
             app:argType="string" />
     </fragment>
 

@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -63,6 +64,13 @@ class TripDetailsFragment : Fragment() {
         val noTripsMessageView = view.findViewById<TextView>(R.id.noTripsMessageTextView)
         val statusMessageView = view.findViewById<TextView>(R.id.requestStatusTextView)
 
+        val rateTripButton = view.findViewById<Button>(R.id.ratingTripButton)
+        rateTripButton.setOnClickListener {
+            Log.d("POLITO", "Hi ! I click the buton")
+            val action1 = TripDetailsFragmentDirections.actionNavTripToRating("tripRequest")
+            findNavController().navigate(action1)
+
+        }
 
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
 
@@ -374,15 +382,20 @@ val tripSelected: Trip): RecyclerView.Adapter<TripRequestsCardAdapter.TripReques
             // Probably is better to have something here
             val action = TripDetailsFragmentDirections.actionNavTripToNavProfile(selectedRequest.requester, false)
             navController.navigate(action)
+
         }
         val availableSeats = tripSelected.avaSeats - tripRequestList.filter { it.status == TripRequest.ACCEPTED }.size
 
         if (selectedRequest.status == TripRequest.ACCEPTED) {
             // I will not show the menu
             holder.actionMenuView.visibility = View.GONE
+            //holder.actionMenuView.visibility=View.VISIBLE
+            holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.VISIBLE
+            //requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
         } else {
             holder.actionMenuView.setOnClickListener{
                 val popup = PopupMenu(context, holder.actionMenuView)
+                holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.INVISIBLE
                 popup.setOnMenuItemClickListener {
                     onMenuItemClick(it, selectedRequest, availableSeats)
                 }
@@ -401,8 +414,10 @@ val tripSelected: Trip): RecyclerView.Adapter<TripRequestsCardAdapter.TripReques
     private fun onMenuItemClick(item: MenuItem, selectedRequest: TripRequest, trueAvaiableSeats: Int): Boolean {
         return when (item.itemId) {
             R.id.accept_request -> {
+
                 selectedRequest.status = TripRequest.ACCEPTED
                 updateTripRequest(selectedRequest, trueAvaiableSeats)
+
                 //Snackbar.make(generalView, "Request accepted ${selectedRequest.tripId}", Snackbar.LENGTH_SHORT)
                 //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                 //        .show()
