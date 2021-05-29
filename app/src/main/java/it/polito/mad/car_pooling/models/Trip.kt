@@ -33,6 +33,7 @@ data class Trip (var id: String) {
                 new_trip.price = (getDouble("price")?: 0.0).toDouble()
                 new_trip.owner = getString("owner")?:""
                 new_trip.hasImage = getBoolean("hasImage")?: false
+                new_trip.status = getString("status")?: OPEN
                 // new_trip.imageUri = getString("image_uri")!!
                 return new_trip
             } catch (e: Exception) {
