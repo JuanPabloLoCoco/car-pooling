@@ -42,10 +42,12 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
+import it.polito.mad.car_pooling.Utils.TimeUtilFunctions
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
@@ -54,6 +56,9 @@ import it.polito.mad.car_pooling.viewModels.TripViewModel
 import it.polito.mad.car_pooling.viewModels.TripViewModelFactory
 import kotlinx.coroutines.launch
 import java.io.*
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 private val REQUEST_IMAGE_CAPTURE = 1
@@ -74,6 +79,7 @@ class TripEditFragment : Fragment() {
     private val NEW_TRIP: String = "NEW_TRIP"
     lateinit var check_status: String
     lateinit var adapter: OptionalIntermediatesCardAdapter
+    private val TAG = "TripEditFragment"
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -119,6 +125,7 @@ class TripEditFragment : Fragment() {
                 }
             } else {
                 selectedTrip = Trip.NewTrip()
+                loadDataInFields(selectedTrip, view)
                 //Snackbar.make(requireView(), "An error happen getting the Trip", Snackbar.LENGTH_SHORT)
                 //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                 //        .show()
@@ -198,25 +205,6 @@ class TripEditFragment : Fragment() {
         registerForContextMenu(imageButton)
         setHasOptionsMenu(true)
 
-        val cal = Calendar.getInstance()
-        val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-            cal.set(Calendar.YEAR, year)
-            cal.set(Calendar.MONTH, monthOfYear)
-            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            editDepDate.text = SimpleDateFormat("dd.MM.yyyy").format(cal.time)
-        }
-        val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
-            cal.set(Calendar.HOUR_OF_DAY, hour)
-            cal.set(Calendar.MINUTE, minute)
-            editDepTime.text = SimpleDateFormat("HH:mm").format(cal.time)
-        }
-        editDepDate.setOnClickListener {
-            DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-        }
-        editDepTime.setOnClickListener {
-            TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
-        }
-
         val imageButtonMapDep = view.findViewById<ImageButton>(R.id.mapDepImageButton)
         imageButtonMapDep.setOnClickListener{
             val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("departure")
@@ -265,18 +253,50 @@ class TripEditFragment : Fragment() {
         // return view
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun loadDataInFields(trip: Trip, view: View) {
 
         view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(trip.depLocation)
         view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(trip.ariLocation)
 
+        val tripDepartureTimestamp = trip.departureDateTime
+
         val editDepDate = view.findViewById<TextView>(R.id.textEditDepDate)
-        editDepDate.text = trip.depDate
+        // editDepDate.text = trip.depDate
+        editDepDate.text = TimeUtilFunctions.getDateFromTimestamp(tripDepartureTimestamp)
         editDepDate.setTextColor(Color.parseColor("#9E150808"))
 
         val editDepTime = view.findViewById<TextView>(R.id.textEditDepTime)
-        editDepTime.text = trip.depTime
+        //editDepTime.text = trip.depTime
+        editDepTime.text = TimeUtilFunctions.getTimeFromTimestamp(tripDepartureTimestamp)
         editDepTime.setTextColor(Color.parseColor("#9E150808"))
+
+        val cal = Calendar.getInstance()
+        cal.time = tripDepartureTimestamp.toDate()
+        val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, monthOfYear)
+            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            editDepDate.text = SimpleDateFormat("dd.MM.yyyy").format(cal.time)
+        }
+
+        val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
+            cal.set(Calendar.HOUR_OF_DAY, hour)
+            cal.set(Calendar.MINUTE, minute)
+            // view = Date().time
+            editDepTime.text = SimpleDateFormat("HH:mm").format(cal.time)
+        }
+
+
+        editDepDate.setOnClickListener {
+            val datePickerDialog = DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
+            datePickerDialog.datePicker.minDate = Date().time
+            datePickerDialog.show()
+        }
+        editDepTime.setOnClickListener {
+            val timePickerDialog = TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true)
+            timePickerDialog.show()
+        }
 
         view.findViewById<TextInputLayout>(R.id.textEditEstDuration).editText?.setText(trip.estDuration)
         view.findViewById<TextInputLayout>(R.id.textEditAvaSeat).editText?.setText(trip.avaSeats.toString())
@@ -295,6 +315,9 @@ class TripEditFragment : Fragment() {
          */
     }
 
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun saveDataInTrip (): Trip {
         val tripData = selectedTrip.copy()
 
@@ -308,6 +331,10 @@ class TripEditFragment : Fragment() {
         val editPlate = requireView().findViewById<TextInputLayout>(R.id.textEditPlate)
         val editDepDate = requireView().findViewById<TextView>(R.id.textEditDepDate)
         val editDepTime = requireView().findViewById<TextView>(R.id.textEditDepTime)
+
+        val departureDateAsStr = editDepDate.text.toString()
+        val departureTimeAsStr = editDepTime.text.toString()
+        val newTimestamp = TimeUtilFunctions.getTimestampFromDateAndTime(departureDateAsStr, departureTimeAsStr)
 
         val acc_email = ModelPreferencesManager.get<String>(getString(R.string.keyCurrentAccount)) //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         tripData.depLocation = editDepLocation.editText?.text.toString()
@@ -324,7 +351,7 @@ class TripEditFragment : Fragment() {
         tripData.owner = acc_email.toString()
         tripData.status = selectedTrip.status
         tripData.hasImage = true
-
+        tripData.departureDateTime = newTimestamp
         return tripData
     }
 

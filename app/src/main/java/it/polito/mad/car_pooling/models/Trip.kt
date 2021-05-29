@@ -1,12 +1,30 @@
 package it.polito.mad.car_pooling.models
 
 import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import java.lang.Exception
+import java.util.*
 
 // data class  Model(val name: String= "", val count: Int = 0)
 data class Trip (var id: String) {
+
     companion object {
+        private val DEP_LOCATION = "depLocation"
+        private val ADDITIONAL = "additional"
+        private val ARI_LOCATION = "ariLocation"
+        private val AVA_SEATS = "avaSeats"
+        private val DEP_DATE = "depDate"
+        private val DEP_TIME = "depTime"
+        private val EST_DURATION = "estDuration"
+        private val OPTIONAL = "optional"
+        private val PLATE = "plate"
+        private val PRICE = "price"
+        private val OWNER = "owner"
+        private val HAS_IMAGE = "hasImage"
+        private val STATUS = "status"
+        private val DEPARTURE_DATETIME = "departureDateTime"
+
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
         val NEW_TRIP_ID: Int = -1
@@ -15,25 +33,27 @@ data class Trip (var id: String) {
         val FULL = "FULL"
         val DATA_COLLECTION = "Trips"
         val FIELD_STATUS = "status"
+
         private const val TAG = "TRIP"
 
         fun DocumentSnapshot.toTrip(): Trip? {
             val new_trip = Trip("0")
             try {
                 new_trip.id = id
-                new_trip.depLocation = getString("depLocation")?: ""
-                new_trip.additional = getString("additional")?:""
-                new_trip.ariLocation = getString("ariLocation")?:""
-                new_trip.avaSeats = (getLong("avaSeats")?: 0).toInt()
-                new_trip.depDate = getString("depDate")?:""
-                new_trip.depTime = getString("depTime")?:""
-                new_trip.estDuration = getString("estDuration")?:""
-                new_trip.optional = getString("optional")?:""
-                new_trip.plate = getString("plate")?:""
-                new_trip.price = (getDouble("price")?: 0.0).toDouble()
-                new_trip.owner = getString("owner")?:""
-                new_trip.hasImage = getBoolean("hasImage")?: false
-                new_trip.status = getString("status")?: OPEN
+                new_trip.depLocation = getString(DEP_LOCATION)?: ""
+                new_trip.additional = getString(ADDITIONAL)?:""
+                new_trip.ariLocation = getString(ARI_LOCATION)?:""
+                new_trip.avaSeats = (getLong(AVA_SEATS)?: 0).toInt()
+                new_trip.depDate = getString(DEP_DATE)?:""
+                new_trip.depTime = getString(DEP_TIME)?:""
+                new_trip.estDuration = getString(EST_DURATION)?:""
+                new_trip.optional = getString(OPTIONAL)?:""
+                new_trip.plate = getString(PLATE)?:""
+                new_trip.price = (getDouble(PRICE)?: 0.0).toDouble()
+                new_trip.owner = getString(OWNER)?:""
+                new_trip.hasImage = getBoolean(HAS_IMAGE)?: false
+                new_trip.status = getString(STATUS)?: OPEN
+                new_trip.departureDateTime = getTimestamp(DEPARTURE_DATETIME) ?: Timestamp.now()
                 // new_trip.imageUri = getString("image_uri")!!
                 return new_trip
             } catch (e: Exception) {
@@ -57,6 +77,7 @@ data class Trip (var id: String) {
             newTrip.owner = ""
             newTrip.status = OPEN
             newTrip.hasImage = false
+            newTrip.departureDateTime = Timestamp.now()
             return newTrip
         }
     }
@@ -87,7 +108,7 @@ data class Trip (var id: String) {
         this.imageUri = imageUri
         this.owner = owner
         this.status = OPEN
-
+        this.departureDateTime = Timestamp.now()
     }
 
     var depLocation: String = ""
@@ -104,22 +125,24 @@ data class Trip (var id: String) {
     var owner: String=""
     var status: String = OPEN
     var hasImage: Boolean = false
+    var departureDateTime: Timestamp = Timestamp(Date())
 
     fun toMap(): Map<String, Any> {
         return mapOf<String, Any>(
-                "depLocation" to depLocation,
-                "additional" to additional,
-                "ariLocation" to ariLocation,
-                "avaSeats" to avaSeats,
-                "depDate" to depDate,
-                "depTime" to depTime,
-                "estDuration" to estDuration,
-                "optional" to optional,
-                "plate" to plate,
-                "price" to price,
-                "owner" to owner,
-                "status" to status,
-                "hasImage" to hasImage
+                DEP_LOCATION to depLocation,
+                ADDITIONAL to additional,
+                ARI_LOCATION to ariLocation,
+                AVA_SEATS to avaSeats,
+                DEP_DATE to depDate,
+                DEP_TIME to depTime,
+                EST_DURATION to estDuration,
+                OPTIONAL to optional,
+                PLATE to plate,
+                PRICE to price,
+                OWNER to owner,
+                STATUS to status,
+                HAS_IMAGE to hasImage,
+                DEPARTURE_DATETIME to departureDateTime
         )
     }
 }
