@@ -213,7 +213,7 @@
     </fragment>
     <fragment
         android:id="@+id/rating"
-        android:name="it.polito.mad.car_pooling.Rating"
+        android:name="it.polito.mad.car_pooling.RatingFragment"
         android:label="fragment_rating"
         tools:layout="@layout/fragment_rating" >
         <argument

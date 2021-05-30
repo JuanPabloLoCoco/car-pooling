@@ -485,6 +485,7 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
         val requesterAvatar = v.findViewById<ImageView>(R.id.image_request_user)
         val requesterUser = v.findViewById<TextView>(R.id.request_user)
         val actionMenuView = v.findViewById<ImageButton>(R.id.imageButton_3dots)
+        val ratingButton = v.findViewById<Button>(R.id.rateUserButton)
         fun bind(t: TripRequest) {}
         fun unbind() {}
     }
@@ -520,13 +521,23 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
         if (selectedRequest.status == TripRequest.ACCEPTED) {
             // I will not show the menu
             holder.actionMenuView.visibility = View.GONE
+
+            holder.ratingButton.visibility = View.VISIBLE
+            holder.ratingButton.setOnClickListener {
+                val action = TripDetailsFragmentDirections.actionNavTripToRating(selectedRequest.id)
+                navController.navigate(action)
+            }
+            // You have to add a menu here for rating the users!!!
+
+
             //holder.actionMenuView.visibility=View.VISIBLE
-            holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.VISIBLE
+            // holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.VISIBLE
             //requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
         } else {
+            holder.ratingButton.visibility = View.INVISIBLE
             holder.actionMenuView.setOnClickListener{
                 val popup = PopupMenu(context, holder.actionMenuView)
-                holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.INVISIBLE
+                // holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.INVISIBLE
                 popup.setOnMenuItemClickListener {
                     onMenuItemClick(it, selectedRequest, availableSeats)
                 }

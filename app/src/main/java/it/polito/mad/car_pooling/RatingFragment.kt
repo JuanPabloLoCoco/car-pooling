@@ -20,19 +20,19 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import it.polito.mad.car_pooling.models.Profile
-import it.polito.mad.car_pooling.viewModels.EditProfileViewModel
-import it.polito.mad.car_pooling.viewModels.EditProfileViewModelFactory
+import it.polito.mad.car_pooling.models.Rating
 import java.sql.Driver
 
 @SuppressLint("ValidFragment")
-class Rating : Fragment() {
+class RatingFragment : Fragment() {
 
     var mRatingBar: RatingBar? =null
     var mRatingScale: TextView?= null
     var mFeedback:EditText?= null
     var mSendFeedback: Button? =null
 
-    val args:RatingArgs by navArgs()
+    val args:RatingFragmentArgs by navArgs()
+    private val TAG = "RatingFragment"
 
 //    var userSrc: ProfileInformation = PrifileInfromation()
 //    var userDst: ProfileInformation = ProfileInformation()
@@ -112,6 +112,10 @@ class Rating : Fragment() {
 //        }
     }
     private fun ratingsave() {
+        val ratingComment: String = mFeedback?.text.toString() ?: ""
+        val ratingNumber: Double = mRatingBar?.rating?.toDouble()?: 0.0
+        val newRating = Rating(ratingComment, ratingNumber)
+        Log.d(TAG, "Rating save!!. The new rating is $newRating")
 
 //        userModel = requireView().findViewById<EditText>(R.id.etFeedback).editText?.text.toString()
 //        mRatingScale = requireView().findViewById<EditText>(R.id.etFeedback).editableText?.text.toString()

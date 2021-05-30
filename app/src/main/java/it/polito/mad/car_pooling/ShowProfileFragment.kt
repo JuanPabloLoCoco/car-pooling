@@ -2,35 +2,46 @@ package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
+import it.polito.mad.car_pooling.models.Rating
+import it.polito.mad.car_pooling.models.Trip
+import it.polito.mad.car_pooling.viewModels.OthersTripListViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
+import java.io.File
+import java.lang.Double
 
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
     private var profile: Profile? = null
-
+    private lateinit var adapter: RatingListCardAdapter
     private lateinit var appBarConfiguration: AppBarConfiguration
     val args: ShowProfileFragmentArgs by navArgs()
 
     private lateinit var viewModel: ProfileViewModel
     private lateinit var viewModelFactory: ProfileViewModelFactory
     private lateinit var userId: String
+    private lateinit var ratingList: MutableList<Rating>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -114,6 +125,18 @@ class ShowProfileFragment : Fragment() {
                 }
             }
         })
+
+        // Fake Rating List
+        ratingList = mutableListOf(
+                Rating("Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,",1.0),
+                Rating("Good Driver", 4.5),
+                Rating("The path was nice", 3.0)
+        )
+        val reciclerView = view.findViewById<RecyclerView>(R.id.rateRV)
+        reciclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        adapter = RatingListCardAdapter(ratingList, requireContext())
+        reciclerView.adapter = adapter
     }
 
     private fun writeTextView(view: View){
@@ -163,4 +186,60 @@ class ShowProfileFragment : Fragment() {
             .appendPath(resources.getResourceEntryName(resourceId))
             .build()
     }
+}
+
+class RatingListCardAdapter(
+        var ratingList: List<Rating>,
+        val context: Context,
+        ): RecyclerView.Adapter<RatingListCardAdapter.RatingCardViewHolder>() {
+
+    class RatingCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val commentTextView =v.findViewById<TextView>(R.id.commentextView)
+        val ratingbarView = v.findViewById<RatingBar>(R.id.ratingBar2)
+        val reviewName = v.findViewById<TextView>(R.id.reviewuserView)
+        /*
+
+        val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
+        val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
+        val departureTimeView = v.findViewById<TextView>(R.id.timeview)
+        val priceView = v.findViewById<TextView>(R.id.priceview)
+        val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
+        val tripImageView = v.findViewById<ImageView>(R.id.imageview)
+        val tripCardView = v.findViewById<CardView>(R.id.tripCard)
+          */
+        fun bind(t: Trip) {
+
+        }
+
+        fun unbind() {
+
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RatingCardViewHolder {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.ratingbar, parent, false)
+        return RatingCardViewHolder(v)
+    }
+
+    override fun onViewRecycled(holder: RatingCardViewHolder) {
+        super.onViewRecycled(holder)
+        holder.unbind()
+    }
+
+    fun getStringFromField(field: String?): String {
+        return if (field == null) "" else field
+    }
+
+    override fun onBindViewHolder(holder: RatingCardViewHolder, position: Int) {
+        val selecterRating: Rating = ratingList[position]
+        holder.commentTextView.text= selecterRating.comment
+        holder.ratingbarView.rating =selecterRating.ratingNumber.toFloat()
+        holder.reviewName.text = "${selecterRating.writer} said: "
+    }
+
+    override fun getItemCount(): Int {
+        return ratingList.size
+    }
+
+
 }
