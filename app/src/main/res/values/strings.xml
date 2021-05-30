@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ShowProfileActivity</string>
+    <string name="app_name">CAR_POOLING</string>
     <string name="image">Image</string>
     <string name="fullName">Full Name</string>
     <string name="nickName">NickName</string>

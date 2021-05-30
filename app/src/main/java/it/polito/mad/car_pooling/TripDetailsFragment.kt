@@ -9,6 +9,8 @@ import android.view.*
 import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -76,6 +78,14 @@ class TripDetailsFragment : Fragment() {
         val requestListRV = view.findViewById<RecyclerView>(R.id.requestRV)
         val noTripsMessageView = view.findViewById<TextView>(R.id.noTripsMessageTextView)
         val statusMessageView = view.findViewById<TextView>(R.id.requestStatusTextView)
+
+        val rateTripButton = view.findViewById<Button>(R.id.ratingTripButton)
+        rateTripButton.setOnClickListener {
+            Log.d("POLITO", "Hi ! I click the buton")
+            val action1 = TripDetailsFragmentDirections.actionNavTripToRating("tripRequest")
+            findNavController().navigate(action1)
+
+        }
 
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
 
@@ -494,6 +504,7 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
         val requesterAvatar = v.findViewById<ImageView>(R.id.image_request_user)
         val requesterUser = v.findViewById<TextView>(R.id.request_user)
         val actionMenuView = v.findViewById<ImageButton>(R.id.imageButton_3dots)
+        val ratingButton = v.findViewById<Button>(R.id.rateUserButton)
         fun bind(t: TripRequest) {}
         fun unbind() {}
     }
@@ -522,15 +533,30 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
             // Probably is better to have something here
             val action = TripDetailsFragmentDirections.actionNavTripToNavProfile(selectedRequest.requester, false)
             navController.navigate(action)
+
         }
         val availableSeats = tripSelected.avaSeats - tripRequestList.filter { it.status == TripRequest.ACCEPTED }.size
 
         if (selectedRequest.status == TripRequest.ACCEPTED) {
             // I will not show the menu
             holder.actionMenuView.visibility = View.GONE
+
+            holder.ratingButton.visibility = View.VISIBLE
+            holder.ratingButton.setOnClickListener {
+                val action = TripDetailsFragmentDirections.actionNavTripToRating(selectedRequest.id)
+                navController.navigate(action)
+            }
+            // You have to add a menu here for rating the users!!!
+
+
+            //holder.actionMenuView.visibility=View.VISIBLE
+            // holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.VISIBLE
+            //requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
         } else {
+            holder.ratingButton.visibility = View.INVISIBLE
             holder.actionMenuView.setOnClickListener{
                 val popup = PopupMenu(context, holder.actionMenuView)
+                // holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.INVISIBLE
                 popup.setOnMenuItemClickListener {
                     onMenuItemClick(it, selectedRequest, availableSeats)
                 }
@@ -549,8 +575,10 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
     private fun onMenuItemClick(item: MenuItem, selectedRequest: TripRequest, trueAvaiableSeats: Int): Boolean {
         return when (item.itemId) {
             R.id.accept_request -> {
+
                 selectedRequest.status = TripRequest.ACCEPTED
                 updateTripRequest(selectedRequest, trueAvaiableSeats)
+
                 //Snackbar.make(generalView, "Request accepted ${selectedRequest.tripId}", Snackbar.LENGTH_SHORT)
                 //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                 //        .show()
