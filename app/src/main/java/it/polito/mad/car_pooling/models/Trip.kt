@@ -24,6 +24,7 @@ data class Trip (var id: String) {
         private val HAS_IMAGE = "hasImage"
         private val STATUS = "status"
         private val DEPARTURE_DATETIME = "departureDateTime"
+        private val ARRIVAL_DATETIME = "arrivalDateTime"
 
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
@@ -54,6 +55,7 @@ data class Trip (var id: String) {
                 new_trip.hasImage = getBoolean(HAS_IMAGE)?: false
                 new_trip.status = getString(STATUS)?: OPEN
                 new_trip.departureDateTime = getTimestamp(DEPARTURE_DATETIME) ?: Timestamp.now()
+                new_trip.arrivalDateTime = getTimestamp(ARRIVAL_DATETIME) ?: new_trip.departureDateTime
                 // new_trip.imageUri = getString("image_uri")!!
                 return new_trip
             } catch (e: Exception) {
@@ -78,6 +80,7 @@ data class Trip (var id: String) {
             newTrip.status = OPEN
             newTrip.hasImage = false
             newTrip.departureDateTime = Timestamp.now()
+            newTrip.arrivalDateTime = Timestamp.now()
             return newTrip
         }
     }
@@ -109,6 +112,7 @@ data class Trip (var id: String) {
         this.owner = owner
         this.status = OPEN
         this.departureDateTime = Timestamp.now()
+        this.arrivalDateTime = Timestamp.now()
     }
 
     var depLocation: String = ""
@@ -126,6 +130,7 @@ data class Trip (var id: String) {
     var status: String = OPEN
     var hasImage: Boolean = false
     var departureDateTime: Timestamp = Timestamp(Date())
+    var arrivalDateTime: Timestamp = Timestamp(Date())
 
     fun toMap(): Map<String, Any> {
         return mapOf<String, Any>(
@@ -142,7 +147,8 @@ data class Trip (var id: String) {
                 OWNER to owner,
                 STATUS to status,
                 HAS_IMAGE to hasImage,
-                DEPARTURE_DATETIME to departureDateTime
+                DEPARTURE_DATETIME to departureDateTime,
+                ARRIVAL_DATETIME to arrivalDateTime
         )
     }
 }

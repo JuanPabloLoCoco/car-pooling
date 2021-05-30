@@ -154,40 +154,6 @@ class TripEditFragment : Fragment() {
                         }
             }
 
-            /*
-            db.collection(Trip.DATA_COLLECTION)
-                    .document(tripId!!)
-                    .update(
-                            mapOf(Trip.FIELD_STATUS to Trip.BLOCKED)
-                    )
-                    .addOnSuccessListener {
-                        // Change all the request that have status PENDING -> REJECT
-                        db.collection(TripRequest.DATA_COLLECTION)
-                                .whereEqualTo("status", TripRequest.PENDING)
-                                .whereEqualTo("tripId", tripId)
-                                .get()
-                                .addOnSuccessListener {documents ->
-                                    for (document in documents) {
-                                        val tripRequestId = document.id
-                                        db.collection(TripRequest.DATA_COLLECTION)
-                                                .document(tripRequestId)
-                                                .update(mapOf("status" to TripRequest.REJECTED))
-                                    }
-                                    Snackbar.make(view, "The trip was succesfully blocked", Snackbar.LENGTH_SHORT)
-                                            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                                            .show()
-                                }
-
-                    }
-                    .addOnFailureListener {
-                        blockTripButton.isEnabled = true
-                        Snackbar.make(view, "An error happen while updating the trip", Snackbar.LENGTH_SHORT)
-                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                                .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.design_default_color_error))
-                                .show()
-                    }
-            Log.d("POLITO", "We need to block this trip")
-             */
         }
 
         if (tripId == NEW_TRIP) {
@@ -196,10 +162,6 @@ class TripEditFragment : Fragment() {
             blockTripButton.visibility = View.GONE
 
         }
-
-
-        val editDepDate = view.findViewById<TextView>(R.id.textEditDepDate)
-        val editDepTime = view.findViewById<TextView>(R.id.textEditDepTime)
 
         val imageButton = view.findViewById<ImageButton>(R.id.imageButton2)
         registerForContextMenu(imageButton)
@@ -250,7 +212,48 @@ class TripEditFragment : Fragment() {
             optionalInterRV.adapter = adapter
         }
 
-        // return view
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun setDateAndTimeInView (tsToSet: Timestamp, dateView: TextView, timeView: TextView) {
+        val cal = Calendar.getInstance()
+        // val tripDepartureTimestamp = trip.departureDateTime
+
+        //val editDate = view.findViewById<TextView>(R.id.textEditDepDate)
+        //editDepDate.text = TimeUtilFunctions.getDateFromTimestamp(tsToSet)
+        // editDepDate.setTextColor(Color.parseColor("#9E150808"))
+        dateView.text = TimeUtilFunctions.getDateFromTimestamp(tsToSet)
+
+        //val editTime = view.findViewById<TextView>(R.id.textEditDepTime)
+        //editDepTime.text = TimeUtilFunctions.getTimeFromTimestamp(tsToSet)
+        timeView.text = TimeUtilFunctions.getTimeFromTimestamp(tsToSet)
+
+        cal.time = tsToSet.toDate()
+        val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, monthOfYear)
+            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            dateView.text = SimpleDateFormat("dd.MM.yyyy").format(cal.time)
+        }
+
+        val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
+            cal.set(Calendar.HOUR_OF_DAY, hour)
+            cal.set(Calendar.MINUTE, minute)
+            // view = Date().time
+            timeView.text = SimpleDateFormat("HH:mm").format(cal.time)
+        }
+
+
+        dateView.setOnClickListener {
+            val datePickerDialog = DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
+            datePickerDialog.datePicker.minDate = Date().time
+            datePickerDialog.show()
+        }
+        timeView.setOnClickListener {
+            val timePickerDialog = TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true)
+            timePickerDialog.show()
+        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -259,46 +262,19 @@ class TripEditFragment : Fragment() {
         view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(trip.depLocation)
         view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(trip.ariLocation)
 
-        val tripDepartureTimestamp = trip.departureDateTime
-
+        // Departure Date Time
         val editDepDate = view.findViewById<TextView>(R.id.textEditDepDate)
-        // editDepDate.text = trip.depDate
-        editDepDate.text = TimeUtilFunctions.getDateFromTimestamp(tripDepartureTimestamp)
-        editDepDate.setTextColor(Color.parseColor("#9E150808"))
-
         val editDepTime = view.findViewById<TextView>(R.id.textEditDepTime)
-        //editDepTime.text = trip.depTime
-        editDepTime.text = TimeUtilFunctions.getTimeFromTimestamp(tripDepartureTimestamp)
-        editDepTime.setTextColor(Color.parseColor("#9E150808"))
+        val tripDepartureTimestamp = trip.departureDateTime
+        setDateAndTimeInView(tripDepartureTimestamp, editDepDate, editDepTime)
 
-        val cal = Calendar.getInstance()
-        cal.time = tripDepartureTimestamp.toDate()
-        val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-            cal.set(Calendar.YEAR, year)
-            cal.set(Calendar.MONTH, monthOfYear)
-            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            editDepDate.text = SimpleDateFormat("dd.MM.yyyy").format(cal.time)
-        }
+        // Arrival Date Time
+        val editAriDate = view.findViewById<TextView>(R.id.textEditAriDate)
+        val editAriTime = view.findViewById<TextView>(R.id.textEditAriTime)
+        val tripArrivalTimestamp = trip.arrivalDateTime
+        setDateAndTimeInView(tripArrivalTimestamp, editAriDate, editAriTime)
 
-        val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
-            cal.set(Calendar.HOUR_OF_DAY, hour)
-            cal.set(Calendar.MINUTE, minute)
-            // view = Date().time
-            editDepTime.text = SimpleDateFormat("HH:mm").format(cal.time)
-        }
-
-
-        editDepDate.setOnClickListener {
-            val datePickerDialog = DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
-            datePickerDialog.datePicker.minDate = Date().time
-            datePickerDialog.show()
-        }
-        editDepTime.setOnClickListener {
-            val timePickerDialog = TimePickerDialog(requireContext(), timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true)
-            timePickerDialog.show()
-        }
-
-        view.findViewById<TextInputLayout>(R.id.textEditEstDuration).editText?.setText(trip.estDuration)
+        // view.findViewById<TextInputLayout>(R.id.textEditEstDuration).editText?.setText(trip.estDuration)
         view.findViewById<TextInputLayout>(R.id.textEditAvaSeat).editText?.setText(trip.avaSeats.toString())
         view.findViewById<TextInputLayout>(R.id.textEditPrice).editText?.setText(trip.price.toString())
         view.findViewById<TextInputLayout>(R.id.textEditAdditional).editText?.setText(trip.additional)
@@ -323,7 +299,7 @@ class TripEditFragment : Fragment() {
 
         val editDepLocation = requireView().findViewById<TextInputLayout>(R.id.textEditDepLocation)
         val editAriLocation = requireView().findViewById<TextInputLayout>(R.id.textEditAriLocation)
-        val editEstDuration = requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration)
+        // val editEstDuration = requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration)
         val editAvaSeat = requireView().findViewById<TextInputLayout>(R.id.textEditAvaSeat)
         val editPrice = requireView().findViewById<TextInputLayout>(R.id.textEditPrice)
         val editAdditional = requireView().findViewById<TextInputLayout>(R.id.textEditAdditional)
@@ -331,15 +307,23 @@ class TripEditFragment : Fragment() {
         val editPlate = requireView().findViewById<TextInputLayout>(R.id.textEditPlate)
         val editDepDate = requireView().findViewById<TextView>(R.id.textEditDepDate)
         val editDepTime = requireView().findViewById<TextView>(R.id.textEditDepTime)
+        val editAriDate = requireView().findViewById<TextView>(R.id.textEditAriDate)
+        val editAriTime = requireView().findViewById<TextView>(R.id.textEditAriTime)
 
         val departureDateAsStr = editDepDate.text.toString()
         val departureTimeAsStr = editDepTime.text.toString()
-        val newTimestamp = TimeUtilFunctions.getTimestampFromDateAndTime(departureDateAsStr, departureTimeAsStr)
+        val newDepartureTimestamp = TimeUtilFunctions.getTimestampFromDateAndTime(departureDateAsStr, departureTimeAsStr)
+
+        val arrivalDateAsStr = editAriDate.text.toString()
+        val arrivalTimeAsStr = editAriTime.text.toString()
+        val newArrivalTimestamp = TimeUtilFunctions.getTimestampFromDateAndTime(arrivalDateAsStr, arrivalTimeAsStr)
+
+        val newEstDuration = TimeUtilFunctions.getTimestampDifferenceAsStr(newDepartureTimestamp, newArrivalTimestamp)
 
         val acc_email = ModelPreferencesManager.get<String>(getString(R.string.keyCurrentAccount)) //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         tripData.depLocation = editDepLocation.editText?.text.toString()
         tripData.ariLocation = editAriLocation.editText?.text.toString()
-        tripData.estDuration = editEstDuration.editText?.text.toString()
+        tripData.estDuration = newEstDuration //editEstDuration.editText?.text.toString()
         tripData.avaSeats = editAvaSeat.editText?.text.toString().toInt()
         tripData.price = editPrice.editText?.text.toString().toDouble()
         tripData.additional = editAdditional.editText?.text.toString()
@@ -351,7 +335,8 @@ class TripEditFragment : Fragment() {
         tripData.owner = acc_email.toString()
         tripData.status = selectedTrip.status
         tripData.hasImage = true
-        tripData.departureDateTime = newTimestamp
+        tripData.departureDateTime = newDepartureTimestamp
+        tripData.arrivalDateTime = newArrivalTimestamp
         return tripData
     }
 
@@ -374,14 +359,15 @@ class TripEditFragment : Fragment() {
         inflater.inflate(R.menu.save_trip_menu, menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.save_Trip -> {
                 val newTrip = saveDataInTrip() // Trip(tripId)
 
                 val message: String = if (tripId == NEW_TRIP) getString(R.string.tripCreatedSucces) else getString(
-                                R.string.tripEditedSucces
-                        )
+                        R.string.tripEditedSucces
+                )
                 if (tripId == NEW_TRIP) {
                     viewModel.createTrip(newTrip)
                         .addOnSuccessListener { documentReference ->
@@ -392,17 +378,17 @@ class TripEditFragment : Fragment() {
                             findNavController().popBackStack()
                         }
                 } else {
-                    newTrip.id = tripId.toString()
+                    newTrip.id = tripId
                     viewModel.updateTrip(newTrip)
-                            .addOnSuccessListener {
-                                saveImageToFirebaseStorage(tripId)
-                            }
-                            .addOnSuccessListener {
-                                Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
-                                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                                        .show()
-                                findNavController().popBackStack()
-                            }
+                        .addOnSuccessListener {
+                            saveImageToFirebaseStorage(tripId)
+                        }
+                        .addOnSuccessListener {
+                            Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+                                    .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                                    .show()
+                            findNavController().popBackStack()
+                        }
                 }
                 return true
             }

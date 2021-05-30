@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.floor
 
 object TimeUtilFunctions {
 
@@ -15,7 +16,7 @@ object TimeUtilFunctions {
     private val dateFormat = "dd.MM.yyyy"
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun convertToDateViaInstant(dateToConvert: LocalDateTime): Date {
+    private fun convertToDateViaInstant(dateToConvert: LocalDateTime): Date {
         return Date.from(dateToConvert.atZone(ZoneId.systemDefault())
                 .toInstant());
     }
@@ -36,5 +37,37 @@ object TimeUtilFunctions {
     @RequiresApi(Build.VERSION_CODES.N)
     fun getTimeFromTimestamp(ts: Timestamp): String {
         return SimpleDateFormat(timeFormat).format(ts.toDate())
+    }
+
+    fun getTimestampDifferenceAsStr(departureTimestamp: Timestamp, arrivalTimestamp: Timestamp): String {
+        val departureSeconds: Long = departureTimestamp.seconds
+        val arrivalSeconds: Long = arrivalTimestamp.seconds
+
+        // I can divide by 60 because I am not mannaging seconds
+        var difference: Long = floor((arrivalSeconds - departureSeconds) / 60.0).toLong()
+        // I have a difference in Minutes
+        val minutes = difference % 60
+        val hoursLong = floor(difference / 60.0).toLong()
+        val hours = hoursLong % 24
+        val days: Long = floor(hoursLong / 24.0).toLong()
+
+        val minutesInt = minutes.toInt()
+        val hoursInt = hours.toInt()
+        val daysInt = days.toInt()
+
+        val returnString = StringBuilder()
+        if (daysInt > 0) {
+            returnString.append("$daysInt days")
+        }
+        if (hoursInt > 0) {
+            val sep = if (returnString.isEmpty()) "" else ", "
+            returnString.append("${sep}$hoursInt hours")
+        }
+        if (minutesInt > 0){
+            val sep = if (returnString.isEmpty()) "" else ", "
+            returnString.append("${sep}$minutesInt minutes")
+        }
+
+        return returnString.toString()
     }
 }
