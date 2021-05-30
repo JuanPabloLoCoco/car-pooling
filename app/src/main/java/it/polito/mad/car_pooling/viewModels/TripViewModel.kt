@@ -9,6 +9,7 @@ import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
 import it.polito.mad.car_pooling.services.FirebaseTripRequestService
 import it.polito.mad.car_pooling.services.FirebaseTripService
+import it.polito.mad.car_pooling.services.LocalDataService
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -87,5 +88,17 @@ class TripViewModel (private val tripId: String): ViewModel() {
 
     fun updateTrip(trip: Trip): Task<Void> {
         return FirebaseTripService.updateTrip(trip)
+    }
+
+    fun addInterestedTrip(userId: String) {
+        return LocalDataService.addInterestedTrip(userId, tripId)
+    }
+
+    fun getInterestedTrips(userId: String): List<String> {
+        return LocalDataService.getInterestedTrips(userId)
+    }
+
+    fun removeInterestedTrip (userId: String) {
+        return LocalDataService.removeInterestedTrip(userId, tripId)
     }
 }

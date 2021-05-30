@@ -45,6 +45,9 @@ class TripDetailsFragment : Fragment() {
 
     private lateinit var tripRequestListAdapter: TripRequestsCardAdapter
 
+    private lateinit var interestedTrips : List<String>
+    var isInterestedTrip : Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -365,22 +368,38 @@ class TripDetailsFragment : Fragment() {
             //findNavController().navigate(R.id.action_nav_trip_to_mapFragment)
         }
 
-        var current_status : Boolean = true
         val sourceFragment = args.sourceFragment
         val likeButton = activity?.findViewById<ImageButton>(R.id.likeButton)
+
+
+
         if (sourceFragment == "otherTrips") {
             likeButton?.setBackgroundResource(R.drawable.ic_baseline_favorite_border_24)
             //likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24)
         } else if (sourceFragment == "boughtTrips") {
 
         }
-        likeButton?.setOnClickListener{
-            if (current_status) {
+
+
+        interestedTrips = viewModel.getInterestedTrips(acc_email)
+        Log.d("POLITO", "Interested Trips $interestedTrips . Size = ${interestedTrips.size}")
+        isInterestedTrip = interestedTrips.filter { it == tripId }.isNotEmpty()
+        if (isInterestedTrip) {
+            if (likeButton != null) {
                 likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24)
-                current_status = false
-            } else {
+            }
+        }
+        likeButton?.setOnClickListener{
+            if (isInterestedTrip) {
                 likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_border_24)
-                current_status= true
+                Log.d("TRIP_DETAIL_FRAGMENT", "Remove Interested")
+                viewModel.removeInterestedTrip(acc_email)
+                isInterestedTrip = false
+            } else {
+                likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24)
+                Log.d("TRIP_DETAIL_FRAGMENT", "Add Interested")
+                viewModel.addInterestedTrip(acc_email)
+                isInterestedTrip = true
             }
         }
 
