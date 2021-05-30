@@ -76,12 +76,11 @@ class TripEditFragment : Fragment() {
 
     private lateinit var tripId: String
     private val NEW_TRIP: String = "NEW_TRIP"
-    lateinit var check_status: String
-    lateinit var adapter: OptionalIntermediatesCardAdapter
+
     private val TAG = "TripEditFragment"
     lateinit var locationList : MutableList<StopLocation>
-    lateinit var arrLocation : StopLocation
-    lateinit var depLocation : StopLocation
+    //lateinit var arrivalLocation : StopLocation
+    //lateinit var departureLocation : StopLocation
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -225,15 +224,8 @@ class TripEditFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.N)
     private fun setDateAndTimeInView (tsToSet: Timestamp, dateView: TextView, timeView: TextView) {
         val cal = Calendar.getInstance()
-        // val tripDepartureTimestamp = trip.departureDateTime
 
-        //val editDate = view.findViewById<TextView>(R.id.textEditDepDate)
-        //editDepDate.text = TimeUtilFunctions.getDateFromTimestamp(tsToSet)
-        // editDepDate.setTextColor(Color.parseColor("#9E150808"))
         dateView.text = TimeUtilFunctions.getDateFromTimestamp(tsToSet)
-
-        //val editTime = view.findViewById<TextView>(R.id.textEditDepTime)
-        //editDepTime.text = TimeUtilFunctions.getTimeFromTimestamp(tsToSet)
         timeView.text = TimeUtilFunctions.getTimeFromTimestamp(tsToSet)
 
         cal.time = tsToSet.toDate()
@@ -250,7 +242,6 @@ class TripEditFragment : Fragment() {
             // view = Date().time
             timeView.text = SimpleDateFormat("HH:mm").format(cal.time)
         }
-
 
         dateView.setOnClickListener {
             val datePickerDialog = DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
@@ -301,7 +292,9 @@ class TripEditFragment : Fragment() {
             viewLifecycleOwner) { result ->
             val type = object: TypeToken<StopLocation>(){}.type
             val arrLocation = Gson().fromJson<StopLocation>(result, type)
+            //arrivalLocation = arrLocation
             selectedTrip.ariLocation = arrLocation.address
+
             view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(arrLocation.address)
         }
 
@@ -310,11 +303,10 @@ class TripEditFragment : Fragment() {
             val type = object: TypeToken<StopLocation>(){}.type
             val depLocation = Gson().fromJson<StopLocation>(result, type)
             selectedTrip.depLocation = depLocation.address
+            //departureLocation = depLocation
             view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(depLocation.address)
         }
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun saveDataInTrip (): Trip {
@@ -322,7 +314,6 @@ class TripEditFragment : Fragment() {
 
         val editDepLocation = requireView().findViewById<TextInputLayout>(R.id.textEditDepLocation)
         val editAriLocation = requireView().findViewById<TextInputLayout>(R.id.textEditAriLocation)
-        // val editEstDuration = requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration)
         val editAvaSeat = requireView().findViewById<TextInputLayout>(R.id.textEditAvaSeat)
         val editPrice = requireView().findViewById<TextInputLayout>(R.id.textEditPrice)
         val editAdditional = requireView().findViewById<TextInputLayout>(R.id.textEditAdditional)
@@ -342,6 +333,9 @@ class TripEditFragment : Fragment() {
         val newArrivalTimestamp = TimeUtilFunctions.getTimestampFromDateAndTime(arrivalDateAsStr, arrivalTimeAsStr)
 
         val newEstDuration = TimeUtilFunctions.getTimestampDifferenceAsStr(newDepartureTimestamp, newArrivalTimestamp)
+
+        //Log.d(TAG,"DepartureLocation ${departureLocation.toMap()}")
+        //Log.d(TAG,"ArrivalLocation ${arrivalLocation.toMap()}")
 
         val acc_email = ModelPreferencesManager.get<String>(getString(R.string.keyCurrentAccount)) //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         tripData.depLocation = editDepLocation.editText?.text.toString()
@@ -387,6 +381,8 @@ class TripEditFragment : Fragment() {
         when (item.itemId) {
             R.id.save_Trip -> {
                 val newTrip = saveDataInTrip() // Trip(tripId)
+                Log.d(TAG, "${newTrip.toMap()}")
+                return true
 
                 val message: String = if (tripId == NEW_TRIP) getString(R.string.tripCreatedSucces) else getString(
                         R.string.tripEditedSucces
