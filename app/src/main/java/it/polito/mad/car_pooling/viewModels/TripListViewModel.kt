@@ -35,4 +35,8 @@ class TripListViewModel (userId: String) : ViewModel () {
             }
         }
     }
+
+    val othersTrips: LiveData<List<Trip>> = liveData {
+        FirebaseTripService.getOthersTrips(userId).collect { emit(it) }
+    }
 }

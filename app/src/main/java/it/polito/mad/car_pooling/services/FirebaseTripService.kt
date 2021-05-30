@@ -2,6 +2,7 @@ package it.polito.mad.car_pooling.services
 
 import android.util.Log
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
 import it.polito.mad.car_pooling.models.Profile.Companion.toUser
 import it.polito.mad.car_pooling.models.Trip
@@ -64,7 +65,9 @@ object FirebaseTripService {
         val db = FirebaseFirestore.getInstance()
         return callbackFlow {
             val listenerRegistration = db.collection(TRIP_COLLECTION)
-                .whereNotEqualTo("owner", userId)
+                // .whereNotEqualTo("owner", userId)
+                .whereGreaterThan("departureDateTime", Timestamp.now())
+                .whereEqualTo("status", Trip.OPEN)
                 .addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
                     if (firebaseFirestoreException != null || querySnapshot == null) {
                         cancel(message = "Error fetching other trips", cause = firebaseFirestoreException)
@@ -72,6 +75,7 @@ object FirebaseTripService {
                     }
                     val map = querySnapshot.documents
                         .mapNotNull { it.toTrip() }
+                            .filter { it.owner != userId }
                     offer(map)
                 }
             awaitClose{
