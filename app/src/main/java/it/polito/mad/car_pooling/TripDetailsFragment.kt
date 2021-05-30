@@ -9,7 +9,6 @@ import android.view.*
 import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -20,17 +19,13 @@ import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
-import it.polito.mad.car_pooling.viewModels.ProfileViewModel
-import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
 import it.polito.mad.car_pooling.viewModels.TripViewModel
 import it.polito.mad.car_pooling.viewModels.TripViewModelFactory
-import java.util.*
 
 
 @Suppress("UNREACHABLE_CODE")
@@ -358,8 +353,8 @@ class TripDetailsFragment : Fragment() {
 
         val buttonCheckLocationMap = view.findViewById<Button>(R.id.buttonCheckLocationMap)
         buttonCheckLocationMap.setOnClickListener {
-            val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation")
-            findNavController().navigate(action)
+            //val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation")
+            //findNavController().navigate(action)
             //findNavController().navigate(R.id.action_nav_trip_to_mapFragment)
         }
 
@@ -461,8 +456,8 @@ class TripDetailsFragment : Fragment() {
         view.findViewById<TextView>(R.id.textPlate).text = trip.plate //value["plate"].toString()
         view.findViewById<TextView>(R.id.textDepDate).text = trip.depDate //value["depDate"].toString()
         view.findViewById<TextView>(R.id.textDepTime).text = trip.depTime //value["depTime"].toString()
-        view.findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
-        view.findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
+        //view.findViewById<TextView>(R.id.textDepDate).setTextColor(Color.parseColor("#54150808"))
+        //view.findViewById<TextView>(R.id.textDepTime).setTextColor(Color.parseColor("#54150808"))
 
     }
 

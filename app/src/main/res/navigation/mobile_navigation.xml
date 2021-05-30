@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/singInFragment">
+    app:startDestination="@id/startFragment">
     <fragment
         android:id="@+id/nav_trip"
         android:name="it.polito.mad.car_pooling.TripDetailsFragment"
@@ -37,7 +37,11 @@
             app:destination="@id/nav_profile" />
         <action
             android:id="@+id/action_nav_trip_to_mapFragment"
-            app:destination="@id/mapFragment" />
+            app:destination="@id/mapFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right"/>
     </fragment>
     <fragment
         android:id="@+id/tripEditFragment"
@@ -63,8 +67,11 @@
             app:destination="@id/nav_trip" />
         <action
             android:id="@+id/action_tripEditFragment_to_mapFragment"
-            app:destination="@id/mapFragment" >
-
+            app:destination="@id/mapFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right">
         </action>
 
     </fragment>
@@ -186,6 +193,18 @@
         <argument
             android:name="source"
             app:argType="string" />
+        <argument
+            android:name="sourceLocation"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="it.polito.mad.car_pooling.StartFragment"
+        android:label="StartFragment"
+        tools:layout="@layout/fragment_start">
+        <action
+            android:id="@+id/action_startFragment_to_singInFragment"
+            app:destination="@id/singInFragment" />
     </fragment>
 
 </navigation>

@@ -72,6 +72,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.1'
     //def viewmodel_savedstate_version = "1.0.0-alpha02"
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.4.0-alpha01"
+    implementation 'com.airbnb.android:lottie:3.7.0'
 
     testImplementation 'junit:junit:4.+'
 

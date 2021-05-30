@@ -21,6 +21,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.gms.location.*
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import it.polito.mad.car_pooling.models.StopLocation
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -28,7 +31,6 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
-import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import java.util.*
 
@@ -41,6 +43,7 @@ class MapFragment : Fragment() {
     lateinit var locationRequest: LocationRequest
     val PERMISSION_ID = 1010
     val args: MapFragmentArgs by navArgs()
+    lateinit var originListLocation: MutableList<Map<String, String>>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,7 +58,10 @@ class MapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val source = args.source
-        //Log.d("map!!!", "${source}")
+        /*val type = object: TypeToken<MutableList<StopLocation>>(){}.type
+        originListLocation = Gson().fromJson<MutableList<StopLocation>>(args.sourceLocation, type)*/
+        val type = object: TypeToken<MutableList<Map<String, String>>>(){}.type
+        originListLocation = Gson().fromJson(args.sourceLocation, type)
 
         Configuration.getInstance().load(activity, PreferenceManager.getDefaultSharedPreferences(activity))
         map = view.findViewById<MapView>(R.id.map)
@@ -66,33 +72,86 @@ class MapFragment : Fragment() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { currentLocation : Location? ->
             val point = currentLocation?.let { GeoPoint(it.latitude, it.longitude) }
-            Log.d("map!!!", "${currentLocation?.latitude},${currentLocation?.longitude}")
             map.getController().setCenter(point)
         }
-        //val point = GeoPoint(45.845557, 26.170010)
-        //map.getController().setCenter(point)
         val compassOverlay =  CompassOverlay(requireContext(), map)
         compassOverlay.enableCompass()
         map.getOverlays().add(compassOverlay)
-        val startMarker = Marker(map);
-        map.overlays.add(object: Overlay() {
-            override fun onSingleTapConfirmed(e: MotionEvent, mapView: MapView): Boolean {
-                val projection = mapView.projection
-                val geoPoint = projection.fromPixels(e.x.toInt(), e.y.toInt())
-                val set_point = GeoPoint(geoPoint.latitude, geoPoint.longitude)
-                val geoCoder = Geocoder(requireContext(), Locale.getDefault())
-                val address = geoCoder.getFromLocation(set_point.latitude, set_point.longitude,1)
-                startMarker.setPosition(set_point);
-                startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-                map.getOverlays().add(startMarker)
-                Log.d("map!!!", "${geoPoint.latitude},${geoPoint.longitude}")
-                Log.d("map!!!", "${address}")
-                return true
-            }
-        })
+        val startMarker = Marker(map)
+
+        if (source == "addInter") {
+            map.overlays.add(object: Overlay() {
+                override fun onSingleTapConfirmed(e: MotionEvent, mapView: MapView): Boolean {
+                    val projection = mapView.projection
+                    val geoPoint = projection.fromPixels(e.x.toInt(), e.y.toInt())
+                    val set_point = GeoPoint(geoPoint.latitude, geoPoint.longitude)
+                    val geoCoder = Geocoder(requireContext(), Locale.getDefault())
+                    val address = geoCoder.getFromLocation(set_point.latitude, set_point.longitude,1)
+                    startMarker.setPosition(set_point)
+                    startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    map.getOverlays().add(startMarker)
+                    val city = address.get(0).getLocality()
+                    val country = address.get(0).getCountryName()
+                    val buttonSaveLocation = view.findViewById<Button>(R.id.buttonSaveLocation)
+                    buttonSaveLocation.setOnClickListener{
+                        val tempLocation = StopLocation(address.get(0).getAddressLine(0))
+                        tempLocation.address = address.get(0).getAddressLine(0)
+                        tempLocation.latitude = geoPoint.latitude.toString()
+                        tempLocation.longitude = geoPoint.longitude.toString()
+                        tempLocation.city = city
+                        tempLocation.country = country
+                        val newList : MutableList<StopLocation> = emptyList<StopLocation>().toMutableList()
+                        for (i in 0..originListLocation.size - 1) {
+                            val temp = StopLocation(originListLocation[i]["address"]!!)
+                            temp.address = (originListLocation[i]["address"]!!)//.split(",")[0]
+                            temp.city = (originListLocation[i]["city"]!!)
+                            temp.country = (originListLocation[i]["country"]!!)
+                            temp.latitude = originListLocation[i]["latitude"]!!
+                            temp.longitude = originListLocation[i]["latitude"]!!
+                            newList.add(temp)
+                        }
+                        newList.add(tempLocation)
+                        findNavController().previousBackStackEntry?.savedStateHandle?.set("location", Gson().toJson(newList))
+                        findNavController().popBackStack()
+                    }
+                    return true
+                }
+            })
+        } else {
+            map.overlays.add(object: Overlay() {
+                override fun onSingleTapConfirmed(e: MotionEvent, mapView: MapView): Boolean {
+                    val projection = mapView.projection
+                    val geoPoint = projection.fromPixels(e.x.toInt(), e.y.toInt())
+                    val set_point = GeoPoint(geoPoint.latitude, geoPoint.longitude)
+                    val geoCoder = Geocoder(requireContext(), Locale.getDefault())
+                    val address = geoCoder.getFromLocation(set_point.latitude, set_point.longitude,1)
+                    startMarker.setPosition(set_point)
+                    startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    map.getOverlays().add(startMarker)
+                    val city = address.get(0).getLocality()
+                    val country = address.get(0).getCountryName()
+                    val buttonSaveLocation = view.findViewById<Button>(R.id.buttonSaveLocation)
+                    buttonSaveLocation.setOnClickListener{
+                        val tempLocation = StopLocation(address.get(0).getAddressLine(0))
+                        tempLocation.address = address.get(0).getAddressLine(0)
+                        tempLocation.latitude = geoPoint.latitude.toString()
+                        tempLocation.longitude = geoPoint.longitude.toString()
+                        tempLocation.city = city
+                        tempLocation.country = country
+                        val key = if (source == "departure") "depLocation" else "arrLocation"
+                        Log.d("map!!!!!!", "${tempLocation}")
+                        Log.d("map!!!!!!", "${Gson().toJson(tempLocation)}")
+                        findNavController().previousBackStackEntry?.savedStateHandle?.set(key, Gson().toJson(tempLocation))
+                        findNavController().popBackStack()
+                    }
+                    return true
+                }
+            })
+        }
+
 
         //37.4219983,-122.084
-        val origin = GeoPoint(37.4219983,-122.084)
+        /*val origin = GeoPoint(37.4219983,-122.084)
         val p1 = GeoPoint(40.4219983,-115.084)
         val p2 = GeoPoint(45.4219983,-110.084)
         var geoPoints = ArrayList<GeoPoint>()
@@ -102,12 +161,7 @@ class MapFragment : Fragment() {
         Log.d("map!!!", "${geoPoints}")
         val line = Polyline()
         line.setPoints(geoPoints)
-        map.overlays.add(line)
-
-        val buttonSaveLocation = view.findViewById<Button>(R.id.buttonSaveLocation)
-        buttonSaveLocation.setOnClickListener{
-            findNavController().popBackStack()
-        }
+        map.overlays.add(line)*/
     }
 
     @SuppressLint("MissingPermission")
