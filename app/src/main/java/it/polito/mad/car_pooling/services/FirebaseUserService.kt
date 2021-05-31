@@ -9,6 +9,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Profile.Companion.toUser
 import it.polito.mad.car_pooling.models.Rating
+import it.polito.mad.car_pooling.models.Rating.Companion.toRating
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -79,5 +80,28 @@ object FirebaseUserService {
                 .collection(RATINGS_COLLECTION)
                 .document()
                 .set(rating.toMap())
+    }
+
+    suspend fun getUserRatings(userId: String): Flow<List<Rating>> {
+        val db = FirebaseFirestore.getInstance()
+        return callbackFlow {
+            val listenerRegistration = db.collection(USERS_COLLECTION)
+                    .document(userId)
+                    .collection(RATINGS_COLLECTION)
+                    .addSnapshotListener { querySnapShot: QuerySnapshot?, error:FirebaseFirestoreException? ->
+                        if (error != null || querySnapShot == null) {
+                            cancel(message = "Error fetching ratings for user with id ${userId}", cause = error)
+                            return@addSnapshotListener
+                        }
+                        val userRatingList = querySnapShot?.documents
+                                .mapNotNull { it.toRating() }
+                        offer(userRatingList)
+                    }
+            awaitClose {
+                Log.d(TAG, "Cancelling rating list listener for user with id ${userId}")
+                listenerRegistration.remove()
+            }
+        }
+
     }
 }
