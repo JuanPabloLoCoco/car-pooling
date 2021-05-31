@@ -5,8 +5,10 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Profile.Companion.toUser
+import it.polito.mad.car_pooling.models.Rating
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.callbackFlow
 object FirebaseUserService {
     private const val TAG = "FirebaseProfileService"
     private const val USERS_COLLECTION: String = "Users"
+    private const val RATINGS_COLLECTION: String = "Ratings"
 
     @ExperimentalCoroutinesApi
     suspend fun getUserById(userId: String): Flow<Profile?> {
@@ -38,6 +41,27 @@ object FirebaseUserService {
         }
     }
 
+    suspend fun getUserByIdInList(userIdList: List<String>): Flow<List<Profile>> {
+        val db = FirebaseFirestore.getInstance()
+        return callbackFlow {
+            val listenerRegistration = db.collection(USERS_COLLECTION)
+                    .whereIn("__name__", userIdList)
+                    .addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                        if (firebaseFirestoreException != null || querySnapshot == null) {
+                            cancel(message = "Error fetching users with emails = $userIdList", cause = firebaseFirestoreException)
+                            return@addSnapshotListener
+                        }
+                        val usersList = querySnapshot.documents
+                                .mapNotNull { it.toUser() }
+                        offer(usersList)
+                    }
+            awaitClose {
+                Log.d(TAG, "Cancelling users with emails $userIdList listener")
+                listenerRegistration.remove()
+            }
+        }
+    }
+
     fun saveUser(user: Profile): Task<Void> {
         val db = FirebaseFirestore.getInstance()
         return db.collection(USERS_COLLECTION)
@@ -46,5 +70,14 @@ object FirebaseUserService {
 
         // TODO: Change how to return true or false depending on the result.
         // TODO: Take look at Brandan Jones Github
+    }
+
+    fun saveRating(rating: Rating): Task<Void> {
+        val db = FirebaseFirestore.getInstance()
+        return db.collection(USERS_COLLECTION)
+                .document(rating.rated)
+                .collection(RATINGS_COLLECTION)
+                .document()
+                .set(rating.toMap())
     }
 }
