@@ -109,16 +109,44 @@ class TripEditFragment : Fragment() {
         val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
         editimageView.setImageURI(Uri.parse(default_str_car))
 
+        // Views for optional intermidiate stops
         locationList = emptyList<StopLocation>().toMutableList()
-        viewModel.trip.observe(viewLifecycleOwner, {
+        val optionalInterRV = view.findViewById<RecyclerView>(R.id.optional_intermediates_RV)
+        optionalInterRV.layoutManager = LinearLayoutManager(requireContext())
+        adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
+        optionalInterRV.adapter = adapter
+        val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
 
+        arrivalLocation = StopLocation.newLocation()
+        departureLocation = StopLocation.newLocation()
+
+
+        viewModel.trip.observe(viewLifecycleOwner, {
             if (it != null) {
                 Log.d("POLITO", "${it.toMap()}")
                 selectedTrip = it
+                if (it.arrivalLocation != null) {
+                    arrivalLocation = it.arrivalLocation!!
+                }
+                if (it.departureLocation != null) {
+                    departureLocation = it.departureLocation!!
+                }
+
+                // Load optional intermidiate stops
+                if (it.optionalStops.isEmpty()) {
+                    optionalInterRV.visibility = View.GONE
+                    noOpInterView.visibility = View.VISIBLE
+                } else {
+                    optionalInterRV.visibility = View.VISIBLE
+                    noOpInterView.visibility = View.GONE
+                    adapter.updateCollection(it.optionalStops.toMutableList())
+                }
+
                 if (selectedTrip.status == Trip.BLOCKED) {
                     blockTripButton.isEnabled = false
                 }
                 loadDataInFields(selectedTrip, view)
+                Log.d(TAG, "Trip loaded. ${it.toMap()}")
                 if (selectedTrip.hasImage == true) {
                     val storage = Firebase.storage
                     val imageRef = storage.reference.child("trips/$tripId.jpg")
@@ -185,18 +213,6 @@ class TripEditFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        val optionalInterRV = view.findViewById<RecyclerView>(R.id.optional_intermediates_RV)
-        optionalInterRV.layoutManager = LinearLayoutManager(requireContext())
-        val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
-        if (locationList.size == 0) {
-            optionalInterRV.visibility = View.GONE
-            noOpInterView.visibility = View.VISIBLE
-        } else {
-            optionalInterRV.visibility = View.VISIBLE
-            noOpInterView.visibility = View.GONE
-        }
-        adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
-        optionalInterRV.adapter = adapter
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("location")?.observe(
             viewLifecycleOwner) { result ->
             val type = object: TypeToken<MutableList<StopLocation>>(){}.type
@@ -211,7 +227,8 @@ class TripEditFragment : Fragment() {
                 locationList.add(insertLocation)
             }
             adapter.updateCollection(locationList)
-            if (locationList.size == 0) {
+
+            if (adapter.optionalIntermediatesList.isEmpty()) {
                 optionalInterRV.visibility = View.GONE
                 noOpInterView.visibility = View.VISIBLE
             } else {
@@ -290,8 +307,6 @@ class TripEditFragment : Fragment() {
         editimageView.setImageURI(imageUri)
          */
 
-        arrivalLocation = StopLocation.newLocation()
-        departureLocation = StopLocation.newLocation()
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("arrLocation")?.observe(
             viewLifecycleOwner) { result ->
             val type = object: TypeToken<StopLocation>(){}.type
@@ -585,7 +600,6 @@ class TripEditFragment : Fragment() {
             }
         }
     }
-
 
 }
 
