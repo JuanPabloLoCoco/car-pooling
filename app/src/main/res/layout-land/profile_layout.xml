@@ -83,44 +83,53 @@
                 android:drawablePadding="10dp"
                 android:background="#20000000"
                 android:paddingLeft="10dp"/>
-
             <TextView
-                android:id="@+id/textViewBirthday"
+                android:id="@+id/textViewPhoneNumber"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:text="@string/birthday"
-                android:textSize="20sp"
-                android:layout_marginBottom="5dp"
-                android:textColor="#000000"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:drawableLeft="@drawable/ic_baseline_date_range_24"
+                android:text="@string/phoneNumber"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:drawableLeft="@drawable/ic_baseline_contact_phone_24"
                 android:drawablePadding="10dp"
                 android:background="#20000000"
                 android:paddingLeft="10dp"/>
 
             <TextView
-                android:id="@+id/textViewPhoneNumber"
+                android:id="@+id/textViewBirthday"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:text="@string/phoneNumber"
-                android:textSize="20sp"
-                android:textColor="#000000"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:drawableLeft="@drawable/ic_baseline_contact_phone_24"
+                android:text="@string/birthday"
+                android:textSize="20sp"
+                android:layout_marginBottom="5dp"
+                android:textColor="#000000"
+                android:drawableLeft="@drawable/ic_baseline_date_range_24"
                 android:drawablePadding="10dp"
                 android:background="#20000000"
-                android:paddingLeft="10dp"
-                android:layout_marginBottom="5dp"/>
-
+                android:paddingLeft="10dp"/>
+            <!-- Rating -->
+            <TextView
+                android:id="@+id/userRating"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:text="@string/userRating"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:drawableLeft="@drawable/ic_baseline_star_24"
+                android:drawablePadding="10dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="10dp"/>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rateRV"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:minHeight="300dp"
+                android:minHeight="400dp"
                 android:layout_margin="5dp"
                 android:layout_marginBottom="5dp">
             </androidx.recyclerview.widget.RecyclerView>
-
             <Button
                 android:id="@+id/sendEmailButton"
                 android:text="Send an email"
@@ -128,6 +137,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_height="50dp"
                 android:layout_marginBottom="5dp"/>
+
         </LinearLayout>
 
     </ScrollView>

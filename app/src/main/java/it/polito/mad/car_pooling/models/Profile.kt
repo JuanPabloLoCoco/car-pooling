@@ -39,7 +39,6 @@ class Profile (var fullName: String){
                 "full_name" to fullName,
                 "nick_name" to nickName,
                 "email" to email,
-                //"email" to inputEmail,
                 "location" to location,
                 "birthday" to birthday,
                 "phone_number" to phoneNumber,

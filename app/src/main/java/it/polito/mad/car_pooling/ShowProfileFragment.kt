@@ -39,7 +39,7 @@ class ShowProfileFragment : Fragment() {
     private lateinit var viewModel: ProfileViewModel
     private lateinit var viewModelFactory: ProfileViewModelFactory
     private lateinit var userId: String
-    private lateinit var ratingList: MutableList<Rating>
+    private lateinit var ratingList: List<Rating>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +50,6 @@ class ShowProfileFragment : Fragment() {
         setHasOptionsMenu(isOwner)
         imageUri = ""
 
-
         userId = args.userId
         if (userId == "no email") {
             userId = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
@@ -58,27 +57,30 @@ class ShowProfileFragment : Fragment() {
         viewModelFactory = ProfileViewModelFactory(userId)
         viewModel = viewModelFactory.create(ProfileViewModel::class.java)
 
-        //if (args.userId == "no email") (ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email") else args.userId
-        // Create the instances of the viewModel class
-
         return inflater.inflate(R.layout.profile_layout, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /*
-        var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))
-        if (storedProfile === null) {
-            storedProfile = Profile("")
-        }
-        profile = storedProfile
-        loadProfileInFields(storedProfile, view)
-         */
-        // val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        //var acc_email = args.userId //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         val isOwner = args.isOwner
         if (!isOwner) {
+            view.findViewById<TextView>(R.id.textViewLocation).visibility = View.GONE
+            view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.GONE
+            view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.GONE
+        /*val toolbar: Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+            (activity as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+            toolbar.setNavigationOnClickListener(View.OnClickListener(){
+                val drawerLayout: DrawerLayout = (activity as AppCompatActivity).findViewById(R.id.drawer_layout)
+                val navView: NavigationView = (activity as AppCompatActivity).findViewById(R.id.nav_view)
+                val navController = (activity as AppCompatActivity).findNavController(R.id.nav_host_fragment)
+                appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_other_list_trip, R.id.nav_list_trip, R.id.nav_profile), drawerLayout)
+                (activity as AppCompatActivity).setupActionBarWithNavController(navController, appBarConfiguration)
+                navView.setupWithNavController(navController)
+                requireActivity().onBackPressed()
+                //findNavController().popBackStack()
+            })*/
             val db = FirebaseFirestore.getInstance()
             val users = db.collection("Users")
             val profile = users.document(userId)
@@ -169,16 +171,38 @@ class ShowProfileFragment : Fragment() {
         })
 
         // Fake Rating List
-        ratingList = mutableListOf(
+        ratingList = listOf(
                 Rating("Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,",1.0),
                 Rating("Good Driver", 4.5),
                 Rating("The path was nice", 3.0)
         )
+
         val reciclerView = view.findViewById<RecyclerView>(R.id.rateRV)
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        val ratingTitleView = view.findViewById<TextView>(R.id.userRating)
+
         adapter = RatingListCardAdapter(ratingList, requireContext())
         reciclerView.adapter = adapter
+
+        reciclerView.visibility = View.GONE
+        ratingTitleView.visibility = View.GONE
+
+        viewModel.profileRatingList.observe(viewLifecycleOwner, {
+            ratingList = it
+            adapter.updateCollection(ratingList)
+            if (ratingList.isEmpty()) {
+                reciclerView.visibility = View.GONE
+                ratingTitleView.visibility = View.GONE
+            } else {
+                reciclerView.visibility = View.VISIBLE
+                ratingTitleView.visibility = View.VISIBLE
+                
+                val ratingAvg = it.map { r -> r.ratingNumber }.average()
+                val finalAvg = Math.floor(ratingAvg * 100) / 100
+                ratingTitleView.text = "${getString(R.string.userRating)}: ${finalAvg}/5"
+            }
+        })
 
         val sendEmailButton = view?.findViewById<Button>(R.id.sendEmailButton)
         if (sendEmailButton != null) {
@@ -262,33 +286,12 @@ class RatingListCardAdapter(
         val commentTextView =v.findViewById<TextView>(R.id.commentextView)
         val ratingbarView = v.findViewById<RatingBar>(R.id.ratingBar2)
         val reviewName = v.findViewById<TextView>(R.id.reviewuserView)
-        /*
 
-        val departureLocationView = v.findViewById<TextView>(R.id.depatureview)
-        val arriveLocationView = v.findViewById<TextView>(R.id.arriveview)
-        val departureTimeView = v.findViewById<TextView>(R.id.timeview)
-        val priceView = v.findViewById<TextView>(R.id.priceview)
-        val availableSeatsView = v.findViewById<TextView>(R.id.tripAvailableSeatsField)
-        val tripImageView = v.findViewById<ImageView>(R.id.imageview)
-        val tripCardView = v.findViewById<CardView>(R.id.tripCard)
-          */
-        fun bind(t: Trip) {
-
-        }
-
-        fun unbind() {
-
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RatingCardViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.ratingbar, parent, false)
         return RatingCardViewHolder(v)
-    }
-
-    override fun onViewRecycled(holder: RatingCardViewHolder) {
-        super.onViewRecycled(holder)
-        holder.unbind()
     }
 
     fun getStringFromField(field: String?): String {
@@ -304,6 +307,11 @@ class RatingListCardAdapter(
 
     override fun getItemCount(): Int {
         return ratingList.size
+    }
+
+    fun updateCollection(newRatingList: List<Rating>) {
+        ratingList = newRatingList
+        notifyDataSetChanged()
     }
 
 
