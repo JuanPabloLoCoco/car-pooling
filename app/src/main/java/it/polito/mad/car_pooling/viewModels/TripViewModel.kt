@@ -26,8 +26,53 @@ class TripViewModel (private val tripId: String): ViewModel() {
         }
     }
 
-    val tripRequests: LiveData<List<TripRequest>>  = liveData {
-        FirebaseTripRequestService.findRequestsByTrip(tripId).collect { emit(it) }
+    val tripRequests: LiveData<List<TripRequestRating>> = liveData {
+        FirebaseTripRequestService.findRequestsByTrip(tripId).collect { tripRequestList ->
+            if (tripRequestList ==  null || tripRequestList.isEmpty()) {
+                emit(emptyList<TripRequestRating>())
+            } else {
+                val tripOwner: String = tripRequestList.get(0).tripOwner
+
+                val tripRequestMap : MutableMap<String, TripRequestRating> = mutableMapOf()
+                val profileMap: MutableMap<String, String> = mutableMapOf()
+                // Explain:
+                // I have a Map of TripRequestMap = <TripRequestId, <requestTripId, <RequestTrip, Rating From driver, Passanger>>
+                // I have a Map of ProfileMap = <passangerId, tripRequestId>
+
+                for (tripRequestIterator in tripRequestList) {
+                    tripRequestMap.put(tripRequestIterator.id, TripRequestRating(tripRequestIterator))
+                    profileMap.put(tripRequestIterator.requester, tripRequestIterator.id)
+                }
+
+                // val userIdList: List<String> = tripRequestList.map { tr -> tr.requester }
+
+                // Connect the profile to the Composer
+                // Each Request is connected to a Profile
+                // Each Profile can have 1 or 0 ratings
+                FirebaseUserService.getUserByIdInList(profileMap.keys.toList()).collect { profiles ->
+                    for (profileIterator in profiles) {
+                        val profileBelongToTrip = profileMap.get(profileIterator.email)!!
+                        val tripRequestRatingWithOnlyTripRequest = tripRequestMap.get(profileBelongToTrip)
+                        if (tripRequestRatingWithOnlyTripRequest != null) {
+                            tripRequestRatingWithOnlyTripRequest.passanger = profileIterator
+                            tripRequestMap.put(profileBelongToTrip, tripRequestRatingWithOnlyTripRequest)
+                        }
+                    }
+                    // Now I can search for the ratings!!
+                    FirebaseUserService.getRatingsByTrip(tripOwner, tripId).collect { ratingList ->
+                        for (ratingIterator in ratingList) {
+                            val ratingBelongsToRequest = profileMap.get(ratingIterator.writer)!!
+                            val tripRequestThatBelongToRating = tripRequestMap.get(ratingBelongsToRequest)
+                            if (tripRequestThatBelongToRating != null) {
+                                tripRequestThatBelongToRating.rating = ratingIterator
+                                tripRequestMap.put(ratingBelongsToRequest, tripRequestThatBelongToRating)
+                            }
+                        }
+                        emit(tripRequestMap.values.toList())
+                    }
+                }
+            }
+        }
     }
 
 
@@ -54,7 +99,7 @@ class TripViewModel (private val tripId: String): ViewModel() {
 
     fun updateTripRequest(tripRequest: TripRequest): Task<Void> {
         var seatsFull: Int? = tripRequests.value?.fold(0, { acc, thisTrip ->
-            acc + (if (thisTrip.status == TripRequest.ACCEPTED) 1 else 0)
+            acc + (if (thisTrip.tripRequest.status == TripRequest.ACCEPTED) 1 else 0)
         })
         var seatsUsed: Int = seatsFull ?: 0
         var freeSeats: Int = (trip.value?.avaSeats ?: 0) - seatsUsed

@@ -28,6 +28,7 @@ import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
+import it.polito.mad.car_pooling.models.TripRequestRating
 import it.polito.mad.car_pooling.viewModels.TripViewModel
 import it.polito.mad.car_pooling.viewModels.TripViewModelFactory
 
@@ -40,7 +41,7 @@ class TripDetailsFragment : Fragment() {
     private lateinit var selectedTrip: Trip
     private lateinit var acc_email: String
     var realAvaiableSeats: Int = 0
-    var tripRequestList = listOf<TripRequest>()
+    var tripRequestList = listOf<TripRequestRating>()
 
     private val TAG = "TripDetailsFragment"
     private lateinit var viewModel: TripViewModel
@@ -114,7 +115,7 @@ class TripDetailsFragment : Fragment() {
                     imageRef.downloadUrl.addOnSuccessListener { Uri ->
                         val image_uri = Uri.toString()
                         Glide.with(this)
-                                .load(image_uri).into(imageView)
+                            .load(image_uri).into(imageView)
                     }
                 }
 
@@ -353,13 +354,14 @@ class TripDetailsFragment : Fragment() {
     }
 }
 
-class TripRequestsCardAdapter (var tripRequestList: List<TripRequest>,
+class TripRequestsCardAdapter (var tripRequestList: List<TripRequestRating>,
 val context: Context,
 val navController: NavController,
 val dbInstance: FirebaseFirestore,
 val generalView: View,
 val tripSelected: Trip,
 val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.TripRequestsViewHolder>() {
+    private val TAG = "TripRequestsCardAdapter"
     class TripRequestsViewHolder(v: View): RecyclerView.ViewHolder (v) {
         val requesterCard = v.findViewById<CardView>(R.id.requesterTripCard)
         val requesterAvatar = v.findViewById<ImageView>(R.id.image_request_user)
@@ -384,9 +386,13 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
     }
 
     override fun onBindViewHolder(holder: TripRequestsViewHolder, position: Int) {
-        val selectedRequest : TripRequest = tripRequestList[position]
+        val tripRequestRating = tripRequestList[position]
+        Log.d(TAG, "Trip Request Rating: Rating: ${tripRequestRating.rating}, Passanger:${tripRequestRating.passanger}")
+
+        val selectedRequest : TripRequest = tripRequestRating.tripRequest
+
         // We have to add to the requestTripObject the name of the requester
-        holder.requesterUser.text = selectedRequest.requester;
+        holder.requesterUser.text = tripRequestRating.passanger?.fullName ?: tripRequestRating.tripRequest.requester;
 
         // holder.actionMenuView.visibility = View.GONE
         holder.requesterCard.setOnClickListener {
@@ -395,23 +401,23 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
             navController.navigate(action)
 
         }
-        val availableSeats = tripSelected.avaSeats - tripRequestList.filter { it.status == TripRequest.ACCEPTED }.size
+        val availableSeats = tripSelected.avaSeats - tripRequestList.filter { it.tripRequest.status == TripRequest.ACCEPTED }.size
 
         if (selectedRequest.status == TripRequest.ACCEPTED) {
             // I will not show the menu
             holder.actionMenuView.visibility = View.GONE
 
-            holder.ratingButton.visibility = View.VISIBLE
-            holder.ratingButton.setOnClickListener {
-                val action = TripDetailsFragmentDirections.actionNavTripToRating(selectedRequest.id)
-                navController.navigate(action)
+            if (tripRequestRating.rating == null) {
+                holder.ratingButton.visibility = View.VISIBLE
+                holder.ratingButton.setOnClickListener {
+                    val action = TripDetailsFragmentDirections.actionNavTripToRating(selectedRequest.id)
+                    navController.navigate(action)
+                }
+            } else {
+                holder.ratingButton.visibility = View.INVISIBLE
             }
             // You have to add a menu here for rating the users!!!
 
-
-            //holder.actionMenuView.visibility=View.VISIBLE
-            // holder.actionMenuView.findViewById<Button>(R.id.ratingTripButton).visibility=View.VISIBLE
-            //requireView().findViewById<TextView>(R.id.empty_triplist).visibility=View.INVISIBLE
         } else {
             holder.ratingButton.visibility = View.INVISIBLE
             holder.actionMenuView.setOnClickListener{
@@ -438,18 +444,11 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
 
                 selectedRequest.status = TripRequest.ACCEPTED
                 updateTripRequest(selectedRequest, trueAvaiableSeats)
-
-                //Snackbar.make(generalView, "Request accepted ${selectedRequest.tripId}", Snackbar.LENGTH_SHORT)
-                //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                //        .show()
                 return true
             }
             R.id.reject_request -> {
                 selectedRequest.status = TripRequest.REJECTED
                 updateTripRequest(selectedRequest, trueAvaiableSeats)
-                //Snackbar.make(generalView, "Request Rejected", Snackbar.LENGTH_SHORT)
-                //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                //        .show()
                 true
             }
             else -> false
