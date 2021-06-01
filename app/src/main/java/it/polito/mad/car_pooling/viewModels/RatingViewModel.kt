@@ -9,6 +9,7 @@ import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Rating
 import it.polito.mad.car_pooling.models.TripRequest
 import it.polito.mad.car_pooling.models.TripRequestResponse
+import it.polito.mad.car_pooling.services.FirebaseRatingService
 import it.polito.mad.car_pooling.services.FirebaseTripRequestService
 import it.polito.mad.car_pooling.services.FirebaseUserService
 import kotlinx.coroutines.flow.collect
@@ -28,19 +29,19 @@ class RatingViewModel(private val tripRequestId: String): ViewModel() {
                 _tripRequest.value = it
                 if (it != null) {
                     FirebaseUserService.getUserByIdInList(listOf(it.requester, it.tripOwner)).collect{ profiles ->
-                        var tmpPassanger = Profile("passanger")
+                        var tmpPassenger = Profile("passenger")
                         var tmpDriver = Profile("driver")
                         for (profile in profiles) {
                             if (it.requester == profile.email) {
                                 _passenger.value = profile
-                                tmpPassanger = profile
+                                tmpPassenger = profile
                             }
                             if (it.tripOwner == profile.email) {
                                 _driver.value = profile
                                 tmpDriver = profile
                             }
                         }
-                        _tripRequestResponse.value = TripRequestResponse(it, tmpPassanger, tmpDriver)
+                        _tripRequestResponse.value = TripRequestResponse(it, tmpPassenger, tmpDriver)
                     }
                 }
             }
@@ -48,6 +49,6 @@ class RatingViewModel(private val tripRequestId: String): ViewModel() {
     }
 
     fun saveRating(rating: Rating): Task<Void> {
-        return FirebaseUserService.saveRating(rating)
+        return FirebaseRatingService.saveRating(rating)
     }
 }

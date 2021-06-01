@@ -48,10 +48,10 @@ class RatingFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        val callback =requireActivity().onBackPressedDispatcher.addCallback(this){
-            var bundle:Bundle =Bundle()
-            findNavController().navigate(R.id.rv,bundle)
-        }
+        //val callback =requireActivity().onBackPressedDispatcher.addCallback(this){
+        //    var bundle:Bundle =Bundle()
+        //    findNavController().navigate(R.id.rv,bundle)
+        //}
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -86,24 +86,28 @@ class RatingFragment : Fragment() {
                         else -> mRatingScale!!.text = ""
                     }
                 }
+
         mSendFeedback!!.setOnClickListener {
-            Toast.makeText(
-                    this.context,
-                    "Thank you for sharing your feedback",
-                    Toast.LENGTH_SHORT
-
-            ).show()
             ratingsave()
-
         }
+
+        val ratingTitleView = view.findViewById<TextView>(R.id.ratingTitle)
 
         userId = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
         viewModel.tripRequestResponse.observe(viewLifecycleOwner, {
             tripRequestRespose = it
             if (tripRequestRespose != null) {
+
+                ratingTitleView.text =  if (userId == tripRequestRespose.driver.email) {
+                    "How was ${tripRequestRespose.passenger.fullName} as passenger?"
+                } else {
+                    "How was ${tripRequestRespose.driver.fullName} as driver?"
+                }
+
                 Log.d(TAG, "Driver email: ${tripRequestRespose.driver.email}, Pass: ${tripRequestRespose.passenger.email}")
             } else {
                 Log.d(TAG, "Trip Request response is null: $")
+                findNavController().popBackStack()
             }
 
         })

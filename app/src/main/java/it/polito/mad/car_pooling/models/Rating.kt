@@ -7,7 +7,7 @@ data class Rating (var comment: String, var ratingNumber: Double) {
     var writer: String = ""
     var rated: String = ""
     var tripId: String = ""
-    var ratingId: String = ""
+    var id: String = ""
 
     companion object {
         private val COMMENT = "comment"
@@ -20,7 +20,7 @@ data class Rating (var comment: String, var ratingNumber: Double) {
         fun DocumentSnapshot.toRating(): Rating? {
             val newRating = Rating("", 1.0)
             try {
-                newRating.ratingId = id
+                newRating.id = id
                 newRating.comment = getString(COMMENT)?: ""
                 newRating.ratingNumber = getDouble(RATING_NUMBER) ?: 0.0
                 newRating.rated = getString(RATED) ?: ""
@@ -28,7 +28,7 @@ data class Rating (var comment: String, var ratingNumber: Double) {
                 newRating.tripId = getString(TRIP_ID) ?: ""
                 return newRating
             } catch (e: Exception) {
-                Log.d(TAG, "Error converting rating with id ${newRating.ratingId}", e)
+                Log.d(TAG, "Error converting rating with id ${newRating.id}", e)
                 return null
             }
         }

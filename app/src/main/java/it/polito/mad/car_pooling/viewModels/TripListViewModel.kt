@@ -25,7 +25,7 @@ class TripListViewModel (userId: String) : ViewModel () {
     }
 
     val boughtTrips: LiveData<List<Trip>> = liveData {
-        FirebaseTripRequestService.findPassangerAcceptedRequest(userId).collect {
+        FirebaseTripRequestService.findPassengerAcceptedRequest(userId).collect {
             if (it == null || it.isEmpty()) {
                 Log.d(TAG, "Requests accepted to user ${userId} is empty")
                 emit(emptyList<Trip>())

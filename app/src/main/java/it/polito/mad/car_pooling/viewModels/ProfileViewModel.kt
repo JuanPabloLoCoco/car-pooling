@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Task
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Rating
 import it.polito.mad.car_pooling.models.Trip
+import it.polito.mad.car_pooling.services.FirebaseRatingService
 import it.polito.mad.car_pooling.services.FirebaseTripService
 import it.polito.mad.car_pooling.services.FirebaseUserService
 import kotlinx.coroutines.flow.collect
@@ -28,7 +29,7 @@ class ProfileViewModel(private val userId: String): ViewModel() {
     }
 
     val profileRatingList: LiveData<List<Rating>> = liveData {
-        FirebaseUserService.getUserRatings(userId).collect {
+        FirebaseRatingService.getUserRatings(userId).collect {
             if (it == null || it.isEmpty()) {
                 Log.d(TAG, "Requests accepted to user ${userId} is empty")
                 emit(emptyList<Rating>())

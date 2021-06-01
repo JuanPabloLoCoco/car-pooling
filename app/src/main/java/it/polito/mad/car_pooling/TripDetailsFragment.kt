@@ -128,8 +128,9 @@ class TripDetailsFragment : Fragment() {
                         if (tripRequestList.isEmpty()) {
                             requestListRV.visibility = View.GONE
                         }
-                        tripRequestListAdapter.tripRequestList = tripRequestList
-                        tripRequestListAdapter.notifyDataSetChanged()
+                        tripRequestListAdapter.updateTripRequestList(it)
+                        // tripRequestListAdapter.tripRequestList = tripRequestList
+                        // tripRequestListAdapter.notifyDataSetChanged()
 
                     })
 
@@ -139,10 +140,20 @@ class TripDetailsFragment : Fragment() {
                     // I dont want to see the status of my Request
                     statusMessageView.visibility = View.GONE
 
-                    if (selectedTrip.status == Trip.BLOCKED || selectedTrip.status == Trip.FULL) {
+
+                    if (selectedTrip.arrivalDateTime < Timestamp.now()) {
+                        selectedTrip.status = Trip.ENDED
+                    }
+
+                    if (selectedTrip.status == Trip.BLOCKED || selectedTrip.status == Trip.FULL || selectedTrip.status == Trip.ENDED) {
                         statusMessageView.visibility = View.VISIBLE
                         statusMessageView.setTextColor(ContextCompat.getColor(requireContext(), R.color.design_default_color_error))
-                        statusMessageView.text = if (selectedTrip.status == Trip.BLOCKED) "The trip is blocked" else "The trip is full"
+                        statusMessageView.text = when (selectedTrip.status) {
+                            Trip.BLOCKED -> "The trip is blocked"
+                            Trip.FULL -> "The trip is full"
+                            Trip.ENDED -> "The trip is ended"
+                            else -> ""
+                        }
                     }
 
                 } else {
@@ -168,11 +179,12 @@ class TripDetailsFragment : Fragment() {
                             val ratingDB = tripRequestRating.rating
                             Log.d(TAG, "Request getted: ${it.tripRequest.toMap()}")
                             Log.d(TAG, "Rating from that Request ${it.rating?.toMap()}")
+                            var statusCopy = tripRequestDB.status
                             var status = tripRequestDB.status
                             if (selectedTrip.arrivalDateTime < Timestamp.now()) {
-                                status = TripRequest.ENDED
+                                statusCopy = TripRequest.ENDED
                             }
-                            val message = when (status) {
+                            val message = when (statusCopy) {
                                 TripRequest.ACCEPTED -> "Your request was accepted"
                                 TripRequest.REJECTED -> "Your request was rejected"
                                 TripRequest.PENDING -> "Your request is in pending revision"
@@ -280,35 +292,6 @@ class TripDetailsFragment : Fragment() {
         optionalInterRV.adapter = adapter
     }
 
-   // override fun onActivityCreated(savedInstanceState: Bundle?) {
-
-        /*
-        val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val DepAriLocation = sharedPreferences.getString(getString(R.string.KeyDepAriLocation), "Departure&Arrival Location")
-        val DepDateTime = sharedPreferences.getString(getString(R.string.KeyDepDateTime), "Departure Date&Time")
-        val EstDuration = sharedPreferences.getString(getString(R.string.KeyEstDuration), "Estimated Trip Duration")
-        val AvaSeat = sharedPreferences.getString(getString(R.string.KeyAvaSeat), "Available Seats")
-        val Price = sharedPreferences.getString(getString(R.string.KeyPrice), "Price")
-        val Additional = sharedPreferences.getString(getString(R.string.KeyAdditional), "Additional Information")
-        val Optional = sharedPreferences.getString(getString(R.string.KeyOptional), "Optional intermediates")
-        val Plate = sharedPreferences.getString(getString(R.string.KeyPlate), "Plate Number")
-        val TripImageUri = sharedPreferences.getString(getString(R.string.KeyImageTrip), "android.resource://it.polito.mad.car_pooling/drawable/car_default")
-
-        requireView().findViewById<TextView>(R.id.textDepAriLocation).text = if (DepAriLocation == null || DepAriLocation.isEmpty() || DepAriLocation.isBlank()) "Departure&Arrival Location" else DepAriLocation
-        requireView().findViewById<TextView>(R.id.textDepDateTime).text = if (DepDateTime == null || DepDateTime.isEmpty() || DepDateTime.isBlank()) "Departure Date&Time" else DepDateTime
-        requireView().findViewById<TextView>(R.id.textEstDuration).text = if (EstDuration == null || EstDuration.isEmpty() || EstDuration.isBlank()) "Estimated trip duration" else EstDuration
-        requireView().findViewById<TextView>(R.id.textAvaSeat).text = if (AvaSeat == null || AvaSeat.isEmpty() || AvaSeat.isBlank()) "Available Seats" else AvaSeat
-        requireView().findViewById<TextView>(R.id.textPrice).text = if (Price == null || Price.isEmpty() || Price.isBlank()) "Price" else Price
-        requireView().findViewById<TextView>(R.id.textAdditional).text = if (Additional == null || Additional.isEmpty() || Additional.isBlank()) "Additional Information" else Additional
-        requireView().findViewById<TextView>(R.id.textOptional).text = if (Optional == null || Optional.isEmpty() || Optional.isBlank()) "Optional Intermediates" else Optional
-        requireView().findViewById<TextView>(R.id.textPlate).text = if (Plate == null || Plate.isEmpty() || Plate.isBlank()) "Plate Number" else Plate
-        val uri_input = if (TripImageUri.toString() != "android.resource://it.polito.mad.car_pooling/drawable/car_default") TripImageUri else "android.resource://it.polito.mad.car_pooling/drawable/car_default"
-        requireView().findViewById<ImageView>(R.id.imageviewCar).setImageURI(Uri.parse(uri_input))
-
-        imageTripUri = TripImageUri.toString()
-         */
-    //}
-
     override fun onPause() {
         super.onPause()
         val likeButton = requireActivity().findViewById<ImageButton>(R.id.likeButton)
@@ -369,6 +352,11 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
         fun unbind() {}
     }
 
+    fun updateTripRequestList (newTripRequestRating: List<TripRequestRating>) {
+        tripRequestList = newTripRequestRating
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
         return tripRequestList.size
     }
@@ -385,12 +373,12 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
 
     override fun onBindViewHolder(holder: TripRequestsViewHolder, position: Int) {
         val tripRequestRating = tripRequestList[position]
-        Log.d(TAG, "Trip Request Rating: Rating: ${tripRequestRating.rating}, Passanger:${tripRequestRating.passanger}")
+        Log.d(TAG, "Trip Request Rating: Rating: ${tripRequestRating.rating}, Passenger:${tripRequestRating.passenger}")
 
         val selectedRequest : TripRequest = tripRequestRating.tripRequest
 
         // We have to add to the requestTripObject the name of the requester
-        holder.requesterUser.text = tripRequestRating.passanger?.fullName ?: tripRequestRating.tripRequest.requester;
+        holder.requesterUser.text = tripRequestRating.passenger?.fullName ?: tripRequestRating.tripRequest.requester;
 
         // holder.actionMenuView.visibility = View.GONE
         holder.requesterCard.setOnClickListener {

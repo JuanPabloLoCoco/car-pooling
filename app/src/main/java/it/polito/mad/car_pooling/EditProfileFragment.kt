@@ -306,24 +306,23 @@ class EditProfileFragment : Fragment() {
 
 
 
-    private fun savedProfileData () {
-        //val sharedPreferences = this.requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        var newFullName = requireView().findViewById<TextInputLayout>(R.id.editViewFullName).editText?.text.toString()
-        //newFullName = if (newFullName == null || newFullName.isBlank() || newFullName.isEmpty()) getString(R.string.KeyFullName) else newFullName
-        profile.fullName = newFullName
-        profile.nickName = requireView().findViewById<TextInputLayout>(R.id.editViewNickName).editText?.text.toString()
-        profile.email = requireView().findViewById<TextInputLayout>(R.id.editViewEmail).editText?.text.toString()
-        profile.location = requireView().findViewById<TextInputLayout>(R.id.editViewLocation).editText?.text.toString()
-        profile.phoneNumber = requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString()
-        profile.birthday = requireView().findViewById<TextView>(R.id.editViewBirthday).text.toString()
-        profile.imageUri = imageUri.toString()
+    private fun savedProfileData (): Profile {
+        val inputFullName = requireView().findViewById<TextInputLayout>(R.id.editViewFullName).editText?.text.toString()
+        val inputNickname =  requireView().findViewById<TextInputLayout>(R.id.editViewNickName).editText?.text.toString()
+        val inputLocation =  requireView().findViewById<TextInputLayout>(R.id.editViewLocation).editText?.text.toString()
+        val inputBirthday =  requireView().findViewById<TextView>(R.id.editViewBirthday).text.toString()
+        val inputPhoneNumber =  requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString()
+        // val inputPhotoView =  imageUri.toString()
 
-        ModelPreferencesManager.put(profile,getString(R.string.KeyProfileData))
+        val profileToSave = Profile(inputFullName)
+        profileToSave.nickName = inputNickname
+        profileToSave.phoneNumber = inputPhoneNumber
+        profileToSave.location = inputLocation
+        profileToSave.birthday = inputBirthday
+        profileToSave.email = acc_email
+        profileToSave.hasImage = true
 
-        val nav_header_image = requireActivity().findViewById<ImageView>(R.id.nav_header_image)
-        nav_header_image.setImageURI(imageUri)
-        val nav_header_full_name = requireActivity().findViewById<TextView>(R.id.nav_header_full_name)
-        nav_header_full_name.text = newFullName
+        return profileToSave
     }
 
     // ----------------------------- Option Menu ---------------------
@@ -332,73 +331,37 @@ class EditProfileFragment : Fragment() {
         return super.onCreateOptionsMenu(menu, inflater)
     }
 
+    private fun saveImagePhoto() {
+        val imageView = requireView().findViewById<ImageView>(R.id.imageViewEditPhoto)
+        imageView.isDrawingCacheEnabled = true
+        imageView.buildDrawingCache()
+        val bitmap = (imageView.drawable as BitmapDrawable).bitmap
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+        val storage = Firebase.storage
+        val storageRef = storage.reference
+        storageRef.child("users/$acc_email.jpg").putBytes(data)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.saveItem -> {
-                val inputFullName = requireView().findViewById<TextInputLayout>(R.id.editViewFullName).editText?.text.toString()
-                val inputNickname =  requireView().findViewById<TextInputLayout>(R.id.editViewNickName).editText?.text.toString()
-                val inputEmail =  requireView().findViewById<TextInputLayout>(R.id.editViewEmail).editText?.text.toString()
-                val inputLocation =  requireView().findViewById<TextInputLayout>(R.id.editViewLocation).editText?.text.toString()
-                val inputBirthday =  requireView().findViewById<TextView>(R.id.editViewBirthday).text.toString()
-                val inputPhoneNumber =  requireView().findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.text.toString()
-                val inputPhotoView =  imageUri.toString()
+                saveImagePhoto()
+                val profileToStore = savedProfileData()
 
-                val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-                val acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
-                val db = FirebaseFirestore.getInstance()
-                val users = db.collection("Users")
-                val my_profile = users.document(acc_email.toString())
-
-                val imageView = requireView().findViewById<ImageView>(R.id.imageViewEditPhoto)
-                imageView.isDrawingCacheEnabled = true
-                imageView.buildDrawingCache()
-                val bitmap = (imageView.drawable as BitmapDrawable).bitmap
-                val baos = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-                val data = baos.toByteArray()
-                val storage = Firebase.storage
-                val storageRef = storage.reference
-                storageRef.child("users/$acc_email.jpg").putBytes(data)
-
-                val profileToSave = Profile(inputFullName)
-                profileToSave.nickName = inputNickname
-                profileToSave.phoneNumber = inputPhoneNumber
-                profileToSave.location = inputLocation
-                profileToSave.birthday = inputBirthday
-                profileToSave.email = acc_email.toString()
-                profileToSave.hasImage = true
-                viewModel.saveUser(profileToSave)
+                viewModel.saveUser(profileToStore)
                     .addOnSuccessListener {
-
-
+                        Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
+                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                                .show()
+                        findNavController().popBackStack()
                     }
                     .addOnFailureListener {
                         Log.d("POLITO", "An error ocurrs updating profile")
-                        //Snackbar.make(requireView(), R.string. , Snackbar.LENGTH_SHORT)
-                        //        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                        //        .show()
-                    }
-                Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
-                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                        .show()
-                /*
-                my_profile.set(mapOf("full_name" to inputFullName,
-                                     "nick_name" to inputNickname,
-                                     "email" to acc_email.toString(),
-                                     //"email" to inputEmail,
-                                     "location" to inputLocation,
-                                     "birthday" to inputBirthday,
-                                     "phone_number" to inputPhoneNumber,
-                                     //"image_uri" to inputPhotoView
-                                     "image_uri" to "yes"))
-                //savedProfileData()
-                */
-                val showProfileArgs = EditProfileFragmentDirections.actionEditProfileFragmentToShowProfileFragment(userId = acc_email!!,isOwner=true)
 
-                if (!findNavController().popBackStack()) {
-                    findNavController().navigate(showProfileArgs)
-                    //navigate(showProfileArgs)
-                }
+                    }
+
                 return true
             }
         }

@@ -71,7 +71,7 @@ object FirebaseTripRequestService {
         }
     }
 
-    suspend fun findPassangerAcceptedRequest(userId: String): Flow<List<TripRequest>> {
+    suspend fun findPassengerAcceptedRequest(userId: String): Flow<List<TripRequest>> {
         val db = FirebaseFirestore.getInstance()
         return callbackFlow {
             val listenerRegistration = db.collection(TRIP_REQUESTS_COLLECTION)
@@ -79,7 +79,7 @@ object FirebaseTripRequestService {
                     .whereEqualTo("status", TripRequest.ACCEPTED)
                     .addSnapshotListener { querySnapShot: QuerySnapshot?, error:FirebaseFirestoreException? ->
                         if (error != null || querySnapShot == null) {
-                            cancel(message = "Error fetching passenger accepted Trip Requests by passanger ${userId}", cause = error)
+                            cancel(message = "Error fetching passenger accepted Trip Requests by passenger ${userId}", cause = error)
                             return@addSnapshotListener
                         }
                         val tripRequestList = querySnapShot?.documents
@@ -87,7 +87,7 @@ object FirebaseTripRequestService {
                         offer(tripRequestList)
                     }
             awaitClose {
-                Log.d(TAG, "Cancelling trip requests listener for passenger accepted Trip Requests by passanger ${userId}")
+                Log.d(TAG, "Cancelling trip requests listener for passenger accepted Trip Requests by passenger ${userId}")
                 listenerRegistration.remove()
             }
         }

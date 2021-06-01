@@ -32,6 +32,7 @@ data class Trip (var id: String) {
         val OPEN = "OPEN"
         val BLOCKED = "BLOCKED"
         val FULL = "FULL"
+        val ENDED = "ENDED"
         val DATA_COLLECTION = "Trips"
         val FIELD_STATUS = "status"
 

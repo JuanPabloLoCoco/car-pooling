@@ -8,10 +8,7 @@ import com.google.firebase.ktx.Firebase
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
 import it.polito.mad.car_pooling.models.TripRequestRating
-import it.polito.mad.car_pooling.services.FirebaseTripRequestService
-import it.polito.mad.car_pooling.services.FirebaseTripService
-import it.polito.mad.car_pooling.services.FirebaseUserService
-import it.polito.mad.car_pooling.services.LocalDataService
+import it.polito.mad.car_pooling.services.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -26,6 +23,7 @@ class TripViewModel (private val tripId: String): ViewModel() {
         }
     }
 
+    // Probably you are the Driver and you want to know your requests
     val tripRequests: LiveData<List<TripRequestRating>> = liveData {
         FirebaseTripRequestService.findRequestsByTrip(tripId).collect { tripRequestList ->
             if (tripRequestList ==  null || tripRequestList.isEmpty()) {
@@ -54,14 +52,14 @@ class TripViewModel (private val tripId: String): ViewModel() {
                         val profileBelongToTrip = profileMap.get(profileIterator.email)!!
                         val tripRequestRatingWithOnlyTripRequest = tripRequestMap.get(profileBelongToTrip)
                         if (tripRequestRatingWithOnlyTripRequest != null) {
-                            tripRequestRatingWithOnlyTripRequest.passanger = profileIterator
+                            tripRequestRatingWithOnlyTripRequest.passenger = profileIterator
                             tripRequestMap.put(profileBelongToTrip, tripRequestRatingWithOnlyTripRequest)
                         }
                     }
                     // Now I can search for the ratings!!
-                    FirebaseUserService.getRatingsByTrip(tripOwner, tripId).collect { ratingList ->
+                    FirebaseRatingService.getRatingsWrittenByDriver(tripOwner, tripId).collect { ratingList ->
                         for (ratingIterator in ratingList) {
-                            val ratingBelongsToRequest = profileMap.get(ratingIterator.writer)!!
+                            val ratingBelongsToRequest = profileMap.get(ratingIterator.rated)!!
                             val tripRequestThatBelongToRating = tripRequestMap.get(ratingBelongsToRequest)
                             if (tripRequestThatBelongToRating != null) {
                                 tripRequestThatBelongToRating.rating = ratingIterator
@@ -84,7 +82,7 @@ class TripViewModel (private val tripId: String): ViewModel() {
                 var tmpTripRequestRating = TripRequestRating(tripRequest)
                 // emit(tmpTripRequestRating)
                 if (tripRequest.status == TripRequest.ACCEPTED) {
-                    FirebaseUserService.getRatingByRequesterAndOwnerAndTrip(requester, tripRequest.tripOwner, tripId).collect { rating ->
+                    FirebaseRatingService.getRatingByRequesterAndOwnerAndTrip(requester, tripRequest.tripOwner, tripId).collect { rating ->
                         tmpTripRequestRating.rating = rating
                         emit(tmpTripRequestRating)
                     }
