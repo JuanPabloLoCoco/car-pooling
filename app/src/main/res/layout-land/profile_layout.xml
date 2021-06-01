@@ -106,6 +106,12 @@
             android:drawablePadding="10dp"
             android:background="#20000000"
             android:paddingLeft="10dp"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rateRV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp">
+        </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 
 </LinearLayout>

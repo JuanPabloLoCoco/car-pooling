@@ -108,7 +108,7 @@
 
         <ImageView
             android:id="@+id/image_request_user"
-            android:layout_width="123dp"
+            android:layout_width="70dp"
             android:layout_height="153dp"
             app:srcCompat="@drawable/default_image"
 
@@ -128,7 +128,7 @@
 
             <RatingBar
                 android:id="@+id/ratingBar2"
-                android:layout_width="match_parent"
+                android:layout_width="245dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:isIndicator="true"
@@ -139,10 +139,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 tools:ignore="MissingConstraints"
-                app:layout_editor_absoluteX="0dp"
-                app:layout_editor_absoluteY="50dp"
-
-
                 />
 
             <TextView

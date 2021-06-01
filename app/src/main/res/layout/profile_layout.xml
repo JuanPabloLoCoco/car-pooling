@@ -15,7 +15,11 @@
         app:srcCompat="@drawable/default_image"
         tools:srcCompat="@tools:sample/avatars"
         android:padding="16dp"/>
-
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -24,6 +28,7 @@
         android:layout_marginHorizontal="16dp"
         android:paddingTop="10dp"
         android:paddingHorizontal="20dp">
+
 
         <TextView
             android:id="@+id/textViewFullName"
@@ -113,7 +118,7 @@
             android:layout_height="match_parent"
             android:layout_margin="5dp">
         </androidx.recyclerview.widget.RecyclerView>
-
     </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

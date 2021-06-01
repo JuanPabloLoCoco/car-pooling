@@ -25,7 +25,6 @@ import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Rating
 import it.polito.mad.car_pooling.models.Trip
-import it.polito.mad.car_pooling.viewModels.OthersTripListViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
 import java.io.File
