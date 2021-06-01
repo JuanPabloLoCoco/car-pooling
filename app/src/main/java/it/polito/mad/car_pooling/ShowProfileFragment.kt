@@ -2,22 +2,23 @@ package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.*
-import androidx.cardview.widget.CardView
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.RatingBar
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -27,8 +28,6 @@ import it.polito.mad.car_pooling.models.Rating
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
-import java.io.File
-import java.lang.Double
 
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
@@ -80,22 +79,66 @@ class ShowProfileFragment : Fragment() {
         //var acc_email = args.userId //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         val isOwner = args.isOwner
         if (!isOwner) {
-            view.findViewById<TextView>(R.id.textViewLocation).visibility = View.INVISIBLE
-            view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.INVISIBLE
-            view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.INVISIBLE
-        /*val toolbar: Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
-            (activity as AppCompatActivity).setSupportActionBar(toolbar)
-            toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
-            toolbar.setNavigationOnClickListener(View.OnClickListener(){
-                val drawerLayout: DrawerLayout = (activity as AppCompatActivity).findViewById(R.id.drawer_layout)
-                val navView: NavigationView = (activity as AppCompatActivity).findViewById(R.id.nav_view)
-                val navController = (activity as AppCompatActivity).findNavController(R.id.nav_host_fragment)
-                appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_other_list_trip, R.id.nav_list_trip, R.id.nav_profile), drawerLayout)
-                (activity as AppCompatActivity).setupActionBarWithNavController(navController, appBarConfiguration)
-                navView.setupWithNavController(navController)
-                requireActivity().onBackPressed()
-                //findNavController().popBackStack()
-            })*/
+            val db = FirebaseFirestore.getInstance()
+            val users = db.collection("Users")
+            val profile = users.document(userId)
+            profile.addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("showProfileFragment", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null && snapshot.exists()) {
+                    val hideAll = snapshot["hideAll"].toString().toBoolean()
+                    val showLocation = snapshot["showLocation"].toString().toBoolean()
+                    val showBirthday = snapshot["showBirthday"].toString().toBoolean()
+                    val showPhoneNumber = snapshot["showPhoneNumber"].toString().toBoolean()
+                    if (hideAll) {
+                        if (!showLocation) {
+                            val view1 = view.findViewById<TextView>(R.id.textViewLocation)
+                            view1.visibility = View.INVISIBLE
+                            val params1: ViewGroup.LayoutParams = view1.layoutParams
+                            params1.height = 0
+                            view1.layoutParams = params1
+                        }
+
+                        if (!showBirthday) {
+                            val view2 = view.findViewById<TextView>(R.id.textViewBirthday)
+                            view2.visibility = View.INVISIBLE
+                            val param2: ViewGroup.LayoutParams = view2.layoutParams
+                            param2.height = 0
+                            view2.layoutParams = param2
+                        }
+
+                        if (!showPhoneNumber) {
+                            val view3 = view.findViewById<TextView>(R.id.textViewPhoneNumber)
+                            view3.visibility = View.INVISIBLE
+                            val params3: ViewGroup.LayoutParams = view3.layoutParams
+                            params3.height = 0
+                            view3.layoutParams = params3
+                        }
+                    }
+
+                    val idx = requireActivity().fragmentManager.backStackEntryCount
+                    val backEntry = fragmentManager?.getBackStackEntryAt(idx)
+                    val tag = backEntry?.name
+                    if (tag == "2-2131296624") {
+                        Log.d("showProfile!!!!!!","$tag")
+                        val view3 = view.findViewById<TextView>(R.id.textViewPhoneNumber)
+                        view3.visibility = View.VISIBLE
+                        val params3: ViewGroup.LayoutParams = view3.layoutParams
+                        params3.height = 140
+                        view3.layoutParams = params3
+                    }
+                } else {
+                    Log.d("showProfileFragment", "Current data: null")
+                }
+            }
+        } else {
+            val view = view.findViewById<Button>(R.id.sendEmailButton)
+            view.visibility = View.INVISIBLE
+            val params: ViewGroup.LayoutParams = view.layoutParams
+            params.height = 0
+            view.layoutParams = params
         }
 
         val imageView = view.findViewById<ImageView>(R.id.imageViewPhoto)
@@ -136,6 +179,29 @@ class ShowProfileFragment : Fragment() {
 
         adapter = RatingListCardAdapter(ratingList, requireContext())
         reciclerView.adapter = adapter
+
+        val sendEmailButton = view?.findViewById<Button>(R.id.sendEmailButton)
+        if (sendEmailButton != null) {
+            sendEmailButton.setOnClickListener{
+                val action = ShowProfileFragmentDirections.actionNavProfileToSendEmailFragment(view.findViewById<TextView>(R.id.textViewEmail).text.toString())
+                findNavController().navigate(action)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val isOwner = args.isOwner
+        if (!isOwner){
+            val toolbar : Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+            (activity as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+            toolbar.setNavigationOnClickListener(View.OnClickListener(){
+                requireActivity().onBackPressed()
+                //findNavController().popBackStack()
+            })
+        }
     }
 
     private fun writeTextView(view: View){

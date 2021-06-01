@@ -7,21 +7,29 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Trip
-import it.polito.mad.car_pooling.viewModels.*
+import it.polito.mad.car_pooling.viewModels.TripListViewModel
+import it.polito.mad.car_pooling.viewModels.TripListViewModelFactory
 import java.io.File
 import java.lang.Double.parseDouble
-
 
 class OthersTripListFragment : Fragment() {
 
@@ -29,11 +37,13 @@ class OthersTripListFragment : Fragment() {
     private lateinit var viewModel: TripListViewModel
     private lateinit var viewModelFactory: TripListViewModelFactory
     private lateinit var userId: String
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         setHasOptionsMenu(true)
 
         userId = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
@@ -61,6 +71,18 @@ class OthersTripListFragment : Fragment() {
                 view.findViewById<TextView>(R.id.empty_triplist).visibility=View.VISIBLE
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val toolbar : Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        val drawerLayout: DrawerLayout = (activity as AppCompatActivity).findViewById(R.id.drawer_layout)
+        val navView: NavigationView = (activity as AppCompatActivity).findViewById(R.id.nav_view)
+        val navController = (activity as AppCompatActivity).findNavController(R.id.nav_host_fragment)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_other_list_trip, R.id.nav_list_trip, R.id.nav_profile), drawerLayout)
+        (activity as AppCompatActivity).setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
