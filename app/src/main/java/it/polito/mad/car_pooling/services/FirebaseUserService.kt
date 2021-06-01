@@ -104,4 +104,28 @@ object FirebaseUserService {
         }
 
     }
+
+    fun getRatingByRequesterAndOwnerAndTrip(requester: String, tripOwner: String, tripId: String): Flow<Rating?> {
+        val db = FirebaseFirestore.getInstance()
+        return callbackFlow {
+            val listenerRegistration = db.collection(USERS_COLLECTION)
+                    .document(tripOwner)
+                    .collection(RATINGS_COLLECTION)
+                    .whereEqualTo("tripId", tripId)
+                    .whereEqualTo("writerId", requester)
+                    .addSnapshotListener { querySnapShot: QuerySnapshot?, error:FirebaseFirestoreException? ->
+                        if (error != null || querySnapShot == null) {
+                            cancel(message = "Error fetching rating from ${requester} to user ${tripOwner} for trip with id ${tripId}", cause = error)
+                            return@addSnapshotListener
+                        }
+                        val userRatingList = querySnapShot?.documents
+                                .map { it.toRating() }.firstOrNull()
+                        offer(userRatingList)
+                    }
+            awaitClose {
+                Log.d(TAG, "Cancelling listener for rating from ${requester} to user ${tripOwner} for trip with id ${tripId}")
+                listenerRegistration.remove()
+            }
+        }
+    }
 }
