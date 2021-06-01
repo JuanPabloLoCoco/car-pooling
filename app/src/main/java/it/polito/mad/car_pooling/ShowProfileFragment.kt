@@ -25,7 +25,6 @@ import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Rating
-import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
 
@@ -65,10 +64,10 @@ class ShowProfileFragment : Fragment() {
 
         val isOwner = args.isOwner
         if (!isOwner) {
-            view.findViewById<TextView>(R.id.textViewLocation).visibility = View.GONE
-            view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.GONE
-            view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.GONE
-        /*val toolbar: Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+            //view.findViewById<TextView>(R.id.textViewLocation).visibility = View.GONE
+            //view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.GONE
+            //view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.GONE
+            /*val toolbar: Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
             (activity as AppCompatActivity).setSupportActionBar(toolbar)
             toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
             toolbar.setNavigationOnClickListener(View.OnClickListener(){
@@ -94,6 +93,7 @@ class ShowProfileFragment : Fragment() {
                     val showLocation = snapshot["showLocation"].toString().toBoolean()
                     val showBirthday = snapshot["showBirthday"].toString().toBoolean()
                     val showPhoneNumber = snapshot["showPhoneNumber"].toString().toBoolean()
+                    Log.d("showProfile!!", "$hideAll")
                     if (hideAll) {
                         if (!showLocation) {
                             val view1 = view.findViewById<TextView>(R.id.textViewLocation)
@@ -120,16 +120,18 @@ class ShowProfileFragment : Fragment() {
                         }
                     }
 
-                    val idx = requireActivity().fragmentManager.backStackEntryCount
-                    val backEntry = fragmentManager?.getBackStackEntryAt(idx)
-                    val tag = backEntry?.name
-                    if (tag == "2-2131296624") {
-                        Log.d("showProfile!!!!!!","$tag")
-                        val view3 = view.findViewById<TextView>(R.id.textViewPhoneNumber)
-                        view3.visibility = View.VISIBLE
-                        val params3: ViewGroup.LayoutParams = view3.layoutParams
-                        params3.height = 140
-                        view3.layoutParams = params3
+                    val idx = activity?.fragmentManager?.backStackEntryCount
+                    if (idx != null) {
+                        val backEntry = fragmentManager?.getBackStackEntryAt(idx)
+                        val tag = backEntry?.name
+                        if (tag == "2-2131296624") {
+                            Log.d("showProfile!!!!!!","$tag")
+                            val view3 = view.findViewById<TextView>(R.id.textViewPhoneNumber)
+                            view3.visibility = View.VISIBLE
+                            val params3: ViewGroup.LayoutParams = view3.layoutParams
+                            params3.height = 140
+                            view3.layoutParams = params3
+                        }
                     }
                 } else {
                     Log.d("showProfileFragment", "Current data: null")
@@ -141,6 +143,9 @@ class ShowProfileFragment : Fragment() {
             val params: ViewGroup.LayoutParams = view.layoutParams
             params.height = 0
             view.layoutParams = params
+            //val paramsMargin = view.layoutParams as ViewGroup.MarginLayoutParams
+            //paramsMargin.setMargins(10,10,10,10)
+            //view.layoutParams = paramsMargin
         }
 
         val imageView = view.findViewById<ImageView>(R.id.imageViewPhoto)

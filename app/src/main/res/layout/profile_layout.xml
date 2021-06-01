@@ -96,7 +96,8 @@
                 android:drawableLeft="@drawable/ic_baseline_contact_phone_24"
                 android:drawablePadding="10dp"
                 android:background="#20000000"
-                android:paddingLeft="10dp"/>
+                android:paddingLeft="10dp"
+                android:layout_marginBottom="5dp"/>
 
             <TextView
                 android:id="@+id/textViewBirthday"
