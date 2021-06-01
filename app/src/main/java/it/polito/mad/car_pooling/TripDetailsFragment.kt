@@ -184,8 +184,6 @@ class TripDetailsFragment : Fragment() {
                             statusMessageView.visibility = View.VISIBLE
 
                             // I can rate the trip only if my status is accepted
-                            // TODO: Add the validation that the trip has end
-                            Log.d(TAG, "Selected Trip arrive TS ${selectedTrip.arrivalDateTime}")
                             if (status == TripRequest.ACCEPTED && ratingDB == null && selectedTrip.arrivalDateTime < Timestamp.now()) {
                                 rateTripButton.visibility = View.VISIBLE
                                 rateTripButton.setOnClickListener {
@@ -407,7 +405,7 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
             // I will not show the menu
             holder.actionMenuView.visibility = View.GONE
 
-            if (tripRequestRating.rating == null) {
+            if (tripRequestRating.rating == null && tripSelected.arrivalDateTime < Timestamp.now()) {
                 holder.ratingButton.visibility = View.VISIBLE
                 holder.ratingButton.setOnClickListener {
                     val action = TripDetailsFragmentDirections.actionNavTripToRating(selectedRequest.id)
