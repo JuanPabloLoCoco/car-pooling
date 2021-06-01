@@ -82,6 +82,8 @@ class TripEditFragment : Fragment() {
     private lateinit var arrivalLocation : StopLocation
     private lateinit var departureLocation : StopLocation
 
+    private lateinit var adapter: OptionalIntermediatesCardAdapter
+
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -193,7 +195,7 @@ class TripEditFragment : Fragment() {
             optionalInterRV.visibility = View.VISIBLE
             noOpInterView.visibility = View.GONE
         }
-        val adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
+        adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
         optionalInterRV.adapter = adapter
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("location")?.observe(
             viewLifecycleOwner) { result ->
@@ -208,8 +210,7 @@ class TripEditFragment : Fragment() {
                 insertLocation.longitude = jsonList[i].longitude
                 locationList.add(insertLocation)
             }
-            val adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
-            optionalInterRV.adapter = adapter
+            adapter.updateCollection(locationList)
             if (locationList.size == 0) {
                 optionalInterRV.visibility = View.GONE
                 noOpInterView.visibility = View.VISIBLE
@@ -307,7 +308,6 @@ class TripEditFragment : Fragment() {
             val depLocation = Gson().fromJson<StopLocation>(result, type)
             selectedTrip.depLocation = depLocation.fullAddress
             departureLocation = depLocation
-            Log.d(TAG, "depLocation = ${departureLocation.toMap()}")
             view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(depLocation.address)
         }
     }
@@ -362,6 +362,7 @@ class TripEditFragment : Fragment() {
         tripData.arrivalDateTime = newArrivalTimestamp
         tripData.departureLocation = if (departureLocation.fullAddress == newStopLocation.fullAddress) null else departureLocation
         tripData.arrivalLocation = if (arrivalLocation.fullAddress == newStopLocation.fullAddress) null else arrivalLocation
+        tripData.optionalStops = adapter.optionalIntermediatesList.toList()
 
         return tripData
     }
@@ -390,7 +391,6 @@ class TripEditFragment : Fragment() {
         when (item.itemId) {
             R.id.save_Trip -> {
                 val newTrip = saveDataInTrip() // Trip(tripId)
-                Log.d(TAG, "${newTrip.toMap()}")
 
                 val message: String = if (tripId == NEW_TRIP) getString(R.string.tripCreatedSucces) else getString(
                         R.string.tripEditedSucces
@@ -589,7 +589,7 @@ class TripEditFragment : Fragment() {
 
 }
 
-class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableList<StopLocation>,
+class OptionalIntermediatesCardAdapter (var optionalIntermediatesList: MutableList<StopLocation>,
                                         val context: Context,
                                         val view: View) :
     RecyclerView.Adapter<OptionalIntermediatesCardAdapter.OptionalIntermediatesViewHolder>() {
@@ -599,6 +599,11 @@ class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableLi
         val deleteCardImageButton = v.findViewById<ImageButton>(R.id.imageButton_delete_card)
         fun bind(t: String) {}
         fun unbind() {}
+    }
+
+    fun updateCollection(newStopList: MutableList<StopLocation>) {
+        optionalIntermediatesList = newStopList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
