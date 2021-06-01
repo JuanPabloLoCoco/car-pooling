@@ -64,6 +64,7 @@ class MapFragment : Fragment() {
         originListLocation = Gson().fromJson(args.sourceLocation, type)
 
         Configuration.getInstance().load(activity, PreferenceManager.getDefaultSharedPreferences(activity))
+        Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
         map = view.findViewById<MapView>(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
@@ -95,7 +96,7 @@ class MapFragment : Fragment() {
                     val buttonSaveLocation = view.findViewById<Button>(R.id.buttonSaveLocation)
                     buttonSaveLocation.setOnClickListener{
                         val tempLocation = StopLocation(address.get(0).getAddressLine(0))
-                        tempLocation.address = address.get(0).getAddressLine(0)
+                        tempLocation.address = address.get(0).getAddressLine(0).split(", ")[0]
                         tempLocation.latitude = geoPoint.latitude.toString()
                         tempLocation.longitude = geoPoint.longitude.toString()
                         tempLocation.city = city
@@ -122,10 +123,10 @@ class MapFragment : Fragment() {
                 override fun onSingleTapConfirmed(e: MotionEvent, mapView: MapView): Boolean {
                     val projection = mapView.projection
                     val geoPoint = projection.fromPixels(e.x.toInt(), e.y.toInt())
-                    val set_point = GeoPoint(geoPoint.latitude, geoPoint.longitude)
+                    val setPoint = GeoPoint(geoPoint.latitude, geoPoint.longitude)
                     val geoCoder = Geocoder(requireContext(), Locale.getDefault())
-                    val address = geoCoder.getFromLocation(set_point.latitude, set_point.longitude,1)
-                    startMarker.setPosition(set_point)
+                    val address = geoCoder.getFromLocation(setPoint.latitude, setPoint.longitude,1)
+                    startMarker.setPosition(setPoint)
                     startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     map.getOverlays().add(startMarker)
                     val city = address.get(0).getLocality()
@@ -133,7 +134,7 @@ class MapFragment : Fragment() {
                     val buttonSaveLocation = view.findViewById<Button>(R.id.buttonSaveLocation)
                     buttonSaveLocation.setOnClickListener{
                         val tempLocation = StopLocation(address.get(0).getAddressLine(0))
-                        tempLocation.address = address.get(0).getAddressLine(0)
+                        tempLocation.address = address.get(0).getAddressLine(0).split(", ")[0]
                         tempLocation.latitude = geoPoint.latitude.toString()
                         tempLocation.longitude = geoPoint.longitude.toString()
                         tempLocation.city = city

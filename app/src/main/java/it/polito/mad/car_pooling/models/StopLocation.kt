@@ -53,7 +53,7 @@ data class StopLocation(var fullAddress : String) {
             }
         }
 
-        fun newLocation(): StopLocation? {
+        fun newLocation(): StopLocation {
             var newLocation = StopLocation("")
             newLocation.fullAddress = ""
             newLocation.address = ""

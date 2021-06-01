@@ -79,8 +79,8 @@ class TripEditFragment : Fragment() {
 
     private val TAG = "TripEditFragment"
     lateinit var locationList : MutableList<StopLocation>
-    //lateinit var arrivalLocation : StopLocation
-    //lateinit var departureLocation : StopLocation
+    private lateinit var arrivalLocation : StopLocation
+    private lateinit var departureLocation : StopLocation
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -288,12 +288,15 @@ class TripEditFragment : Fragment() {
         imageUri = Uri.parse(uri_input)
         editimageView.setImageURI(imageUri)
          */
+
+        arrivalLocation = StopLocation.newLocation()
+        departureLocation = StopLocation.newLocation()
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("arrLocation")?.observe(
             viewLifecycleOwner) { result ->
             val type = object: TypeToken<StopLocation>(){}.type
             val arrLocation = Gson().fromJson<StopLocation>(result, type)
-            //arrivalLocation = arrLocation
-            selectedTrip.ariLocation = arrLocation.address
+            arrivalLocation = arrLocation
+            selectedTrip.ariLocation = arrLocation.fullAddress
 
             view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(arrLocation.address)
         }
@@ -302,8 +305,9 @@ class TripEditFragment : Fragment() {
             viewLifecycleOwner) { result ->
             val type = object: TypeToken<StopLocation>(){}.type
             val depLocation = Gson().fromJson<StopLocation>(result, type)
-            selectedTrip.depLocation = depLocation.address
-            //departureLocation = depLocation
+            selectedTrip.depLocation = depLocation.fullAddress
+            departureLocation = depLocation
+            Log.d(TAG, "depLocation = ${departureLocation.toMap()}")
             view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(depLocation.address)
         }
     }
@@ -334,8 +338,10 @@ class TripEditFragment : Fragment() {
 
         val newEstDuration = TimeUtilFunctions.getTimestampDifferenceAsStr(newDepartureTimestamp, newArrivalTimestamp)
 
-        //Log.d(TAG,"DepartureLocation ${departureLocation.toMap()}")
-        //Log.d(TAG,"ArrivalLocation ${arrivalLocation.toMap()}")
+        Log.d(TAG,"DepartureLocation ${departureLocation.toMap()}")
+        Log.d(TAG,"ArrivalLocation ${arrivalLocation.toMap()}")
+
+        val newStopLocation = StopLocation.newLocation()
 
         val acc_email = ModelPreferencesManager.get<String>(getString(R.string.keyCurrentAccount)) //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         tripData.depLocation = editDepLocation.editText?.text.toString()
@@ -354,6 +360,9 @@ class TripEditFragment : Fragment() {
         tripData.hasImage = true
         tripData.departureDateTime = newDepartureTimestamp
         tripData.arrivalDateTime = newArrivalTimestamp
+        tripData.departureLocation = if (departureLocation.fullAddress == newStopLocation.fullAddress) null else departureLocation
+        tripData.arrivalLocation = if (arrivalLocation.fullAddress == newStopLocation.fullAddress) null else arrivalLocation
+
         return tripData
     }
 
@@ -382,7 +391,6 @@ class TripEditFragment : Fragment() {
             R.id.save_Trip -> {
                 val newTrip = saveDataInTrip() // Trip(tripId)
                 Log.d(TAG, "${newTrip.toMap()}")
-                return true
 
                 val message: String = if (tripId == NEW_TRIP) getString(R.string.tripCreatedSucces) else getString(
                         R.string.tripEditedSucces

@@ -2,6 +2,7 @@ package it.polito.mad.car_pooling.models
 
 import android.util.Log
 import com.google.firebase.Timestamp
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.getField
 import java.lang.Exception
@@ -61,14 +62,16 @@ data class Trip (var id: String) {
                 new_trip.departureDateTime = getTimestamp(DEPARTURE_DATETIME) ?: Timestamp.now()
                 new_trip.arrivalDateTime = getTimestamp(ARRIVAL_DATETIME) ?: new_trip.departureDateTime
                 //new_trip.departureLocation = get(DEPARTURE_LOCATION) as
-                val departureStopLocation = getField<Map<String, Any>>(DEPARTURE_LOCATION)
-                new_trip.departureLocation = if (departureStopLocation != null) StopLocation.parseStopLocation(departureStopLocation) else null
 
-                val arrivalStopLocation = getField<Map<String, Any>>(ARRIVAL_LOCATION)
-                new_trip.arrivalLocation = if (arrivalStopLocation != null) StopLocation.parseStopLocation(arrivalStopLocation) else null
+                val departureStopLocation = get(DEPARTURE_LOCATION)
+                //val departureStopLocation = getField<Map<String, Any>>(DEPARTURE_LOCATION)
+                new_trip.departureLocation = if (departureStopLocation != null) StopLocation.parseStopLocation(departureStopLocation  as Map<String, Any>) else null
 
-                val optionalStopsList = getField<List<Map<String, Any>>>(OPTIONAL_STOPS)
-                new_trip.optionalStops =  if (optionalStopsList == null || optionalStopsList.isEmpty()) emptyList() else optionalStopsList.map { StopLocation.parseStopLocation(it) }.filter { it != null } as List<StopLocation>
+                val arrivalStopLocation = get(ARRIVAL_LOCATION)
+                new_trip.arrivalLocation = if (arrivalStopLocation != null) StopLocation.parseStopLocation(arrivalStopLocation as Map<String, Any>) else null
+
+                val optionalStopsList = get(OPTIONAL_STOPS)
+                new_trip.optionalStops =  if (optionalStopsList == null) emptyList() else (optionalStopsList as List<Map<String, Any>>).map { StopLocation.parseStopLocation(it) }.filter { it != null } as List<StopLocation>
                 // new_trip.imageUri = getString("image_uri")!!
                 return new_trip
             } catch (e: Exception) {
