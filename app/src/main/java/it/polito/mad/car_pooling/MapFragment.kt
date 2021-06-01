@@ -8,6 +8,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import android.os.StrictMode
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -47,6 +48,10 @@ class MapFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+        val ctx = requireContext()
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         RequestPermission()
         getLastLocation()

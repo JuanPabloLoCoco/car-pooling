@@ -9,8 +9,6 @@ import android.view.*
 import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
-import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -71,12 +69,19 @@ class TripDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val isOwner = args.isOwner
         val tripId = args.tripId
+        val source_fragment = args.sourceFragment
         val db = FirebaseFirestore.getInstance()
 
         // val sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         // acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")!!
         acc_email = ModelPreferencesManager.get<String>(getString(R.string.keyCurrentAccount))?: "no email"
-
+        if (source_fragment == "interestTrips") {
+            val ratingButton = view.findViewById<Button>(R.id.ratingTripButton)
+            ratingButton.visibility=View.INVISIBLE
+            val params: ViewGroup.LayoutParams = ratingButton.layoutParams
+            params.height = 0
+            ratingButton.layoutParams = params
+        }
         val requestFabView = view.findViewById<FloatingActionButton>(R.id.requestTripFAB)
         val requestTitleView = view.findViewById<TextView>(R.id.requestTextView)
         val requestListRV = view.findViewById<RecyclerView>(R.id.requestRV)
@@ -92,6 +97,14 @@ class TripDetailsFragment : Fragment() {
 
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
 
+
+        rateTripButton.setOnClickListener {
+            Log.d("POLITO", "Hi ! I click the buton")
+            val action1 = TripDetailsFragmentDirections.actionNavTripToRating("tripRequest")
+            findNavController().navigate(action1)
+        }
+
+        requestListRV.layoutManager = LinearLayoutManager(requireContext())
 
         viewModel.trip.observe(viewLifecycleOwner, {
             selectedTrip = it
@@ -132,6 +145,11 @@ class TripDetailsFragment : Fragment() {
                         // tripRequestListAdapter.tripRequestList = tripRequestList
                         // tripRequestListAdapter.notifyDataSetChanged()
 
+                        val ratingButton = view.findViewById<Button>(R.id.ratingTripButton)
+                        ratingButton.visibility=View.INVISIBLE
+                        val params: ViewGroup.LayoutParams = ratingButton.layoutParams
+                        params.height = 0
+                        ratingButton.layoutParams = params
                     })
 
                     // I dont want to request the trip
@@ -194,21 +212,37 @@ class TripDetailsFragment : Fragment() {
 
                             statusMessageView.text = message
                             statusMessageView.visibility = View.VISIBLE
+                        }
+                    })
 
-                            // I can rate the trip only if my status is accepted
-                            if (status == TripRequest.ACCEPTED && ratingDB == null && selectedTrip.arrivalDateTime < Timestamp.now()) {
-                                rateTripButton.visibility = View.VISIBLE
-                                rateTripButton.setOnClickListener {
-                                    val action1 = TripDetailsFragmentDirections.actionNavTripToRating(tripRequestDB.id)
-                                    findNavController().navigate(action1)
+                    val trips = db.collection("Trips")
+                    val trip = trips.document(tripId)
+                    trip.get().addOnSuccessListener { document ->
+                        if (document != null) {
+                            val target_email = document.get("owner").toString()
+                            val users = db.collection("Users")
+                            val profile = users.document(target_email)
+                            profile.addSnapshotListener { snapshot, e ->
+                                if (e != null) {
+                                    Log.w("tripDetailFragment", "Listen failed.", e)
+                                    return@addSnapshotListener
+                                }
+                                if (snapshot != null && snapshot.exists()) {
+                                    val hidePlate = snapshot["hidePlate"].toString().toBoolean()
+                                    if (hidePlate) {
+                                        val view = view.findViewById<TextView>(R.id.textPlate)
+                                        view.visibility = View.INVISIBLE
+                                        val params: ViewGroup.LayoutParams = view.layoutParams
+                                        params.height = 0
+                                        view.layoutParams = params
+                                    }
                                 }
                             }
                         }
-                    })
+                    }
                 }
             }
         })
-
 
         requestFabView.setOnClickListener {
             // A new Request from the current user to the owner of the user,should be done
