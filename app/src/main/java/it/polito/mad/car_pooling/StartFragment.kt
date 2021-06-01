@@ -5,7 +5,9 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.lottie.LottieAnimationView
@@ -25,14 +27,23 @@ class StartFragment : Fragment() {
         val startTextImage1 = view.findViewById<ImageView>(R.id.imageViewText1)
         val startTextImage2 = view.findViewById<ImageView>(R.id.imageViewText2)
         val startAnimationView = view.findViewById<LottieAnimationView>(R.id.lottieAnimationViewStart)
+        val skipButton = view.findViewById<Button>(R.id.skipButton)
 
-        startTextImage1.animate().translationY(-1600f).setDuration(1000).setStartDelay(4000)
-        startTextImage2.animate().translationY(-1600f).setDuration(1000).setStartDelay(4000)
-        startAnimationView.animate().translationY(1600f).setDuration(1000).setStartDelay(4000)
+        startTextImage1.animate().translationY(-1600f).setDuration(1000).startDelay = 4000
+        startTextImage2.animate().translationY(-1600f).setDuration(1000).startDelay = 4000
+        startAnimationView.animate().translationY(1600f).setDuration(1000).startDelay = 4000
+        skipButton.animate().translationY(1600f).setDuration(1000).startDelay = 4000
 
         val handler = Handler()
         handler.postDelayed(Runnable {
+            (activity as AppCompatActivity).supportActionBar?.show()
             findNavController().navigate(R.id.singInFragment)
-        },5500)
+        },6300)
+
+        skipButton.setOnClickListener {
+            handler.removeCallbacksAndMessages(null)
+            (activity as AppCompatActivity).supportActionBar?.show()
+            findNavController().navigate(R.id.singInFragment)
+        }
     }
 }

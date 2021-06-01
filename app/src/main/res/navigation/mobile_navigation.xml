@@ -45,7 +45,11 @@
             app:popExitAnim="@anim/to_right"/>
         <action
             android:id="@+id/action_nav_trip_to_rating"
-            app:destination="@id/rating" />
+            app:destination="@id/rating"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right"/>
 
     </fragment>
     <fragment
@@ -125,6 +129,13 @@
         <action
             android:id="@+id/action_nav_profile_to_nav_other_list_trip2"
             app:destination="@id/nav_other_list_trip" />
+        <action
+            android:id="@+id/action_nav_profile_to_sendEmailFragment"
+            app:destination="@id/sendEmailFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right"/>
     </fragment>
 
     <fragment
@@ -159,12 +170,16 @@
             android:id="@+id/action_othersTripListFragment_to_nav_trip"
             app:destination="@id/nav_trip"
             app:enterAnim="@anim/from_right"
-            app:exitAnim="@anim/to_left"/>
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right"/>
         <action
             android:id="@+id/action_nav_other_list_trip_to_nav_profile"
             app:destination="@id/nav_profile"
             app:enterAnim="@anim/from_right"
-            app:exitAnim="@anim/to_left"/>
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right"/>
     </fragment>
     <fragment
         android:id="@+id/nav_list_bought_trip"
@@ -173,10 +188,19 @@
         tools:layout="@layout/fragment_bought_trips_list" >
         <action
             android:id="@+id/action_nav_list_bought_trip_to_nav_profile"
-            app:destination="@id/nav_profile" />
+            app:destination="@id/nav_profile"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right">
+        </action>
         <action
             android:id="@+id/action_nav_list_bought_trip_to_nav_trip"
-            app:destination="@id/nav_trip" />
+            app:destination="@id/nav_trip"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right"/>
     </fragment>
     <fragment
         android:id="@+id/nav_list_interest_trip"
@@ -185,15 +209,23 @@
         tools:layout="@layout/fragment_trips_of_interest_list" >
         <action
             android:id="@+id/action_nav_list_interest_trip_to_nav_profile"
-            app:destination="@id/nav_profile" />
+            app:destination="@id/nav_profile"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right"/>
         <action
             android:id="@+id/action_nav_list_interest_trip_to_nav_trip"
-            app:destination="@id/nav_trip" />
+            app:destination="@id/nav_trip"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right"/>
     </fragment>
     <fragment
         android:id="@+id/mapFragment"
         android:name="it.polito.mad.car_pooling.MapFragment"
-        android:label="MapFragment"
+        android:label="Map"
         tools:layout="@layout/fragment_map">
         <argument
             android:name="source"
@@ -205,7 +237,7 @@
     <fragment
         android:id="@+id/startFragment"
         android:name="it.polito.mad.car_pooling.StartFragment"
-        android:label="StartFragment"
+        android:label="Welcome to Car Pooling"
         tools:layout="@layout/fragment_start">
         <action
             android:id="@+id/action_startFragment_to_singInFragment"
@@ -214,10 +246,23 @@
     <fragment
         android:id="@+id/rating"
         android:name="it.polito.mad.car_pooling.RatingFragment"
-        android:label="fragment_rating"
+        android:label="Rating"
         tools:layout="@layout/fragment_rating" >
         <argument
             android:name="tripRequestId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_setting"
+        android:name="it.polito.mad.car_pooling.SettingsFragment"
+        android:label="Settings" />
+    <fragment
+        android:id="@+id/sendEmailFragment"
+        android:name="it.polito.mad.car_pooling.SendEmailFragment"
+        android:label="SendEmailFragment"
+        tools:layout="@layout/fragment_send_email">
+        <argument
+            android:name="targetEmail"
             app:argType="string" />
     </fragment>
 

@@ -124,7 +124,12 @@ class SignInFragment : Fragment() {
                     "location" to "Location",
                     "birthday" to "Birthday",
                     "phone_number" to "PhoneNumber",
-                    "image_uri" to input_uri)
+                    "image_uri" to input_uri,
+                    "hideAll" to "false",
+                    "showLocation" to "false",
+                    "showBirthday" to "false",
+                    "showPhoneNumber" to "false",
+                    "hidePlate" to "false")
         )
     }
 
