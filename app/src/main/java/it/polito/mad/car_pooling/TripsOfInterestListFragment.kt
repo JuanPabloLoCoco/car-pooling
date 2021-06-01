@@ -1,23 +1,27 @@
 package it.polito.mad.car_pooling
 
-import android.app.Activity
-import android.app.SearchManager
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
@@ -32,6 +36,7 @@ class TripsOfInterestListFragment : Fragment() {
     private lateinit var viewModel: TripListViewModel
     private lateinit var viewModelFactory: TripListViewModelFactory
     private var TAG = "TripsOfInterestListFragment"
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     lateinit var adapter: InterestTripCardAdapter
 
@@ -84,7 +89,19 @@ class TripsOfInterestListFragment : Fragment() {
             }
         })
         return super.onCreateOptionsMenu(menu, inflater)
+    }
 
+    override fun onResume() {
+        super.onResume()
+        val toolbar : Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        val drawerLayout: DrawerLayout = (activity as AppCompatActivity).findViewById(R.id.drawer_layout)
+        val navView: NavigationView = (activity as AppCompatActivity).findViewById(R.id.nav_view)
+        val navController = (activity as AppCompatActivity).findNavController(R.id.nav_host_fragment)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_other_list_trip, R.id.nav_list_trip, R.id.nav_profile, R.id.nav_list_interest_trip, R.id.nav_list_bought_trip, R.id.nav_setting), drawerLayout)
+        (activity as AppCompatActivity).setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_dehaze_24)
     }
 }
 
