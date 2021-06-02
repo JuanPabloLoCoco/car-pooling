@@ -26,7 +26,9 @@ data class Trip (var id: String) {
         private val HAS_IMAGE = "hasImage"
         private val STATUS = "status"
         private val DEPARTURE_DATETIME = "departureDateTime"
+        private val DEPARTURE_DATETIME_SEC = "departureDateTimeSec"
         private val ARRIVAL_DATETIME = "arrivalDateTime"
+        private val ARRIVAL_DATETIME_SEC = "arrivalDateTimeSec"
         private val DEPARTURE_LOCATION = "departureLocation"
         private val ARRIVAL_LOCATION = "arrivalLocation"
         private val OPTIONAL_STOPS = "optionalStops"
@@ -62,6 +64,7 @@ data class Trip (var id: String) {
                 new_trip.status = getString(STATUS)?: OPEN
                 new_trip.departureDateTime = getTimestamp(DEPARTURE_DATETIME) ?: Timestamp.now()
                 new_trip.arrivalDateTime = getTimestamp(ARRIVAL_DATETIME) ?: new_trip.departureDateTime
+
                 //new_trip.departureLocation = get(DEPARTURE_LOCATION) as
 
                 val departureStopLocation = get(DEPARTURE_LOCATION)
@@ -172,7 +175,9 @@ data class Trip (var id: String) {
                 HAS_IMAGE to hasImage,
                 DEPARTURE_DATETIME to departureDateTime,
                 ARRIVAL_DATETIME to arrivalDateTime,
-                OPTIONAL_STOPS to optionalStops.map { it.toMap() }
+                OPTIONAL_STOPS to optionalStops.map { it.toMap() },
+                DEPARTURE_DATETIME_SEC to departureDateTime.seconds,
+                ARRIVAL_DATETIME_SEC to arrivalDateTime.seconds
         )
         if (arrivalLocation != null) {
             returnMap.put(ARRIVAL_LOCATION, arrivalLocation!!.toMap())

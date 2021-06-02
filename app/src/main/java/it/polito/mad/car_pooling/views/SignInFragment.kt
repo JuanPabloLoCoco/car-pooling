@@ -1,4 +1,4 @@
-package it.polito.mad.car_pooling
+package it.polito.mad.car_pooling.views
 
 import android.content.Context
 import android.content.Intent
@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import it.polito.mad.car_pooling.R
 
 @Suppress("UNREACHABLE_CODE")
 class SignInFragment : Fragment() {
@@ -139,7 +140,7 @@ class SignInFragment : Fragment() {
             //Log.d("signInFragment", "email : ${acc.getEmail()}")
             val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             with(sharedPreferences.edit()) {
-                putString( getString(it.polito.mad.car_pooling.R.string.keyCurrentAccount), acc.getEmail().toString())
+                putString( getString(R.string.keyCurrentAccount), acc.getEmail().toString())
                 commit()
             }
         }

@@ -1,4 +1,4 @@
-package it.polito.mad.car_pooling
+package it.polito.mad.car_pooling.views.Profile
 
 import android.app.Activity
 import android.content.Context
@@ -22,6 +22,7 @@ import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
+import it.polito.mad.car_pooling.R
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException

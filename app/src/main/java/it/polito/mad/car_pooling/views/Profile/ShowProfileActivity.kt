@@ -1,4 +1,4 @@
-package it.polito.mad.car_pooling
+package it.polito.mad.car_pooling.views.Profile
 
 import android.content.ContentResolver
 import android.content.Context
@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import it.polito.mad.car_pooling.R
 
 class ShowProfileActivity : AppCompatActivity() {
 

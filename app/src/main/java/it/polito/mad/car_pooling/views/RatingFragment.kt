@@ -1,33 +1,23 @@
-package it.polito.mad.car_pooling
+package it.polito.mad.car_pooling.views
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.activity.addCallback
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import it.polito.mad.car_pooling.R
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
-import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Rating
 import it.polito.mad.car_pooling.models.TripRequestResponse
 import it.polito.mad.car_pooling.viewModels.RatingViewModel
 import it.polito.mad.car_pooling.viewModels.RatingViewModelFactory
-import java.sql.Driver
 
 @SuppressLint("ValidFragment")
 class RatingFragment : Fragment() {
@@ -37,7 +27,7 @@ class RatingFragment : Fragment() {
     var mFeedback:EditText?= null
     var mSendFeedback: Button? =null
 
-    val args:RatingFragmentArgs by navArgs()
+    val args: RatingFragmentArgs by navArgs()
     private val TAG = "RatingFragment"
 
     private lateinit var viewModel: RatingViewModel

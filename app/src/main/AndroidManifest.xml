@@ -32,7 +32,7 @@
             android:resource="@xml/circle" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".views.MainActivity"
             android:label="CarPooling"
             android:theme="@style/Theme.ShowProfileActivity.NoActionBar">
             <intent-filter>
@@ -53,10 +53,10 @@
         </provider>
 
         <activity
-            android:name=".EditProfileActivity"
+            android:name=".views.Profile.EditProfileActivity"
             android:label="Edit Profile" />
         <activity
-            android:name=".ShowProfileActivity"
+            android:name=".views.Profile.ShowProfileActivity"
             android:label="Profile" />
     </application>
 

@@ -1,4 +1,4 @@
-package it.polito.mad.car_pooling
+package it.polito.mad.car_pooling.views
 
 import android.annotation.SuppressLint
 import android.content.Context.LOCATION_SERVICE
@@ -24,6 +24,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.gms.location.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import it.polito.mad.car_pooling.R
 import it.polito.mad.car_pooling.models.StopLocation
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
