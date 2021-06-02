@@ -22,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import it.polito.mad.car_pooling.models.StopLocation
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
 import it.polito.mad.car_pooling.viewModels.TripViewModel
@@ -45,6 +46,8 @@ class TripDetailsFragment : Fragment() {
 
     private lateinit var interestedTrips : List<String>
     var isInterestedTrip : Boolean = false
+
+    private lateinit var optionalStopsAdapter: TripOptionalIntermediatesCardAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -80,6 +83,14 @@ class TripDetailsFragment : Fragment() {
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
 
 
+        val optionalInterRV = view.findViewById<RecyclerView>(R.id.trip_optional_intermediates_RV)
+        optionalInterRV.layoutManager = LinearLayoutManager(activity)
+        val testList = listOf<StopLocation>()
+
+        val noOpInterView = view.findViewById<TextView>(R.id.tripNoLocationMessageTextView)
+
+        optionalStopsAdapter = TripOptionalIntermediatesCardAdapter(testList, requireContext())
+        optionalInterRV.adapter = optionalStopsAdapter
 
         viewModel.trip.observe(viewLifecycleOwner, {
             selectedTrip = it
@@ -90,6 +101,16 @@ class TripDetailsFragment : Fragment() {
                 loadTripInFields(selectedTrip, view)
                 val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
                 val imageView = view.findViewById<ImageView>(R.id.imageviewCar)
+
+                val optionalStops = it.optionalStops
+                if (optionalStops.isEmpty()) {
+                    optionalInterRV.visibility = View.GONE
+                    noOpInterView.visibility = View.VISIBLE
+                } else {
+                    optionalInterRV.visibility = View.VISIBLE
+                    noOpInterView.visibility = View.GONE
+                    optionalStopsAdapter.updateCollection(optionalStops)
+                }
 
                 tripRequestListAdapter = TripRequestsCardAdapter(tripRequestList, requireContext(), findNavController(), db, view, selectedTrip, viewModel)
                 requestListRV.adapter = tripRequestListAdapter
@@ -393,21 +414,7 @@ class TripDetailsFragment : Fragment() {
             }
         }
 
-        val optionalInterRV = view.findViewById<RecyclerView>(R.id.trip_optional_intermediates_RV)
-        optionalInterRV.layoutManager = LinearLayoutManager(activity)
-        val testList = mutableListOf<String>()
-        testList.add("11111111111111111111111111111111111111111111")
-        testList.add("2")
-        val noOpInterView = view.findViewById<TextView>(R.id.tripNoLocationMessageTextView)
-        if (testList.size == 0) {
-            optionalInterRV.visibility = View.GONE
-            noOpInterView.visibility = View.VISIBLE
-        } else {
-            optionalInterRV.visibility = View.VISIBLE
-            noOpInterView.visibility = View.GONE
-        }
-        val adapter = TripOptionalIntermediatesCardAdapter(testList, requireContext())
-        optionalInterRV.adapter = adapter
+
     }
 
    // override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -621,7 +628,7 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
     }
 }
 
-class TripOptionalIntermediatesCardAdapter (val tripOptionalIntermediatesList: MutableList<String>,
+class TripOptionalIntermediatesCardAdapter (var tripOptionalIntermediatesList: List<StopLocation>,
                                             val context: Context) :
     RecyclerView.Adapter<TripOptionalIntermediatesCardAdapter.TripOptionalIntermediatesViewHolder>() {
     class TripOptionalIntermediatesViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -629,6 +636,11 @@ class TripOptionalIntermediatesCardAdapter (val tripOptionalIntermediatesList: M
         val deleteCardImageButton = v.findViewById<ImageButton>(R.id.imageButton_delete_card)
         fun bind(t: String) {}
         fun unbind() {}
+    }
+
+    fun updateCollection (newStopsLocationList: List<StopLocation>) {
+        tripOptionalIntermediatesList = newStopsLocationList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
@@ -647,8 +659,8 @@ class TripOptionalIntermediatesCardAdapter (val tripOptionalIntermediatesList: M
     }
 
     override fun onBindViewHolder(holder: TripOptionalIntermediatesViewHolder, position: Int) {
-        val selectedRequest: String = tripOptionalIntermediatesList[position]
-        holder.optionalInterText.text = selectedRequest
+        val selectedRequest: StopLocation = tripOptionalIntermediatesList[position]
+        holder.optionalInterText.text = selectedRequest.fullAddress
         holder.deleteCardImageButton.setVisibility(View.GONE)
     }
 }
