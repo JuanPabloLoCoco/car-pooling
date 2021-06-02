@@ -46,6 +46,7 @@ class TripDetailsFragment : Fragment() {
 
     private lateinit var interestedTrips : List<String>
     var isInterestedTrip : Boolean = false
+    private val TAG = "TripDetailsFragment"
 
     private lateinit var optionalStopsAdapter: TripOptionalIntermediatesCardAdapter
 
@@ -374,6 +375,16 @@ class TripDetailsFragment : Fragment() {
 
         val buttonCheckLocationMap = view.findViewById<Button>(R.id.buttonCheckLocationMap)
         buttonCheckLocationMap.setOnClickListener {
+            val tripStopList = mutableListOf<StopLocation>()
+            if (selectedTrip.departureLocation != null) {
+                tripStopList.add(selectedTrip.departureLocation!!)
+            }
+            tripStopList.addAll(selectedTrip.optionalStops)
+            if(selectedTrip.arrivalLocation != null) {
+                tripStopList.add(selectedTrip.arrivalLocation!!)
+            }
+            Log.d(TAG, "Stops = ${tripStopList}")
+            // TODO: SHOW MAP WITH THE LIST OF STOPS
             //val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation")
             //findNavController().navigate(action)
             //findNavController().navigate(R.id.action_nav_trip_to_mapFragment)
