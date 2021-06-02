@@ -326,7 +326,7 @@ class TripEditFragment : Fragment() {
         view.findViewById<TextInputLayout>(R.id.textEditPrice).editText?.setText(trip.price.toString())
         view.findViewById<TextInputLayout>(R.id.textEditAdditional).editText?.setText(trip.additional)
 
-        view.findViewById<TextInputLayout>(R.id.textEditOptional).editText?.setText(trip.optional)
+        //view.findViewById<TextInputLayout>(R.id.textEditOptional).editText?.setText(trip.optional)
         view.findViewById<TextInputLayout>(R.id.textEditPlate).editText?.setText(trip.plate)
 
         /*
@@ -352,7 +352,7 @@ class TripEditFragment : Fragment() {
         val editAvaSeat = requireView().findViewById<TextInputLayout>(R.id.textEditAvaSeat)
         val editPrice = requireView().findViewById<TextInputLayout>(R.id.textEditPrice)
         val editAdditional = requireView().findViewById<TextInputLayout>(R.id.textEditAdditional)
-        val editOptional = requireView().findViewById<TextInputLayout>(R.id.textEditOptional)
+        //val editOptional = requireView().findViewById<TextInputLayout>(R.id.textEditOptional)
         val editPlate = requireView().findViewById<TextInputLayout>(R.id.textEditPlate)
         val editDepDate = requireView().findViewById<TextView>(R.id.textEditDepDate)
         val editDepTime = requireView().findViewById<TextView>(R.id.textEditDepTime)
@@ -381,7 +381,7 @@ class TripEditFragment : Fragment() {
         tripData.avaSeats = editAvaSeat.editText?.text.toString().toInt()
         tripData.price = editPrice.editText?.text.toString().toDouble()
         tripData.additional = editAdditional.editText?.text.toString()
-        tripData.optional = editOptional.editText?.text.toString()
+        //tripData.optional = editOptional.editText?.text.toString()
         tripData.plate = editPlate.editText?.text.toString()
         tripData.depDate = editDepDate.text.toString()
         tripData.depTime = editDepTime.text.toString()

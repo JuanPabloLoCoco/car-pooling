@@ -23,8 +23,9 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import it.polito.mad.car_pooling.models.StopLocation
+import com.google.gson.Gson
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
+import it.polito.mad.car_pooling.models.StopLocation
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
 import it.polito.mad.car_pooling.models.TripRequestRating
@@ -72,13 +73,13 @@ class TripDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val isOwner = args.isOwner
         val tripId = args.tripId
-        val source_fragment = args.sourceFragment
+        val sourceFragment = args.sourceFragment
         val db = FirebaseFirestore.getInstance()
 
         // val sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         // acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")!!
         acc_email = ModelPreferencesManager.get<String>(getString(R.string.keyCurrentAccount))?: "no email"
-        if (source_fragment == "interestTrips") {
+        if (sourceFragment == "interestTrips") {
             val ratingButton = view.findViewById<Button>(R.id.ratingTripButton)
             ratingButton.visibility=View.INVISIBLE
             val params: ViewGroup.LayoutParams = ratingButton.layoutParams
@@ -249,7 +250,7 @@ class TripDetailsFragment : Fragment() {
                                 }
                                 if (snapshot != null && snapshot.exists()) {
                                     val hidePlate = snapshot["hidePlate"].toString().toBoolean()
-                                    if (hidePlate) {
+                                    if (hidePlate && sourceFragment != "boughtTrips") {
                                         val view = view.findViewById<TextView>(R.id.textPlate)
                                         view.visibility = View.INVISIBLE
                                         val params: ViewGroup.LayoutParams = view.layoutParams
@@ -298,20 +299,16 @@ class TripDetailsFragment : Fragment() {
                 tripStopList.add(selectedTrip.arrivalLocation!!)
             }
             Log.d(TAG, "Stops = ${tripStopList}")
-            // TODO: SHOW MAP WITH THE LIST OF STOPS
-            //val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation")
-            //findNavController().navigate(action)
-            //findNavController().navigate(R.id.action_nav_trip_to_mapFragment)
+            val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation", Gson().toJson(tripStopList))
+            findNavController().navigate(action)
         }
 
-        val sourceFragment = args.sourceFragment
+
         val likeButton = activity?.findViewById<ImageButton>(R.id.likeButton)
 
         if (sourceFragment == "otherTrips") {
             likeButton?.setBackgroundResource(R.drawable.ic_baseline_favorite_border_24)
             //likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24)
-        } else if (sourceFragment == "boughtTrips") {
-
         }
 
         interestedTrips = viewModel.getInterestedTrips(acc_email)
@@ -352,7 +349,7 @@ class TripDetailsFragment : Fragment() {
         view.findViewById<TextView>(R.id.textAvaSeat).text = trip.avaSeats.toString() // ["avaSeats"].toString()
         view.findViewById<TextView>(R.id.textPrice).text = trip.price.toString() //value["price"].toString()
         view.findViewById<TextView>(R.id.textAdditional).text = trip.additional //value["additional"].toString()
-        view.findViewById<TextView>(R.id.textOptional).text = trip.optional //value["optional"].toString()
+        //view.findViewById<TextView>(R.id.textOptional).text = trip.optional //value["optional"].toString()
         view.findViewById<TextView>(R.id.textPlate).text = trip.plate //value["plate"].toString()
         view.findViewById<TextView>(R.id.textDepDate).text = trip.depDate //value["depDate"].toString()
         view.findViewById<TextView>(R.id.textDepTime).text = trip.depTime //value["depTime"].toString()

@@ -7,7 +7,10 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.icu.text.SimpleDateFormat
 import android.media.ExifInterface
@@ -147,7 +150,7 @@ class EditProfileFragment : Fragment() {
                     val imageRef = storage.reference.child("users/$acc_email.jpg")
                     imageRef.downloadUrl.addOnSuccessListener { Uri ->
                         val image_uri = Uri.toString()
-                        Glide.with(this).load(image_uri).into(imageView)
+                        Glide.with(this.requireActivity()).load(image_uri).into(imageView)
                     }
                 } else {
                     imageUri = Uri.parse(default_str_profile)

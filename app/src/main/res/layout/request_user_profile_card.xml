@@ -40,12 +40,13 @@
             android:gravity="center"
             android:text="Full Name"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:layout_gravity="center"/>
 
         <LinearLayout
             android:layout_marginVertical="1dp"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="2"
             android:layout_marginHorizontal="10dp"
             android:layout_gravity="center"
@@ -54,11 +55,12 @@
             <ImageButton
                 android:id="@+id/imageButton_3dots"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="#FFFFFF"
                 android:gravity="center"
                 app:srcCompat="@drawable/ic_baseline_more_vert_24"
-                tools:ignore="VectorDrawableCompat" />
+                tools:ignore="VectorDrawableCompat"
+                android:layout_gravity="center"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

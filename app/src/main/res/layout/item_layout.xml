@@ -19,72 +19,85 @@
         <ImageView
             android:id="@+id/imageview"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="140dp"
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/car_default" />
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:outlineSpotShadowColor="@color/lightGrayColor">
+
             <TextView
                 android:id="@+id/list_title"
                 style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="180dp"
-                android:layout_height="25dp"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:minHeight="25dp"
                 android:background="#20000000"
                 android:drawablePadding="10dp"
                 android:paddingLeft="10dp"
                 android:text="DEPATURE"
-
                 android:gravity="center_vertical"
                 android:drawableLeft="@drawable/ic_baseline_location_on_24"
-
-                 />
+                android:textSize="15sp"/>
             <TextView
                 android:id="@+id/depatureview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
                 android:layout_marginLeft="10dp"
                 android:drawablePadding="10dp"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:text="Departure Location"
-                android:textColor="@color/black"
-                 />
+                android:textColor="@color/black" />
+
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:outlineSpotShadowColor="@color/lightGrayColor">
             <TextView
                 android:id="@+id/list_title1"
                 style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
+                android:minHeight="25dp"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
                 android:drawablePadding="10dp"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
                 android:text="ARRIVAL"
                 android:background="#20000000"
                 android:drawableLeft="@drawable/ic_baseline_location_on_24"
-
-                android:textAppearance="?attr/textAppearanceHeadline1" />
+                android:textAppearance="?attr/textAppearanceHeadline1"
+                android:textSize="15sp"/>
 
             <TextView
                 android:id="@+id/arriveview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
                 android:layout_marginLeft="10dp"
                 android:drawablePadding="10dp"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:text="Arrival Location"
                 android:textAppearance="?attr/textAppearanceBody2" />
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="25dp"
@@ -93,7 +106,7 @@
             <TextView
                 android:id="@+id/list_title2"
                 style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="180dp"
+                android:layout_width="150dp"
                 android:layout_height="25dp"
                 android:text="TIME"
                 android:drawablePadding="10dp"
@@ -101,7 +114,8 @@
                 android:paddingLeft="10dp"
                 android:background="#20000000"
                 android:drawableLeft="@drawable/ic_baseline_access_time_24"
-                android:textAppearance="?attr/textAppearanceHeadline1" />
+                android:textAppearance="?attr/textAppearanceHeadline1"
+                android:textSize="15sp"/>
 
             <TextView
                 android:id="@+id/timeview"
@@ -111,10 +125,11 @@
                 android:paddingLeft="10dp"
                 android:layout_marginLeft="10dp"
                 android:drawablePadding="10dp"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:text="Departure date&amp;time"
                 android:textAppearance="?attr/textAppearanceBody2" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="400dp"
             android:layout_height="50dp"
@@ -135,7 +150,7 @@
                     <TextView
                         android:id="@+id/list_title4"
                         style='@style/TextAppearance.AppCompat.Title'
-                        android:layout_width="180dp"
+                        android:layout_width="150dp"
                         android:layout_height="25dp"
                         android:background="#20000000"
                         android:drawableLeft="@drawable/ic_baseline_airline_seat_recline_normal_24"
@@ -143,7 +158,8 @@
                         android:gravity="center_vertical"
                         android:paddingLeft="10dp"
                         android:text="AVALABLE"
-                        android:textAppearance="?attr/textAppearanceHeadline1" />
+                        android:textAppearance="?attr/textAppearanceHeadline1"
+                        android:textSize="15sp"/>
 
                     <TextView
                         android:id="@+id/tripAvailableSeatsField"
@@ -155,7 +171,7 @@
                         android:paddingLeft="10dp"
                         android:text="Seats"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -167,7 +183,7 @@
                     <TextView
                         android:id="@+id/list_title3"
                         style='@style/TextAppearance.AppCompat.Title'
-                        android:layout_width="180dp"
+                        android:layout_width="150dp"
                         android:layout_height="match_parent"
                         android:background="#20000000"
                         android:drawableLeft="@drawable/ic_baseline_euro_24"
@@ -175,7 +191,8 @@
                         android:gravity="center_vertical"
                         android:paddingLeft="10dp"
                         android:text="PRICE"
-                        android:textAppearance="?attr/textAppearanceHeadline1" />
+                        android:textAppearance="?attr/textAppearanceHeadline1"
+                        android:textSize="15sp"/>
 
                     <TextView
                         android:id="@+id/priceview"
@@ -187,8 +204,9 @@
                         android:paddingLeft="10dp"
                         android:text="Price"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="15sp"/>
                 </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
@@ -197,7 +215,6 @@
                 android:layout_weight="1">
 
                 <com.google.android.material.button.MaterialButton
-
                     android:id="@+id/tripCardEditTripButton"
                     style="@style/Widget.MaterialComponents.Button.Icon"
                     android:layout_width="wrap_content"
@@ -205,20 +222,9 @@
                     android:layout_gravity="center"
                     android:text="Edit" />
             </LinearLayout>
-<!--            <LinearLayout-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_weight="1">-->
 
-<!--                <com.google.android.material.button.MaterialButton-->
-
-<!--                    android:id="@+id/Profile"-->
-<!--                    style="@style/Widget.MaterialComponents.Button.Icon"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:text="Profile" />-->
-<!--            </LinearLayout>-->
         </LinearLayout>
+
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>
