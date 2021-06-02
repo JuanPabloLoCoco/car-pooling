@@ -1,4 +1,4 @@
-package it.polito.mad.car_pooling
+package it.polito.mad.car_pooling.views
 
 import android.content.ContentResolver
 import android.content.Context
@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import it.polito.mad.car_pooling.R
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 
 class MainActivity : AppCompatActivity() {

@@ -1,4 +1,4 @@
-package it.polito.mad.car_pooling
+package it.polito.mad.car_pooling.views
 
 import android.content.Context
 import android.os.Bundle
@@ -14,6 +14,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.firestore.FirebaseFirestore
+import it.polito.mad.car_pooling.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
 

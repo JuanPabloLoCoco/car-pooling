@@ -72,12 +72,13 @@ class TripEditFragment : Fragment() {
 
     private lateinit var tripId: String
     private val NEW_TRIP: String = "NEW_TRIP"
-    lateinit var check_status: String
-    lateinit var adapter: OptionalIntermediatesCardAdapter
+
     private val TAG = "TripEditFragment"
     lateinit var locationList : MutableList<StopLocation>
-    lateinit var arrLocation : StopLocation
-    lateinit var depLocation : StopLocation
+    private lateinit var arrivalLocation : StopLocation
+    private lateinit var departureLocation : StopLocation
+
+    private lateinit var adapter: OptionalIntermediatesCardAdapter
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -104,16 +105,49 @@ class TripEditFragment : Fragment() {
         val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
         editimageView.setImageURI(Uri.parse(default_str_car))
 
+        // Views for optional intermidiate stops
         locationList = emptyList<StopLocation>().toMutableList()
-        viewModel.trip.observe(viewLifecycleOwner, {
+        val optionalInterRV = view.findViewById<RecyclerView>(R.id.optional_intermediates_RV)
+        optionalInterRV.layoutManager = LinearLayoutManager(requireContext())
+        adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
+        optionalInterRV.adapter = adapter
+        val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
+        var doesOptionalListUpdateRun = false
+        var doesArrivalLocationUpdateRun = false
+        var doesDepartureLocationUpdateRun = false
 
+        arrivalLocation = StopLocation.newLocation()
+        departureLocation = StopLocation.newLocation()
+
+
+        viewModel.trip.observe(viewLifecycleOwner, {
             if (it != null) {
-                Log.d("POLITO", "${it.toMap()}")
                 selectedTrip = it
+                if (it.arrivalLocation != null && !doesArrivalLocationUpdateRun) {
+                    arrivalLocation = it.arrivalLocation!!
+                }
+                if (it.departureLocation != null && !doesDepartureLocationUpdateRun) {
+                    departureLocation = it.departureLocation!!
+                }
+
+                // Load optional intermidiate stops
+                if (!doesOptionalListUpdateRun) {
+                    if (it.optionalStops.isEmpty()) {
+                        optionalInterRV.visibility = View.GONE
+                        noOpInterView.visibility = View.VISIBLE
+                    } else {
+                        optionalInterRV.visibility = View.VISIBLE
+                        noOpInterView.visibility = View.GONE
+                        // locationList = it.optionalStops.toMutableList()
+                        adapter.updateCollection(it.optionalStops.toMutableList())
+                    }
+                }
+
                 if (selectedTrip.status == Trip.BLOCKED) {
                     blockTripButton.isEnabled = false
                 }
                 loadDataInFields(selectedTrip, view)
+                Log.d(TAG, "Trip loaded. ${it.toMap()}")
                 if (selectedTrip.hasImage == true) {
                     val storage = Firebase.storage
                     val imageRef = storage.reference.child("trips/$tripId.jpg")
@@ -127,7 +161,6 @@ class TripEditFragment : Fragment() {
                 loadDataInFields(selectedTrip, view)
                 findNavController().popBackStack()
             }
-
         })
         blockTripButton.setOnClickListener {
             // Change status of trip to BLOCK
@@ -176,26 +209,17 @@ class TripEditFragment : Fragment() {
         }
         val addOptionalIntermediatesButton = view.findViewById<ImageView>(R.id.mapAddInterImageButtonTest)
         addOptionalIntermediatesButton.setOnClickListener {
-            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter", Gson().toJson(locationList))
+            Log.d(TAG, "OPT STOPS: ${adapter.optionalIntermediatesList}")
+            Log.d(TAG, "OPT STOPS as GSON: ${Gson().toJson(adapter.optionalIntermediatesList)}")
+            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter", Gson().toJson(adapter.optionalIntermediatesList))
             findNavController().navigate(action)
         }
 
-        val optionalInterRV = view.findViewById<RecyclerView>(R.id.optional_intermediates_RV)
-        optionalInterRV.layoutManager = LinearLayoutManager(requireContext())
-        val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
-        if (locationList.size == 0) {
-            optionalInterRV.visibility = View.GONE
-            noOpInterView.visibility = View.VISIBLE
-        } else {
-            optionalInterRV.visibility = View.VISIBLE
-            noOpInterView.visibility = View.GONE
-        }
-        val adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
-        optionalInterRV.adapter = adapter
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("location")?.observe(
             viewLifecycleOwner) { result ->
             val type = object: TypeToken<MutableList<StopLocation>>(){}.type
             val jsonList = Gson().fromJson<MutableList<StopLocation>>(result, type)
+            val newLocationList = mutableListOf<StopLocation>()
             for (i in 0..jsonList.size - 1) {
                 val insertLocation = StopLocation(jsonList[i].fullAddress)
                 insertLocation.address = jsonList[i].address
@@ -203,11 +227,15 @@ class TripEditFragment : Fragment() {
                 insertLocation.country = jsonList[i].country
                 insertLocation.latitude = jsonList[i].latitude
                 insertLocation.longitude = jsonList[i].longitude
-                locationList.add(insertLocation)
+                newLocationList.add(insertLocation)
+                //locationList.add(insertLocation)
             }
-            val adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
-            optionalInterRV.adapter = adapter
-            if (locationList.size == 0) {
+            locationList = newLocationList
+            Log.d(TAG, "Location List after new STOP = ${locationList}")
+            doesOptionalListUpdateRun = true
+            adapter.updateCollection(locationList)
+
+            if (adapter.optionalIntermediatesList.isEmpty()) {
                 optionalInterRV.visibility = View.GONE
                 noOpInterView.visibility = View.VISIBLE
             } else {
@@ -216,20 +244,36 @@ class TripEditFragment : Fragment() {
             }
         }
 
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("arrLocation")?.observe(
+                viewLifecycleOwner) { result ->
+            val type = object: TypeToken<StopLocation>(){}.type
+            val arrLocation = Gson().fromJson<StopLocation>(result, type)
+            arrivalLocation = arrLocation
+            doesArrivalLocationUpdateRun = true
+            loadDataInFields(selectedTrip, view)
+            selectedTrip.ariLocation = arrLocation.fullAddress
+
+
+        }
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("depLocation")?.observe(
+                viewLifecycleOwner) { result ->
+            val type = object: TypeToken<StopLocation>(){}.type
+            val depLocation = Gson().fromJson<StopLocation>(result, type)
+            selectedTrip.depLocation = depLocation.fullAddress
+            departureLocation = depLocation
+            doesDepartureLocationUpdateRun = true
+            loadDataInFields(selectedTrip, view)
+            view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(depLocation.address)
+        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun setDateAndTimeInView (tsToSet: Timestamp, dateView: TextView, timeView: TextView) {
         val cal = Calendar.getInstance()
-        // val tripDepartureTimestamp = trip.departureDateTime
 
-        //val editDate = view.findViewById<TextView>(R.id.textEditDepDate)
-        //editDepDate.text = TimeUtilFunctions.getDateFromTimestamp(tsToSet)
-        // editDepDate.setTextColor(Color.parseColor("#9E150808"))
         dateView.text = TimeUtilFunctions.getDateFromTimestamp(tsToSet)
-
-        //val editTime = view.findViewById<TextView>(R.id.textEditDepTime)
-        //editDepTime.text = TimeUtilFunctions.getTimeFromTimestamp(tsToSet)
         timeView.text = TimeUtilFunctions.getTimeFromTimestamp(tsToSet)
 
         cal.time = tsToSet.toDate()
@@ -246,7 +290,6 @@ class TripEditFragment : Fragment() {
             // view = Date().time
             timeView.text = SimpleDateFormat("HH:mm").format(cal.time)
         }
-
 
         dateView.setOnClickListener {
             val datePickerDialog = DatePickerDialog(requireContext(), dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
@@ -293,24 +336,12 @@ class TripEditFragment : Fragment() {
         imageUri = Uri.parse(uri_input)
         editimageView.setImageURI(imageUri)
          */
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("arrLocation")?.observe(
-            viewLifecycleOwner) { result ->
-            val type = object: TypeToken<StopLocation>(){}.type
-            val arrLocation = Gson().fromJson<StopLocation>(result, type)
-            selectedTrip.ariLocation = arrLocation.address
-            view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(arrLocation.address)
-        }
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("depLocation")?.observe(
-            viewLifecycleOwner) { result ->
-            val type = object: TypeToken<StopLocation>(){}.type
-            val depLocation = Gson().fromJson<StopLocation>(result, type)
-            selectedTrip.depLocation = depLocation.address
-            view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(depLocation.address)
-        }
+        view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(arrivalLocation.fullAddress)
+        view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(departureLocation.fullAddress)
+
+
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun saveDataInTrip (): Trip {
@@ -318,7 +349,6 @@ class TripEditFragment : Fragment() {
 
         val editDepLocation = requireView().findViewById<TextInputLayout>(R.id.textEditDepLocation)
         val editAriLocation = requireView().findViewById<TextInputLayout>(R.id.textEditAriLocation)
-        // val editEstDuration = requireView().findViewById<TextInputLayout>(R.id.textEditEstDuration)
         val editAvaSeat = requireView().findViewById<TextInputLayout>(R.id.textEditAvaSeat)
         val editPrice = requireView().findViewById<TextInputLayout>(R.id.textEditPrice)
         val editAdditional = requireView().findViewById<TextInputLayout>(R.id.textEditAdditional)
@@ -339,6 +369,11 @@ class TripEditFragment : Fragment() {
 
         val newEstDuration = TimeUtilFunctions.getTimestampDifferenceAsStr(newDepartureTimestamp, newArrivalTimestamp)
 
+        Log.d(TAG,"DepartureLocation ${departureLocation.toMap()}")
+        Log.d(TAG,"ArrivalLocation ${arrivalLocation.toMap()}")
+
+        val newStopLocation = StopLocation.newLocation()
+
         val acc_email = ModelPreferencesManager.get<String>(getString(R.string.keyCurrentAccount)) //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         tripData.depLocation = editDepLocation.editText?.text.toString()
         tripData.ariLocation = editAriLocation.editText?.text.toString()
@@ -356,6 +391,10 @@ class TripEditFragment : Fragment() {
         tripData.hasImage = true
         tripData.departureDateTime = newDepartureTimestamp
         tripData.arrivalDateTime = newArrivalTimestamp
+        tripData.departureLocation = if (departureLocation.fullAddress == newStopLocation.fullAddress) null else departureLocation
+        tripData.arrivalLocation = if (arrivalLocation.fullAddress == newStopLocation.fullAddress) null else arrivalLocation
+        tripData.optionalStops = adapter.optionalIntermediatesList.toList()
+
         return tripData
     }
 
@@ -578,10 +617,9 @@ class TripEditFragment : Fragment() {
         }
     }
 
-
 }
 
-class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableList<StopLocation>,
+class OptionalIntermediatesCardAdapter (var optionalIntermediatesList: MutableList<StopLocation>,
                                         val context: Context,
                                         val view: View) :
     RecyclerView.Adapter<OptionalIntermediatesCardAdapter.OptionalIntermediatesViewHolder>() {
@@ -591,6 +629,11 @@ class OptionalIntermediatesCardAdapter (val optionalIntermediatesList: MutableLi
         val deleteCardImageButton = v.findViewById<ImageButton>(R.id.imageButton_delete_card)
         fun bind(t: String) {}
         fun unbind() {}
+    }
+
+    fun updateCollection(newStopList: MutableList<StopLocation>) {
+        optionalIntermediatesList = newStopList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

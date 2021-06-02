@@ -2,7 +2,9 @@ package it.polito.mad.car_pooling.models
 
 import android.util.Log
 import com.google.firebase.Timestamp
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.ktx.getField
 import java.lang.Exception
 import java.util.*
 
@@ -24,7 +26,12 @@ data class Trip (var id: String) {
         private val HAS_IMAGE = "hasImage"
         private val STATUS = "status"
         private val DEPARTURE_DATETIME = "departureDateTime"
+        private val DEPARTURE_DATETIME_SEC = "departureDateTimeSec"
         private val ARRIVAL_DATETIME = "arrivalDateTime"
+        private val ARRIVAL_DATETIME_SEC = "arrivalDateTimeSec"
+        private val DEPARTURE_LOCATION = "departureLocation"
+        private val ARRIVAL_LOCATION = "arrivalLocation"
+        private val OPTIONAL_STOPS = "optionalStops"
 
         val EDIT_TRIP: String = "edit"
         val CREATE_TRIP: String = "create"
@@ -57,6 +64,18 @@ data class Trip (var id: String) {
                 new_trip.status = getString(STATUS)?: OPEN
                 new_trip.departureDateTime = getTimestamp(DEPARTURE_DATETIME) ?: Timestamp.now()
                 new_trip.arrivalDateTime = getTimestamp(ARRIVAL_DATETIME) ?: new_trip.departureDateTime
+
+                //new_trip.departureLocation = get(DEPARTURE_LOCATION) as
+
+                val departureStopLocation = get(DEPARTURE_LOCATION)
+                //val departureStopLocation = getField<Map<String, Any>>(DEPARTURE_LOCATION)
+                new_trip.departureLocation = if (departureStopLocation != null) StopLocation.parseStopLocation(departureStopLocation  as Map<String, Any>) else null
+
+                val arrivalStopLocation = get(ARRIVAL_LOCATION)
+                new_trip.arrivalLocation = if (arrivalStopLocation != null) StopLocation.parseStopLocation(arrivalStopLocation as Map<String, Any>) else null
+
+                val optionalStopsList = get(OPTIONAL_STOPS)
+                new_trip.optionalStops =  if (optionalStopsList == null) emptyList() else (optionalStopsList as List<Map<String, Any>>).map { StopLocation.parseStopLocation(it) }.filter { it != null } as List<StopLocation>
                 // new_trip.imageUri = getString("image_uri")!!
                 return new_trip
             } catch (e: Exception) {
@@ -82,6 +101,9 @@ data class Trip (var id: String) {
             newTrip.hasImage = false
             newTrip.departureDateTime = Timestamp.now()
             newTrip.arrivalDateTime = Timestamp.now()
+            newTrip.arrivalLocation = null
+            newTrip.departureLocation = null
+            newTrip.optionalStops = emptyList()
             return newTrip
         }
     }
@@ -117,7 +139,9 @@ data class Trip (var id: String) {
     }
 
     var depLocation: String = ""
-    var ariLocation: String=""
+    var departureLocation: StopLocation? = null
+    var ariLocation: String= ""
+    var arrivalLocation : StopLocation? = null
     var depDate: String = ""
     var depTime: String = ""
     var estDuration: String = ""
@@ -132,9 +156,10 @@ data class Trip (var id: String) {
     var hasImage: Boolean = false
     var departureDateTime: Timestamp = Timestamp(Date())
     var arrivalDateTime: Timestamp = Timestamp(Date())
+    var optionalStops: List<StopLocation> = listOf()
 
     fun toMap(): Map<String, Any> {
-        return mapOf<String, Any>(
+        var returnMap = mutableMapOf<String, Any>(
                 DEP_LOCATION to depLocation,
                 ADDITIONAL to additional,
                 ARI_LOCATION to ariLocation,
@@ -149,7 +174,18 @@ data class Trip (var id: String) {
                 STATUS to status,
                 HAS_IMAGE to hasImage,
                 DEPARTURE_DATETIME to departureDateTime,
-                ARRIVAL_DATETIME to arrivalDateTime
+                ARRIVAL_DATETIME to arrivalDateTime,
+                OPTIONAL_STOPS to optionalStops.map { it.toMap() },
+                DEPARTURE_DATETIME_SEC to departureDateTime.seconds,
+                ARRIVAL_DATETIME_SEC to arrivalDateTime.seconds
         )
+        if (arrivalLocation != null) {
+            returnMap.put(ARRIVAL_LOCATION, arrivalLocation!!.toMap())
+        }
+        if (departureLocation != null) {
+            returnMap.put(DEPARTURE_LOCATION, departureLocation!!.toMap())
+        }
+
+        return returnMap.toMap()
     }
 }

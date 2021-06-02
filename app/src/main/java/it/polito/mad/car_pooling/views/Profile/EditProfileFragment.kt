@@ -1,4 +1,4 @@
-package it.polito.mad.car_pooling
+package it.polito.mad.car_pooling.views.Profile
 
 import android.app.Activity
 import android.app.DatePickerDialog
@@ -29,9 +29,9 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import it.polito.mad.car_pooling.R
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
@@ -158,48 +158,6 @@ class EditProfileFragment : Fragment() {
                 Log.d("POLITO", "MyUser from viewMode is null")
             }
         })
-
-        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        var acc_emailone =sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
-
-        /*
-        acc_email = if (acc_emailone == null) "" else acc_emailone
-        val db = FirebaseFirestore.getInstance()
-        val users = db.collection("Users")
-        if (acc_email != "no email"){
-            val my_profile = users.document(acc_email.toString())
-            my_profile.addSnapshotListener { value, error ->
-                if (error != null) throw error
-                if (value != null) {
-                    if (value.exists()) {
-                        view.findViewById<TextInputLayout>(R.id.editViewFullName).editText?.setText(value["full_name"].toString())
-                        view.findViewById<TextInputLayout>(R.id.editViewNickName).editText?.setText(value["nick_name"].toString())
-                        view.findViewById<TextInputLayout>(R.id.editViewEmail).editText?.setText(value["email"].toString())
-                        view.findViewById<TextInputLayout>(R.id.editViewLocation).editText?.setText(value["location"].toString())
-                        view.findViewById<TextView>(R.id.editViewBirthday).text = value["birthday"].toString()
-                        view.findViewById<TextInputLayout>(R.id.editViewPhoneNumber).editText?.setText(value["phone_number"].toString())
-                        val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
-                        val imageView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
-                        if (value["image_uri"].toString() == "" || value["image_uri"].toString().isEmpty()) {
-                            imageUri = Uri.parse(default_str_profile)
-                            imageView.setImageURI(imageUri)
-                        } else {
-                            val storage = Firebase.storage
-                            val imageRef = storage.reference.child("users/$acc_email.jpg")
-                            imageRef.downloadUrl.addOnSuccessListener { Uri ->
-                                val image_uri = Uri.toString()
-                                Glide.with(this).load(image_uri).into(imageView)
-                            }
-                        }
-                    } else {
-                        writeTextView(view)
-                    }
-                }
-            }
-        } else {
-            writeTextView(view)
-        }
-        */
     }
 
     private fun writeTextView(view: View){
@@ -352,7 +310,7 @@ class EditProfileFragment : Fragment() {
 
                 viewModel.saveUser(profileToStore)
                     .addOnSuccessListener {
-                        Snackbar.make(requireView(), R.string.profileEditedSucces , Snackbar.LENGTH_SHORT)
+                        Snackbar.make(requireView(), R.string.profileEditedSucces, Snackbar.LENGTH_SHORT)
                                 .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                                 .show()
                         findNavController().popBackStack()

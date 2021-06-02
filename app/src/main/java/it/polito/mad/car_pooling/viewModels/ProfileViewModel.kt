@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.google.android.gms.tasks.Task
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Rating
+import it.polito.mad.car_pooling.models.RatingProfile
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.services.FirebaseRatingService
 import it.polito.mad.car_pooling.services.FirebaseTripService
@@ -28,13 +29,32 @@ class ProfileViewModel(private val userId: String): ViewModel() {
         return FirebaseUserService.saveUser(profileToSave)
     }
 
-    val profileRatingList: LiveData<List<Rating>> = liveData {
-        FirebaseRatingService.getUserRatings(userId).collect {
-            if (it == null || it.isEmpty()) {
-                Log.d(TAG, "Requests accepted to user ${userId} is empty")
-                emit(emptyList<Rating>())
+    val profileRatingList: LiveData<List<RatingProfile>> = liveData {
+        FirebaseRatingService.getUserRatings(userId).collect { ratingList ->
+            if (ratingList == null || ratingList.isEmpty()) {
+                // Log.d(TAG, "Requests accepted to user ${userId} is empty")
+                emit(emptyList<RatingProfile>())
             } else {
-                emit(it)
+                var ratingMap = mutableMapOf<String, MutableList<Rating>>()
+                var returnList = mutableListOf<RatingProfile>()
+                for (ratingIterator in ratingList) {
+                    var writerList = ratingMap.get(ratingIterator.writer)
+                    if (writerList == null) {
+                        writerList = mutableListOf(ratingIterator)
+                    } else {
+                        writerList.add(ratingIterator)
+                    }
+                    ratingMap.put(ratingIterator.writer, writerList)
+                }
+                FirebaseUserService.getUserByIdInList(ratingMap.keys.toList()).collect { writerProfileList ->
+                    for (writerProfileIterator in writerProfileList) {
+                        val profileRatingList = ratingMap.get(writerProfileIterator.email) ?: emptyList<Rating>()
+                        for (ratingIterator in profileRatingList) {
+                            returnList.add(RatingProfile(ratingIterator, writerProfileIterator))
+                        }
+                    }
+                    emit(returnList)
+                }
             }
         }
     }

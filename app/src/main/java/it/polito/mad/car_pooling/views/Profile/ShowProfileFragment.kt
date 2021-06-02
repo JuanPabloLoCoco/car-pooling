@@ -25,6 +25,7 @@ import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
 import it.polito.mad.car_pooling.models.Rating
+import it.polito.mad.car_pooling.models.RatingProfile
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
 
@@ -38,7 +39,7 @@ class ShowProfileFragment : Fragment() {
     private lateinit var viewModel: ProfileViewModel
     private lateinit var viewModelFactory: ProfileViewModelFactory
     private lateinit var userId: String
-    private lateinit var ratingList: List<Rating>
+    private lateinit var ratingList: List<RatingProfile>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -176,11 +177,7 @@ class ShowProfileFragment : Fragment() {
         })
 
         // Fake Rating List
-        ratingList = listOf(
-                Rating("Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,",1.0),
-                Rating("Good Driver", 4.5),
-                Rating("The path was nice", 3.0)
-        )
+        ratingList = listOf()
 
         val reciclerView = view.findViewById<RecyclerView>(R.id.rateRV)
         reciclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -203,7 +200,7 @@ class ShowProfileFragment : Fragment() {
                 reciclerView.visibility = View.VISIBLE
                 ratingTitleView.visibility = View.VISIBLE
                 
-                val ratingAvg = it.map { r -> r.ratingNumber }.average()
+                val ratingAvg = it.map { r -> r.rating.ratingNumber }.average()
                 val finalAvg = Math.floor(ratingAvg * 100) / 100
                 ratingTitleView.text = "${getString(R.string.userRating)}: ${finalAvg}/5"
             }
@@ -227,8 +224,8 @@ class ShowProfileFragment : Fragment() {
             (activity as AppCompatActivity).setSupportActionBar(toolbar)
             toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
             toolbar.setNavigationOnClickListener(View.OnClickListener(){
-                requireActivity().onBackPressed()
-                //findNavController().popBackStack()
+                // requireActivity().onBackPressed()
+                findNavController().popBackStack()
             })
         }
     }
@@ -283,7 +280,7 @@ class ShowProfileFragment : Fragment() {
 }
 
 class RatingListCardAdapter(
-        var ratingList: List<Rating>,
+        var ratingList: List<RatingProfile>,
         val context: Context,
         ): RecyclerView.Adapter<RatingListCardAdapter.RatingCardViewHolder>() {
 
@@ -291,6 +288,7 @@ class RatingListCardAdapter(
         val commentTextView =v.findViewById<TextView>(R.id.commentextView)
         val ratingbarView = v.findViewById<RatingBar>(R.id.ratingBar2)
         val reviewName = v.findViewById<TextView>(R.id.reviewuserView)
+        val profileImage = v.findViewById<ImageView>(R.id.image_request_user)
 
     }
 
@@ -304,17 +302,18 @@ class RatingListCardAdapter(
     }
 
     override fun onBindViewHolder(holder: RatingCardViewHolder, position: Int) {
-        val selecterRating: Rating = ratingList[position]
-        holder.commentTextView.text= selecterRating.comment
-        holder.ratingbarView.rating =selecterRating.ratingNumber.toFloat()
-        holder.reviewName.text = "${selecterRating.writer} said: "
+        val selecterRating: RatingProfile = ratingList[position]
+        holder.commentTextView.text= selecterRating.rating.comment
+        holder.ratingbarView.rating =selecterRating.rating.ratingNumber.toFloat()
+        holder.reviewName.text = "${selecterRating.profile.fullName} said: "
+        // Change image of the person who wrote the rating
     }
 
     override fun getItemCount(): Int {
         return ratingList.size
     }
 
-    fun updateCollection(newRatingList: List<Rating>) {
+    fun updateCollection(newRatingList: List<RatingProfile>) {
         ratingList = newRatingList
         notifyDataSetChanged()
     }

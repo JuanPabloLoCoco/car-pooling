@@ -23,6 +23,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import it.polito.mad.car_pooling.models.StopLocation
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.models.TripRequest
@@ -41,13 +42,15 @@ class TripDetailsFragment : Fragment() {
     var realAvaiableSeats: Int = 0
     var tripRequestList = listOf<TripRequestRating>()
 
-    private val TAG = "TripDetailsFragment"
     private lateinit var viewModel: TripViewModel
     private lateinit var viewModelFactory: TripViewModelFactory
 
     private lateinit var tripRequestListAdapter: TripRequestsCardAdapter
     private lateinit var interestedTrips : List<String>
     var isInterestedTrip : Boolean = false
+    private val TAG = "TripDetailsFragment"
+
+    private lateinit var optionalStopsAdapter: TripOptionalIntermediatesCardAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -98,8 +101,15 @@ class TripDetailsFragment : Fragment() {
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
 
 
+        val optionalInterRV = view.findViewById<RecyclerView>(R.id.trip_optional_intermediates_RV)
+        optionalInterRV.layoutManager = LinearLayoutManager(activity)
+        val testList = listOf<StopLocation>()
+
+        val noOpInterView = view.findViewById<TextView>(R.id.tripNoLocationMessageTextView)
+
+        optionalStopsAdapter = TripOptionalIntermediatesCardAdapter(testList, requireContext())
+        optionalInterRV.adapter = optionalStopsAdapter
         rateTripButton.setOnClickListener {
-            Log.d("POLITO", "Hi ! I click the buton")
             val action1 = TripDetailsFragmentDirections.actionNavTripToRating("tripRequest")
             findNavController().navigate(action1)
         }
@@ -115,6 +125,16 @@ class TripDetailsFragment : Fragment() {
                 loadTripInFields(selectedTrip, view)
                 val default_str_car = "android.resource://it.polito.mad.car_pooling/drawable/car_default"
                 val imageView = view.findViewById<ImageView>(R.id.imageviewCar)
+
+                val optionalStops = it.optionalStops
+                if (optionalStops.isEmpty()) {
+                    optionalInterRV.visibility = View.GONE
+                    noOpInterView.visibility = View.VISIBLE
+                } else {
+                    optionalInterRV.visibility = View.VISIBLE
+                    noOpInterView.visibility = View.GONE
+                    optionalStopsAdapter.updateCollection(optionalStops)
+                }
 
                 tripRequestListAdapter = TripRequestsCardAdapter(tripRequestList, requireContext(), findNavController(), db, view, selectedTrip, viewModel)
                 requestListRV.adapter = tripRequestListAdapter
@@ -269,6 +289,16 @@ class TripDetailsFragment : Fragment() {
 
         val buttonCheckLocationMap = view.findViewById<Button>(R.id.buttonCheckLocationMap)
         buttonCheckLocationMap.setOnClickListener {
+            val tripStopList = mutableListOf<StopLocation>()
+            if (selectedTrip.departureLocation != null) {
+                tripStopList.add(selectedTrip.departureLocation!!)
+            }
+            tripStopList.addAll(selectedTrip.optionalStops)
+            if(selectedTrip.arrivalLocation != null) {
+                tripStopList.add(selectedTrip.arrivalLocation!!)
+            }
+            Log.d(TAG, "Stops = ${tripStopList}")
+            // TODO: SHOW MAP WITH THE LIST OF STOPS
             //val action = TripDetailsFragmentDirections.actionNavTripToMapFragment("checkLocation")
             //findNavController().navigate(action)
             //findNavController().navigate(R.id.action_nav_trip_to_mapFragment)
@@ -277,15 +307,12 @@ class TripDetailsFragment : Fragment() {
         val sourceFragment = args.sourceFragment
         val likeButton = activity?.findViewById<ImageButton>(R.id.likeButton)
 
-
-
         if (sourceFragment == "otherTrips") {
             likeButton?.setBackgroundResource(R.drawable.ic_baseline_favorite_border_24)
             //likeButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24)
         } else if (sourceFragment == "boughtTrips") {
 
         }
-
 
         interestedTrips = viewModel.getInterestedTrips(acc_email)
         Log.d("POLITO", "Interested Trips $interestedTrips . Size = ${interestedTrips.size}")
@@ -309,21 +336,7 @@ class TripDetailsFragment : Fragment() {
             }
         }
 
-        val optionalInterRV = view.findViewById<RecyclerView>(R.id.trip_optional_intermediates_RV)
-        optionalInterRV.layoutManager = LinearLayoutManager(activity)
-        val testList = mutableListOf<String>()
-        testList.add("11111111111111111111111111111111111111111111")
-        testList.add("2")
-        val noOpInterView = view.findViewById<TextView>(R.id.tripNoLocationMessageTextView)
-        if (testList.size == 0) {
-            optionalInterRV.visibility = View.GONE
-            noOpInterView.visibility = View.VISIBLE
-        } else {
-            optionalInterRV.visibility = View.VISIBLE
-            noOpInterView.visibility = View.GONE
-        }
-        val adapter = TripOptionalIntermediatesCardAdapter(testList, requireContext())
-        optionalInterRV.adapter = adapter
+
     }
 
     override fun onPause() {
@@ -476,12 +489,6 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
     }
 
     private fun updateTripRequest(tripRequest: TripRequest, trueAvaiableSeats: Int): Unit {
-        /*
-        dbInstance.collection(TripRequest.DATA_COLLECTION).document(tripRequest.id)
-            .update(mapOf(
-                "status" to tripRequest.status,
-                "updateTimestamp" to Timestamp(Date())
-            ))*/
         viewModel.updateTripRequest(tripRequest)
                 .addOnSuccessListener {
                     // Update the trip if it's full
@@ -491,44 +498,10 @@ val viewModel: TripViewModel): RecyclerView.Adapter<TripRequestsCardAdapter.Trip
                         .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                         .show()
                 }
-
-        /*
-        viewModel.updateTripRequest(tripRequest)
-            .addOnSuccessListener {
-                if (tripRequest.status == TripRequest.ACCEPTED){
-                    Snackbar.make(generalView, "Request accepted", Snackbar.LENGTH_SHORT)
-                            .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                            .show()
-                    if (trueAvaiableSeats <= 1) {
-                        viewModel.updateTripStatus(Trip.FULL)
-                            .addOnSuccessListener {
-                                dbInstance.collection(TripRequest.DATA_COLLECTION)
-                                    .whereEqualTo("status", TripRequest.PENDING)
-                                    .whereEqualTo("tripId", tripRequest.tripId)
-                                    .get()
-                                    .addOnSuccessListener {documents ->
-                                        for (document in documents) {
-                                            val tripRequestId = document.id
-                                            dbInstance.collection(TripRequest.DATA_COLLECTION)
-                                                .document(tripRequestId)
-                                                .update(mapOf("status" to TripRequest.REJECTED))
-                                        }
-                                    }
-                            }
-
-                    }
-                }
-
-            }
-            .addOnFailureListener {
-                Snackbar.make(generalView, "An error happen while updating the request", Snackbar.LENGTH_SHORT)
-                    .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                    .show()
-            }*/
     }
 }
 
-class TripOptionalIntermediatesCardAdapter (val tripOptionalIntermediatesList: MutableList<String>,
+class TripOptionalIntermediatesCardAdapter (var tripOptionalIntermediatesList: List<StopLocation>,
                                             val context: Context) :
     RecyclerView.Adapter<TripOptionalIntermediatesCardAdapter.TripOptionalIntermediatesViewHolder>() {
     class TripOptionalIntermediatesViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -536,6 +509,11 @@ class TripOptionalIntermediatesCardAdapter (val tripOptionalIntermediatesList: M
         val deleteCardImageButton = v.findViewById<ImageButton>(R.id.imageButton_delete_card)
         fun bind(t: String) {}
         fun unbind() {}
+    }
+
+    fun updateCollection (newStopsLocationList: List<StopLocation>) {
+        tripOptionalIntermediatesList = newStopsLocationList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
@@ -554,8 +532,8 @@ class TripOptionalIntermediatesCardAdapter (val tripOptionalIntermediatesList: M
     }
 
     override fun onBindViewHolder(holder: TripOptionalIntermediatesViewHolder, position: Int) {
-        val selectedRequest: String = tripOptionalIntermediatesList[position]
-        holder.optionalInterText.text = selectedRequest
+        val selectedRequest: StopLocation = tripOptionalIntermediatesList[position]
+        holder.optionalInterText.text = selectedRequest.fullAddress
         holder.deleteCardImageButton.setVisibility(View.GONE)
     }
 }

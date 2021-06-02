@@ -140,7 +140,7 @@
 
     <fragment
         android:id="@+id/nav_edit_profile"
-        android:name="it.polito.mad.car_pooling.EditProfileFragment"
+        android:name="it.polito.mad.car_pooling.views.Profile.EditProfileFragment"
         android:label="Profile"
         tools:layout="@layout/edit_profile_layout">
         <action
@@ -154,7 +154,7 @@
     </fragment>
     <fragment
         android:id="@+id/singInFragment"
-        android:name="it.polito.mad.car_pooling.SignInFragment"
+        android:name="it.polito.mad.car_pooling.views.SignInFragment"
         android:label="Sign In"
         tools:layout="@layout/fragment_sign_in">
         <action
@@ -224,7 +224,7 @@
     </fragment>
     <fragment
         android:id="@+id/mapFragment"
-        android:name="it.polito.mad.car_pooling.MapFragment"
+        android:name="it.polito.mad.car_pooling.views.MapFragment"
         android:label="Map"
         tools:layout="@layout/fragment_map">
         <argument
@@ -236,7 +236,7 @@
     </fragment>
     <fragment
         android:id="@+id/startFragment"
-        android:name="it.polito.mad.car_pooling.StartFragment"
+        android:name="it.polito.mad.car_pooling.views.StartFragment"
         android:label="Welcome to Car Pooling"
         tools:layout="@layout/fragment_start">
         <action
@@ -245,7 +245,7 @@
     </fragment>
     <fragment
         android:id="@+id/rating"
-        android:name="it.polito.mad.car_pooling.RatingFragment"
+        android:name="it.polito.mad.car_pooling.views.RatingFragment"
         android:label="Rating"
         tools:layout="@layout/fragment_rating" >
         <argument
@@ -254,11 +254,11 @@
     </fragment>
     <fragment
         android:id="@+id/nav_setting"
-        android:name="it.polito.mad.car_pooling.SettingsFragment"
+        android:name="it.polito.mad.car_pooling.views.SettingsFragment"
         android:label="Settings" />
     <fragment
         android:id="@+id/sendEmailFragment"
-        android:name="it.polito.mad.car_pooling.SendEmailFragment"
+        android:name="it.polito.mad.car_pooling.views.SendEmailFragment"
         android:label="SendEmailFragment"
         tools:layout="@layout/fragment_send_email">
         <argument

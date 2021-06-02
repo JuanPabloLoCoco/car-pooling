@@ -65,8 +65,8 @@ object FirebaseTripService {
         return callbackFlow {
             val listenerRegistration = db.collection(TRIP_COLLECTION)
                 //.whereNotEqualTo("owner", userId)
-                //.whereGreaterThan("departureDateTime", Timestamp.now())
-                .whereEqualTo("status", Trip.OPEN)
+                .whereGreaterThan("departureDateTimeSec", Timestamp.now().seconds)
+                //.whereEqualTo("status", Trip.OPEN)
                 .addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
                     if (firebaseFirestoreException != null || querySnapshot == null) {
                         cancel(message = "Error fetching other trips", cause = firebaseFirestoreException)
@@ -75,7 +75,7 @@ object FirebaseTripService {
                     val map = querySnapshot.documents
                         .mapNotNull { it.toTrip() }
                             .filter { it.owner != userId }
-                            .filter { it.departureDateTime != null && it.departureDateTime.seconds > Timestamp.now().seconds}
+                            // .filter { it.departureDateTime != null && it.departureDateTime.seconds > Timestamp.now().seconds}
                     offer(map)
                 }
             awaitClose{
