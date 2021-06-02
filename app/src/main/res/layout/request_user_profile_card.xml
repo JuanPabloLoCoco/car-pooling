@@ -8,13 +8,14 @@
     android:clickable="true"
     android:focusable="true"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="wrap_content"
+    android:minHeight="60dp"
     android:orientation="vertical"
     android:layout_margin="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center"
         android:layout_marginHorizontal="10dp"
@@ -24,38 +25,49 @@
             android:id="@+id/image_request_user"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:layout_marginLeft="10dp"
             android:layout_marginVertical="1dp"
-            app:srcCompat="@drawable/default_image"/>
+            app:srcCompat="@drawable/default_image"
+            android:layout_gravity="center"/>
 
         <TextView
             android:id="@+id/request_user"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_weight="3"
+            android:layout_weight="5"
             android:gravity="center"
             android:text="Full Name"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textSize="35dp" />
+            android:textSize="20sp"
+            android:layout_gravity="center"/>
 
         <LinearLayout
             android:layout_marginVertical="1dp"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
             android:layout_marginHorizontal="10dp"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            tools:ignore="Orientation">
 
             <ImageButton
                 android:id="@+id/imageButton_3dots"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="#FFFFFF"
                 android:gravity="center"
                 app:srcCompat="@drawable/ic_baseline_more_vert_24"
-                tools:ignore="VectorDrawableCompat" />
+                tools:ignore="VectorDrawableCompat"
+                android:layout_gravity="center"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rateUserButton"
+                android:textSize="8dp"
+                android:text="Rate"
+                android:layout_gravity="center"/>
         </LinearLayout>
 
     </LinearLayout>

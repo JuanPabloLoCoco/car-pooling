@@ -1,0 +1,58 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="Account"
+        app:icon="@drawable/ic_baseline_account_circle_24_blue">
+
+        <EditTextPreference
+            app:key="current_account"
+            app:title="Your Account"
+            app:useSimpleSummaryProvider="true"/>
+            <!--app:widgetLayout="@layout/preference_button"-->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Profile Setting For Other Users"
+        app:icon="@drawable/ic_baseline_manage_accounts_24">
+
+        <SwitchPreferenceCompat
+            app:key="hideAll"
+            app:title="Hide some profiles to other users"
+            app:summaryOff="You are showing full profile to others"
+            app:summaryOn="You are hiding your location, birthday and phone number except following"/>
+
+        <SwitchPreferenceCompat
+            app:dependency="hideAll"
+            app:key="showLocation"
+            app:summaryOff="You are hiding your location"
+            app:summaryOn="You are showing your location"
+            app:title="Show your location" />
+
+        <SwitchPreferenceCompat
+            app:dependency="hideAll"
+            app:key="showBirthday"
+            app:summaryOff="You are hiding your birthday"
+            app:summaryOn="You are showing your birthday"
+            app:title="Show your birthday" />
+
+        <SwitchPreferenceCompat
+            app:dependency="hideAll"
+            app:key="showPhoneNumber"
+            app:summaryOff="You are hiding your phone number"
+            app:summaryOn="You are showing your phone number"
+            app:title="Show your phone number" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Trip Detail Setting For Other Users"
+        app:icon="@drawable/ic_baseline_directions_car_24">
+
+        <SwitchPreferenceCompat
+            app:key="hidePlate"
+            app:title="Hide plate number for other users"
+            app:summaryOff="You are showing your plate number"
+            app:summaryOn="You are hiding your plate number"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
