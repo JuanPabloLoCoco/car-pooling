@@ -116,6 +116,9 @@ class TripEditFragment : Fragment() {
         adapter = OptionalIntermediatesCardAdapter(locationList, requireContext(), view)
         optionalInterRV.adapter = adapter
         val noOpInterView = view.findViewById<TextView>(R.id.noLocationMessageTextView)
+        var doesOptionalListUpdateRun = false
+        var doesArrivalLocationUpdateRun = false
+        var doesDepartureLocationUpdateRun = false
 
         arrivalLocation = StopLocation.newLocation()
         departureLocation = StopLocation.newLocation()
@@ -123,23 +126,25 @@ class TripEditFragment : Fragment() {
 
         viewModel.trip.observe(viewLifecycleOwner, {
             if (it != null) {
-                Log.d("POLITO", "${it.toMap()}")
                 selectedTrip = it
-                if (it.arrivalLocation != null) {
+                if (it.arrivalLocation != null && !doesArrivalLocationUpdateRun) {
                     arrivalLocation = it.arrivalLocation!!
                 }
-                if (it.departureLocation != null) {
+                if (it.departureLocation != null && !doesDepartureLocationUpdateRun) {
                     departureLocation = it.departureLocation!!
                 }
 
                 // Load optional intermidiate stops
-                if (it.optionalStops.isEmpty()) {
-                    optionalInterRV.visibility = View.GONE
-                    noOpInterView.visibility = View.VISIBLE
-                } else {
-                    optionalInterRV.visibility = View.VISIBLE
-                    noOpInterView.visibility = View.GONE
-                    adapter.updateCollection(it.optionalStops.toMutableList())
+                if (!doesOptionalListUpdateRun) {
+                    if (it.optionalStops.isEmpty()) {
+                        optionalInterRV.visibility = View.GONE
+                        noOpInterView.visibility = View.VISIBLE
+                    } else {
+                        optionalInterRV.visibility = View.VISIBLE
+                        noOpInterView.visibility = View.GONE
+                        // locationList = it.optionalStops.toMutableList()
+                        adapter.updateCollection(it.optionalStops.toMutableList())
+                    }
                 }
 
                 if (selectedTrip.status == Trip.BLOCKED) {
@@ -160,7 +165,6 @@ class TripEditFragment : Fragment() {
                 loadDataInFields(selectedTrip, view)
                 findNavController().popBackStack()
             }
-
         })
         blockTripButton.setOnClickListener {
             // Change status of trip to BLOCK
@@ -209,7 +213,9 @@ class TripEditFragment : Fragment() {
         }
         val addOptionalIntermediatesButton = view.findViewById<ImageView>(R.id.mapAddInterImageButtonTest)
         addOptionalIntermediatesButton.setOnClickListener {
-            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter", Gson().toJson(locationList))
+            Log.d(TAG, "OPT STOPS: ${adapter.optionalIntermediatesList}")
+            Log.d(TAG, "OPT STOPS as GSON: ${Gson().toJson(adapter.optionalIntermediatesList)}")
+            val action = TripEditFragmentDirections.actionTripEditFragmentToMapFragment("addInter", Gson().toJson(adapter.optionalIntermediatesList))
             findNavController().navigate(action)
         }
 
@@ -217,6 +223,7 @@ class TripEditFragment : Fragment() {
             viewLifecycleOwner) { result ->
             val type = object: TypeToken<MutableList<StopLocation>>(){}.type
             val jsonList = Gson().fromJson<MutableList<StopLocation>>(result, type)
+            val newLocationList = mutableListOf<StopLocation>()
             for (i in 0..jsonList.size - 1) {
                 val insertLocation = StopLocation(jsonList[i].fullAddress)
                 insertLocation.address = jsonList[i].address
@@ -224,8 +231,12 @@ class TripEditFragment : Fragment() {
                 insertLocation.country = jsonList[i].country
                 insertLocation.latitude = jsonList[i].latitude
                 insertLocation.longitude = jsonList[i].longitude
-                locationList.add(insertLocation)
+                newLocationList.add(insertLocation)
+                //locationList.add(insertLocation)
             }
+            locationList = newLocationList
+            Log.d(TAG, "Location List after new STOP = ${locationList}")
+            doesOptionalListUpdateRun = true
             adapter.updateCollection(locationList)
 
             if (adapter.optionalIntermediatesList.isEmpty()) {
@@ -235,6 +246,29 @@ class TripEditFragment : Fragment() {
                 optionalInterRV.visibility = View.VISIBLE
                 noOpInterView.visibility = View.GONE
             }
+        }
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("arrLocation")?.observe(
+                viewLifecycleOwner) { result ->
+            val type = object: TypeToken<StopLocation>(){}.type
+            val arrLocation = Gson().fromJson<StopLocation>(result, type)
+            arrivalLocation = arrLocation
+            doesArrivalLocationUpdateRun = true
+            loadDataInFields(selectedTrip, view)
+            selectedTrip.ariLocation = arrLocation.fullAddress
+
+
+        }
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("depLocation")?.observe(
+                viewLifecycleOwner) { result ->
+            val type = object: TypeToken<StopLocation>(){}.type
+            val depLocation = Gson().fromJson<StopLocation>(result, type)
+            selectedTrip.depLocation = depLocation.fullAddress
+            departureLocation = depLocation
+            doesDepartureLocationUpdateRun = true
+            loadDataInFields(selectedTrip, view)
+            view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(depLocation.address)
         }
 
     }
@@ -307,24 +341,10 @@ class TripEditFragment : Fragment() {
         editimageView.setImageURI(imageUri)
          */
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("arrLocation")?.observe(
-            viewLifecycleOwner) { result ->
-            val type = object: TypeToken<StopLocation>(){}.type
-            val arrLocation = Gson().fromJson<StopLocation>(result, type)
-            arrivalLocation = arrLocation
-            selectedTrip.ariLocation = arrLocation.fullAddress
+        view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(arrivalLocation.fullAddress)
+        view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(departureLocation.fullAddress)
 
-            view.findViewById<TextInputLayout>(R.id.textEditAriLocation).editText?.setText(arrLocation.address)
-        }
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("depLocation")?.observe(
-            viewLifecycleOwner) { result ->
-            val type = object: TypeToken<StopLocation>(){}.type
-            val depLocation = Gson().fromJson<StopLocation>(result, type)
-            selectedTrip.depLocation = depLocation.fullAddress
-            departureLocation = depLocation
-            view.findViewById<TextInputLayout>(R.id.textEditDepLocation).editText?.setText(depLocation.address)
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
