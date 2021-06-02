@@ -288,6 +288,7 @@ class RatingListCardAdapter(
         val commentTextView =v.findViewById<TextView>(R.id.commentextView)
         val ratingbarView = v.findViewById<RatingBar>(R.id.ratingBar2)
         val reviewName = v.findViewById<TextView>(R.id.reviewuserView)
+        val profileImage = v.findViewById<ImageView>(R.id.image_request_user)
 
     }
 
