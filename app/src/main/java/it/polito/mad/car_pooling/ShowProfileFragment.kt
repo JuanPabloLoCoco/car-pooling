@@ -6,31 +6,39 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.RatingBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
+import it.polito.mad.car_pooling.models.Rating
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
 
 class ShowProfileFragment : Fragment() {
     private lateinit var imageUri: String
     private var profile: Profile? = null
-
+    private lateinit var adapter: RatingListCardAdapter
     private lateinit var appBarConfiguration: AppBarConfiguration
     val args: ShowProfileFragmentArgs by navArgs()
 
     private lateinit var viewModel: ProfileViewModel
     private lateinit var viewModelFactory: ProfileViewModelFactory
     private lateinit var userId: String
+    private lateinit var ratingList: List<Rating>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +49,6 @@ class ShowProfileFragment : Fragment() {
         setHasOptionsMenu(isOwner)
         imageUri = ""
 
-
         userId = args.userId
         if (userId == "no email") {
             userId = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
@@ -49,31 +56,18 @@ class ShowProfileFragment : Fragment() {
         viewModelFactory = ProfileViewModelFactory(userId)
         viewModel = viewModelFactory.create(ProfileViewModel::class.java)
 
-        //if (args.userId == "no email") (ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email") else args.userId
-        // Create the instances of the viewModel class
-
         return inflater.inflate(R.layout.profile_layout, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /*
-        var storedProfile = ModelPreferencesManager.get<Profile>(getString(R.string.KeyProfileData))
-        if (storedProfile === null) {
-            storedProfile = Profile("")
-        }
-        profile = storedProfile
-        loadProfileInFields(storedProfile, view)
-         */
-        // val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        //var acc_email = args.userId //sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")
         val isOwner = args.isOwner
         if (!isOwner) {
-            view.findViewById<TextView>(R.id.textViewLocation).visibility = View.INVISIBLE
-            view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.INVISIBLE
-            view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.INVISIBLE
-        /*val toolbar: Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+            //view.findViewById<TextView>(R.id.textViewLocation).visibility = View.GONE
+            //view.findViewById<TextView>(R.id.textViewBirthday).visibility = View.GONE
+            //view.findViewById<TextView>(R.id.textViewPhoneNumber).visibility = View.GONE
+            /*val toolbar: Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
             (activity as AppCompatActivity).setSupportActionBar(toolbar)
             toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
             toolbar.setNavigationOnClickListener(View.OnClickListener(){
@@ -86,6 +80,72 @@ class ShowProfileFragment : Fragment() {
                 requireActivity().onBackPressed()
                 //findNavController().popBackStack()
             })*/
+            val db = FirebaseFirestore.getInstance()
+            val users = db.collection("Users")
+            val profile = users.document(userId)
+            profile.addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("showProfileFragment", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null && snapshot.exists()) {
+                    val hideAll = snapshot["hideAll"].toString().toBoolean()
+                    val showLocation = snapshot["showLocation"].toString().toBoolean()
+                    val showBirthday = snapshot["showBirthday"].toString().toBoolean()
+                    val showPhoneNumber = snapshot["showPhoneNumber"].toString().toBoolean()
+                    Log.d("showProfile!!", "$hideAll")
+                    if (hideAll) {
+                        if (!showLocation) {
+                            val view1 = view.findViewById<TextView>(R.id.textViewLocation)
+                            view1.visibility = View.INVISIBLE
+                            val params1: ViewGroup.LayoutParams = view1.layoutParams
+                            params1.height = 0
+                            view1.layoutParams = params1
+                        }
+
+                        if (!showBirthday) {
+                            val view2 = view.findViewById<TextView>(R.id.textViewBirthday)
+                            view2.visibility = View.INVISIBLE
+                            val param2: ViewGroup.LayoutParams = view2.layoutParams
+                            param2.height = 0
+                            view2.layoutParams = param2
+                        }
+
+                        if (!showPhoneNumber) {
+                            val view3 = view.findViewById<TextView>(R.id.textViewPhoneNumber)
+                            view3.visibility = View.INVISIBLE
+                            val params3: ViewGroup.LayoutParams = view3.layoutParams
+                            params3.height = 0
+                            view3.layoutParams = params3
+                        }
+                    }
+
+                    val idx = activity?.fragmentManager?.backStackEntryCount
+                    if (idx != null) {
+                        val backEntry = fragmentManager?.getBackStackEntryAt(idx)
+                        val tag = backEntry?.name
+                        if (tag == "2-2131296624") {
+                            Log.d("showProfile!!!!!!","$tag")
+                            val view3 = view.findViewById<TextView>(R.id.textViewPhoneNumber)
+                            view3.visibility = View.VISIBLE
+                            val params3: ViewGroup.LayoutParams = view3.layoutParams
+                            params3.height = 140
+                            view3.layoutParams = params3
+                        }
+                    }
+                } else {
+                    Log.d("showProfileFragment", "Current data: null")
+                }
+            }
+        } else {
+            val view = view.findViewById<Button>(R.id.sendEmailButton)
+            view.visibility = View.INVISIBLE
+            val params: ViewGroup.LayoutParams = view.layoutParams
+            params.height = 0
+            view.layoutParams = params
+            //val paramsMargin = view.layoutParams as ViewGroup.MarginLayoutParams
+            //paramsMargin.setMargins(10,10,10,10)
+            //view.layoutParams = paramsMargin
         }
 
         val imageView = view.findViewById<ImageView>(R.id.imageViewPhoto)
@@ -114,6 +174,63 @@ class ShowProfileFragment : Fragment() {
                 }
             }
         })
+
+        // Fake Rating List
+        ratingList = listOf(
+                Rating("Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,Bad trip,",1.0),
+                Rating("Good Driver", 4.5),
+                Rating("The path was nice", 3.0)
+        )
+
+        val reciclerView = view.findViewById<RecyclerView>(R.id.rateRV)
+        reciclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        val ratingTitleView = view.findViewById<TextView>(R.id.userRating)
+
+        adapter = RatingListCardAdapter(ratingList, requireContext())
+        reciclerView.adapter = adapter
+
+        reciclerView.visibility = View.GONE
+        ratingTitleView.visibility = View.GONE
+
+        viewModel.profileRatingList.observe(viewLifecycleOwner, {
+            ratingList = it
+            adapter.updateCollection(ratingList)
+            if (ratingList.isEmpty()) {
+                reciclerView.visibility = View.GONE
+                ratingTitleView.visibility = View.GONE
+            } else {
+                reciclerView.visibility = View.VISIBLE
+                ratingTitleView.visibility = View.VISIBLE
+                
+                val ratingAvg = it.map { r -> r.ratingNumber }.average()
+                val finalAvg = Math.floor(ratingAvg * 100) / 100
+                ratingTitleView.text = "${getString(R.string.userRating)}: ${finalAvg}/5"
+            }
+        })
+
+        val sendEmailButton = view?.findViewById<Button>(R.id.sendEmailButton)
+        if (sendEmailButton != null) {
+            sendEmailButton.setOnClickListener{
+                val action = ShowProfileFragmentDirections.actionNavProfileToSendEmailFragment(view.findViewById<TextView>(R.id.textViewEmail).text.toString())
+                findNavController().navigate(action)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val isOwner = args.isOwner
+        if (!isOwner){
+            val toolbar : Toolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+            (activity as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+            toolbar.setNavigationOnClickListener(View.OnClickListener(){
+                requireActivity().onBackPressed()
+                //findNavController().popBackStack()
+            })
+        }
     }
 
     private fun writeTextView(view: View){
@@ -163,4 +280,44 @@ class ShowProfileFragment : Fragment() {
             .appendPath(resources.getResourceEntryName(resourceId))
             .build()
     }
+}
+
+class RatingListCardAdapter(
+        var ratingList: List<Rating>,
+        val context: Context,
+        ): RecyclerView.Adapter<RatingListCardAdapter.RatingCardViewHolder>() {
+
+    class RatingCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val commentTextView =v.findViewById<TextView>(R.id.commentextView)
+        val ratingbarView = v.findViewById<RatingBar>(R.id.ratingBar2)
+        val reviewName = v.findViewById<TextView>(R.id.reviewuserView)
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RatingCardViewHolder {
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.ratingbar, parent, false)
+        return RatingCardViewHolder(v)
+    }
+
+    fun getStringFromField(field: String?): String {
+        return if (field == null) "" else field
+    }
+
+    override fun onBindViewHolder(holder: RatingCardViewHolder, position: Int) {
+        val selecterRating: Rating = ratingList[position]
+        holder.commentTextView.text= selecterRating.comment
+        holder.ratingbarView.rating =selecterRating.ratingNumber.toFloat()
+        holder.reviewName.text = "${selecterRating.writer} said: "
+    }
+
+    override fun getItemCount(): Int {
+        return ratingList.size
+    }
+
+    fun updateCollection(newRatingList: List<Rating>) {
+        ratingList = newRatingList
+        notifyDataSetChanged()
+    }
+
+
 }

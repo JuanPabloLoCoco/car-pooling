@@ -22,8 +22,8 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@drawable/car_default"
+        android:label="CarPooling"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShowProfileActivity">
@@ -33,7 +33,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main"
+            android:label="CarPooling"
             android:theme="@style/Theme.ShowProfileActivity.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

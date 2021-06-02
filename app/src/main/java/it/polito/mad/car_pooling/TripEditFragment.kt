@@ -10,7 +10,6 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.graphics.drawable.BitmapDrawable
 import android.icu.text.SimpleDateFormat
@@ -45,19 +44,16 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
-import it.polito.mad.car_pooling.Utils.TimeUtilFunctions
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
+import it.polito.mad.car_pooling.Utils.TimeUtilFunctions
 import it.polito.mad.car_pooling.models.StopLocation
 import it.polito.mad.car_pooling.models.Trip
 import it.polito.mad.car_pooling.viewModels.TripViewModel
 import it.polito.mad.car_pooling.viewModels.TripViewModelFactory
 import kotlinx.coroutines.launch
 import java.io.*
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 private val REQUEST_IMAGE_CAPTURE = 1

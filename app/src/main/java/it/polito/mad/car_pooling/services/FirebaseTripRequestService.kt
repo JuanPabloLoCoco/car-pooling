@@ -4,9 +4,11 @@ import android.util.Log
 import android.view.View
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
+import it.polito.mad.car_pooling.models.Profile.Companion.toUser
 import it.polito.mad.car_pooling.models.TripRequest
 import it.polito.mad.car_pooling.models.TripRequest.Companion.toTripRequest
 import kotlinx.coroutines.cancel
@@ -69,7 +71,7 @@ object FirebaseTripRequestService {
         }
     }
 
-    suspend fun findPassangerAcceptedRequest(userId: String): Flow<List<TripRequest>> {
+    suspend fun findPassengerAcceptedRequest(userId: String): Flow<List<TripRequest>> {
         val db = FirebaseFirestore.getInstance()
         return callbackFlow {
             val listenerRegistration = db.collection(TRIP_REQUESTS_COLLECTION)
@@ -77,7 +79,7 @@ object FirebaseTripRequestService {
                     .whereEqualTo("status", TripRequest.ACCEPTED)
                     .addSnapshotListener { querySnapShot: QuerySnapshot?, error:FirebaseFirestoreException? ->
                         if (error != null || querySnapShot == null) {
-                            cancel(message = "Error fetching passenger accepted Trip Requests by passanger ${userId}", cause = error)
+                            cancel(message = "Error fetching passenger accepted Trip Requests by passenger ${userId}", cause = error)
                             return@addSnapshotListener
                         }
                         val tripRequestList = querySnapShot?.documents
@@ -85,7 +87,7 @@ object FirebaseTripRequestService {
                         offer(tripRequestList)
                     }
             awaitClose {
-                Log.d(TAG, "Cancelling trip requests listener for passenger accepted Trip Requests by passanger ${userId}")
+                Log.d(TAG, "Cancelling trip requests listener for passenger accepted Trip Requests by passenger ${userId}")
                 listenerRegistration.remove()
             }
         }
@@ -121,6 +123,26 @@ object FirebaseTripRequestService {
 
             }
 
+    }
+
+    suspend fun findRequestById(tripRequestId: String): Flow<TripRequest?> {
+        val db = FirebaseFirestore.getInstance()
+        return callbackFlow {
+            val listenerRegistration = db.collection(TRIP_REQUESTS_COLLECTION)
+                .document(tripRequestId)
+                .addSnapshotListener { documentSnapshot: DocumentSnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                    if (firebaseFirestoreException != null || documentSnapshot == null) {
+                        cancel(message = "Error fetching user with email = $tripRequestId", cause = firebaseFirestoreException)
+                        return@addSnapshotListener
+                    }
+                    val tripRequest = documentSnapshot?.toTripRequest()
+                    offer(tripRequest)
+                }
+            awaitClose {
+                Log.d(TAG, "Cancelling trip request with id $tripRequestId listener")
+                listenerRegistration.remove()
+            }
+        }
     }
 
 

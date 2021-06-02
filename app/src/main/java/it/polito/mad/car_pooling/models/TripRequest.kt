@@ -10,6 +10,7 @@ import java.util.*
 data class TripRequest(var requester: String, var tripOwner: String, var tripId: String) {
 
     companion object {
+        val ENDED: String = "ENDED"
         val PENDING: String = "PENDING"
         val ACCEPTED: String = "ACCEPTED"
         val REJECTED: String = "REJECTED"
