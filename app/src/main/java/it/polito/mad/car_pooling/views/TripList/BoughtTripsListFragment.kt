@@ -3,6 +3,7 @@ package it.polito.mad.car_pooling
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -20,6 +21,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.ktx.Firebase
@@ -69,6 +71,17 @@ class BoughtTripsListFragment : Fragment() {
             }
             Log.d(TAG, "Trips found size = ${it.size}")
         })
+
+        val refreshBoughtTripList = view.findViewById<SwipeRefreshLayout>(R.id.refreshBoughtTripList)
+        refreshBoughtTripList.setOnRefreshListener{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                fragmentManager?.beginTransaction()?.detach(this)?.commitNow()
+                fragmentManager?.beginTransaction()?.attach(this)?.commitNow()
+            } else {
+                fragmentManager?.beginTransaction()?.detach(this)?.attach(this)?.commit()
+            }
+            refreshBoughtTripList.isRefreshing = false
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -59,7 +59,8 @@
             <TextView
                 android:id="@+id/textViewEmail"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
                 android:text="@string/email"
                 android:textSize="20sp"
                 android:layout_marginBottom="5dp"
@@ -73,7 +74,8 @@
             <TextView
                 android:id="@+id/textViewLocation"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
                 android:text="@string/location"
                 android:textSize="20sp"
                 android:layout_marginBottom="5dp"

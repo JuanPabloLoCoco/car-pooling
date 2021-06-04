@@ -3,6 +3,7 @@ package it.polito.mad.car_pooling
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,13 +12,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.ktx.Firebase
@@ -68,6 +69,8 @@ class TripListFragment : Fragment() {
         viewModel.myTrips.observe(viewLifecycleOwner, Observer {
             rvAdapter.tripList = it
             if (it.size > 0) {
+                val counterView = activity?.findViewById<TextView>(R.id.counterOtherTrip)
+                counterView?.text = it.size.toString()
                 requireView().findViewById<TextView>(R.id.empty_triplist).visibility = View.INVISIBLE
             } else {
                 requireView().findViewById<TextView>(R.id.empty_triplist).visibility = View.VISIBLE
@@ -81,6 +84,17 @@ class TripListFragment : Fragment() {
             // val bundle = bundleOf( "newOrOld" to "new")
             val action = TripListFragmentDirections.actionNavListTripToTripEditFragment(tripId = null)
             findNavController().navigate(action)
+        }
+
+        val refreshMyTripList = view.findViewById<SwipeRefreshLayout>(R.id.refreshMyTripList)
+        refreshMyTripList.setOnRefreshListener{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                fragmentManager?.beginTransaction()?.detach(this)?.commitNow()
+                fragmentManager?.beginTransaction()?.attach(this)?.commitNow()
+            } else {
+                fragmentManager?.beginTransaction()?.detach(this)?.attach(this)?.commit()
+            }
+            refreshMyTripList.isRefreshing = false
         }
     }
 }

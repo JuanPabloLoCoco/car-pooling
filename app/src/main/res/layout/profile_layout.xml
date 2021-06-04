@@ -46,7 +46,8 @@
             <TextView
                 android:id="@+id/textViewNickName"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:minHeight="50dp"
+                android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/nickName"
                 android:gravity="center_vertical"
@@ -60,7 +61,8 @@
             <TextView
                 android:id="@+id/textViewEmail"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:minHeight="50dp"
+                android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/KeyEmail"
                 android:gravity="center_vertical"
@@ -74,7 +76,8 @@
             <TextView
                 android:id="@+id/textViewLocation"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:minHeight="50dp"
+                android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:text="@string/location"
                 android:textSize="20sp"

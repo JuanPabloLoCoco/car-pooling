@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
         fullName = ""
         readSharedPreferences()
 
-
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -88,8 +87,8 @@ class MainActivity : AppCompatActivity() {
                 if (error != null) throw error
                 if (value != null) {
                     if (value.exists()){
-                        imageUri = if (value["image_uri"].toString() != "yes" || value["image_uri"].toString().isEmpty()) default_str_profile
-                                   else value["image_uri"].toString()
+                        imageUri = if (value["hasImage"] != true || value["hasImage"].toString().isEmpty()) default_str_profile
+                                   else value["hasImage"].toString()
                         //writeDefaultValue(value["full_name"].toString(), imageUri)
                         val navView: NavigationView = findViewById(R.id.nav_view)
                         val hView =  navView.getHeaderView(0)

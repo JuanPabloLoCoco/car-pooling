@@ -2,6 +2,7 @@ package it.polito.mad.car_pooling
 
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -24,7 +25,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 import it.polito.mad.car_pooling.models.Profile
-import it.polito.mad.car_pooling.models.Rating
 import it.polito.mad.car_pooling.models.RatingProfile
 import it.polito.mad.car_pooling.viewModels.ProfileViewModel
 import it.polito.mad.car_pooling.viewModels.ProfileViewModelFactory
@@ -45,7 +45,6 @@ class ShowProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val isOwner = args.isOwner
         setHasOptionsMenu(isOwner)
         imageUri = ""
@@ -160,7 +159,7 @@ class ShowProfileFragment : Fragment() {
             } else {
                 loadProfileInFields(it, view)
                 // The profile is not null
-                if (it.hasImage == true) {
+                /*if (it.hasImage == true) {
                     val storage = Firebase.storage
                     val imageRef = storage.reference.child("users/${it.email}.jpg")
                     imageRef.downloadUrl.addOnSuccessListener { Uri ->
@@ -172,9 +171,48 @@ class ShowProfileFragment : Fragment() {
                 } else {
                     imageUri = default_str_profile
                     imageView.setImageURI(Uri.parse(imageUri))
-                }
+                }*/
             }
         })
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("imageUriLocal")?.observe(
+            viewLifecycleOwner) { result ->
+            val tempUri = Uri.parse(result)
+            val bitmap = BitmapFactory.decodeFile(tempUri?.path)
+            imageView.setImageBitmap(bitmap)
+            /*val navView: NavigationView = (activity as AppCompatActivity).findViewById(R.id.nav_view)
+            val hView =  navView.getHeaderView(0)
+            val headerImage = hView.findViewById<ImageView>(R.id.nav_header_image)
+            headerImage.setImageBitmap(bitmap)*/
+            val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putString( "imageChangedOrNot", "no")
+                commit()
+            }
+        }
+
+        val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val imageChangedOrNot = sharedPreferences.getString("imageChangedOrNot", "no")
+        if (imageChangedOrNot == "no") {
+            val acc_email = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
+            val db = FirebaseFirestore.getInstance()
+            val users = db.collection("Users")
+            val my_profile = users.document(acc_email)
+            my_profile.get().addOnSuccessListener {document ->
+                if (document.data != null) {
+                    if (document.data!!["hasImage"] == true) {
+                        val storage = Firebase.storage
+                        val imageRef = storage.reference.child("users/$acc_email.jpg")
+                        imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                            val image_uri = Uri.toString()
+                            Glide.with(this).load(image_uri).into(imageView)
+                        }
+                    } else {
+                        imageView.setImageURI(Uri.parse(default_str_profile))
+                    }
+                }
+            }
+        }
 
         // Fake Rating List
         ratingList = listOf()
