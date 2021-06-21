@@ -1,5 +1,6 @@
 package it.polito.mad.car_pooling.views
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -19,6 +21,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import it.polito.mad.car_pooling.R
+import it.polito.mad.car_pooling.Utils.ModelPreferencesManager
 
 @Suppress("UNREACHABLE_CODE")
 class SignInFragment : Fragment() {
@@ -43,6 +46,20 @@ class SignInFragment : Fragment() {
         val mAuth = FirebaseAuth.getInstance()
         val user = mAuth.currentUser
         if (user != null){
+            val userId = ModelPreferencesManager.get(getString(R.string.keyCurrentAccount))?: "no email"
+            val db = FirebaseFirestore.getInstance()
+            val trips = db.collection("Trips")
+            var tripsNum = 0
+            trips.whereEqualTo("owner", userId).get().addOnSuccessListener { documents ->
+                for (document in documents) {
+                    tripsNum++
+                    Log.d(TAG, "$tripsNum")
+                }
+                val counterView = activity?.findViewById<TextView>(R.id.counterOtherTrip)
+                counterView?.text = tripsNum.toString()
+            }.addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents: ", exception)
+            }
             writeSharedPreferences()
             findNavController().navigate(R.id.nav_other_list_trip)
         }
@@ -103,12 +120,13 @@ class SignInFragment : Fragment() {
 
                     my_profile.get().addOnSuccessListener {document ->
                         if (document.data != null) {
-                            initializeFirebaseMyProfile("yes", users, acc?.getEmail().toString())
+                            //initializeFirebaseMyProfile("yes", users, acc?.getEmail().toString())
+                            findNavController().navigate(R.id.nav_other_list_trip)
                         } else {
                             initializeFirebaseMyProfile("", users, acc?.getEmail().toString())
+                            findNavController().navigate(R.id.nav_other_list_trip)
                         }
                     }
-                    findNavController().navigate(R.id.nav_other_list_trip)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("signInFragment", "signInWithCredential:failure", task.exception)

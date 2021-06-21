@@ -28,10 +28,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import it.polito.mad.car_pooling.R
@@ -139,28 +141,47 @@ class EditProfileFragment : Fragment() {
         }*/
         val default_str_profile = "android.resource://it.polito.mad.car_pooling/drawable/default_image"
         val imageView = view.findViewById<ImageView>(R.id.imageViewEditPhoto)
+        val db = FirebaseFirestore.getInstance()
+        val users = db.collection("Users")
+        val my_profile = users.document(acc_email)
+        my_profile.get().addOnSuccessListener {document ->
+            if (document.data != null) {
+                if (document.data!!["hasImage"] == true) {
+                    val storage = Firebase.storage
+                    val imageRef = storage.reference.child("users/$acc_email.jpg")
+                    imageRef.downloadUrl.addOnSuccessListener { Uri ->
+                        val image_uri = Uri.toString()
+                        Glide.with(this).load(image_uri).into(imageView)
+                    }
+                } else {
+                    imageUri = Uri.parse(default_str_profile)
+                    imageView.setImageURI(imageUri)
+                }
+            }
+        }
 
         viewModel.profile.observe( viewLifecycleOwner, {
             val thisUser = it
             if (thisUser != null) {
                 loadProfileInFields(it, view)
                 Log.d("POLITO", "MyUser from viewMode = ${thisUser.fullName}")
-                if (it.hasImage == true) {
+                /*if (it.hasImage == true) {
                     val storage = Firebase.storage
                     val imageRef = storage.reference.child("users/$acc_email.jpg")
                     imageRef.downloadUrl.addOnSuccessListener { Uri ->
                         val image_uri = Uri.toString()
-                        Glide.with(this.requireActivity()).load(image_uri).into(imageView)
+                        Glide.with((activity as AppCompatActivity)).load(image_uri).into(imageView)
                     }
                 } else {
                     imageUri = Uri.parse(default_str_profile)
                     imageView.setImageURI(imageUri)
-                }
+                }*/
             } else {
                 writeTextView(view)
                 Log.d("POLITO", "MyUser from viewMode is null")
             }
         })
+
     }
 
     private fun writeTextView(view: View){
@@ -316,6 +337,32 @@ class EditProfileFragment : Fragment() {
                         Snackbar.make(requireView(), R.string.profileEditedSucces, Snackbar.LENGTH_SHORT)
                                 .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
                                 .show()
+
+                        val sp = PreferenceManager.getDefaultSharedPreferences(context)
+                        val hideAllRef = sp.getBoolean("hideAll",false)
+                        val showLocationRef= sp.getBoolean("showLocation",false)
+                        val showBirthdayRef = sp.getBoolean("showBirthday",false)
+                        val showPhoneNumberRef = sp.getBoolean("showPhoneNumber",false)
+                        val hidePlateRef = sp.getBoolean("hidePlate",false)
+                        val db = FirebaseFirestore.getInstance()
+                        val users = db.collection("Users")
+                        val my_profile = users.document(acc_email)
+                        my_profile.update("hideAll", hideAllRef.toString(),
+                            "showLocation", showLocationRef.toString(),
+                            "showBirthday", showBirthdayRef.toString(),
+                            "showPhoneNumber", showPhoneNumberRef.toString(),
+                            "hidePlate", hidePlateRef.toString())
+                            .addOnSuccessListener { Log.d("settingFragment", "DocumentSnapshot successfully updated!") }
+                            .addOnFailureListener { e -> Log.w("settingFragment", "Error updating document", e) }
+
+                        val profileFragment = fragmentManager?.findFragmentByTag("profileFragment")
+                        if (profileFragment != null) {
+                            val ft = fragmentManager?.beginTransaction()
+                            ft?.detach(profileFragment)
+                            ft?.attach(profileFragment)
+                            ft?.commit()
+                        }
+
                         findNavController().popBackStack()
                     }
                     .addOnFailureListener {
@@ -436,6 +483,13 @@ class EditProfileFragment : Fragment() {
             }
             //imageView.setImageURI(imageUri)
             //setPic(imageView, photoFile?.absolutePath)
+            Log.d("imageUriLocal", imageUri.toString())
+            findNavController().previousBackStackEntry?.savedStateHandle?.set("imageUriLocal", imageUri.toString())
+            val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putString( "imageChangedOrNot", "yes")
+                commit()
+            }
         }
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_OPEN_GALLERY) {
             imageUri = data?.data
@@ -452,6 +506,13 @@ class EditProfileFragment : Fragment() {
                 // imageView.setImageURI(imageUri);
             }
              */
+            Log.d("imageUriLocal", imageUri.toString())
+            findNavController().previousBackStackEntry?.savedStateHandle?.set("imageUriLocal", imageUri.toString())
+            val sharedPreferences = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putString( "imageChangedOrNot", "yes")
+                commit()
+            }
         }
     }
 
