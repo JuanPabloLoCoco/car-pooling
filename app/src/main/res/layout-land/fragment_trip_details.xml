@@ -37,6 +37,26 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/alreadyRatedTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone"
+                    android:text="This trip has already been rated"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+
+                <Button
+                    android:id="@+id/viewDriverProfileButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:text="View Driver Profile"
+                    />
+
+                <TextView
                     android:id="@+id/requestStatusTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

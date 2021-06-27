@@ -189,6 +189,7 @@ class OthersTripCardAdapter(
             navController.navigate(action)
         }
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).text = "Profile"
+        holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).visibility = View.GONE
 
         holder.tripCardView.findViewById<MaterialButton>(R.id.tripCardEditTripButton).setOnClickListener {
             // Handle navigation to Owner Profile

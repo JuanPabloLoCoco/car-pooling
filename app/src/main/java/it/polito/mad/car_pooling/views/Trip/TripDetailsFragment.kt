@@ -79,8 +79,9 @@ class TripDetailsFragment : Fragment() {
         // val sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         // acc_email = sharedPreferences.getString(getString(R.string.keyCurrentAccount), "no email")!!
         acc_email = ModelPreferencesManager.get<String>(getString(R.string.keyCurrentAccount))?: "no email"
+        val ratingButton = view.findViewById<Button>(R.id.ratingTripButton)
         if (sourceFragment == "interestTrips") {
-            val ratingButton = view.findViewById<Button>(R.id.ratingTripButton)
+
             ratingButton.visibility=View.INVISIBLE
             val params: ViewGroup.LayoutParams = ratingButton.layoutParams
             params.height = 0
@@ -91,16 +92,17 @@ class TripDetailsFragment : Fragment() {
         val requestListRV = view.findViewById<RecyclerView>(R.id.requestRV)
         val noTripsMessageView = view.findViewById<TextView>(R.id.noTripsMessageTextView)
         val statusMessageView = view.findViewById<TextView>(R.id.requestStatusTextView)
+        val driverProfileButton = view.findViewById<Button>(R.id.viewDriverProfileButton)
+        val alreadyRatedTextView = view.findViewById<TextView>(R.id.alreadyRatedTextView)
 
         val rateTripButton = view.findViewById<Button>(R.id.ratingTripButton)
 
         // The rate button should only be visible if I have make the trip and the trip is Done!
         // I know that I have make the trip because my request was accepted
         // I know that the trip is Done because the Current TimeStamp is greater than the arrivalDateTime
-        rateTripButton.visibility = View.GONE
+        ratingButton.visibility = View.GONE
 
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
-
 
         val optionalInterRV = view.findViewById<RecyclerView>(R.id.trip_optional_intermediates_RV)
         optionalInterRV.layoutManager = LinearLayoutManager(activity)
@@ -110,10 +112,7 @@ class TripDetailsFragment : Fragment() {
 
         optionalStopsAdapter = TripOptionalIntermediatesCardAdapter(testList, requireContext())
         optionalInterRV.adapter = optionalStopsAdapter
-        rateTripButton.setOnClickListener {
-            val action1 = TripDetailsFragmentDirections.actionNavTripToRating("tripRequest")
-            findNavController().navigate(action1)
-        }
+
 
         requestListRV.layoutManager = LinearLayoutManager(requireContext())
 
@@ -166,7 +165,6 @@ class TripDetailsFragment : Fragment() {
                         // tripRequestListAdapter.tripRequestList = tripRequestList
                         // tripRequestListAdapter.notifyDataSetChanged()
 
-                        val ratingButton = view.findViewById<Button>(R.id.ratingTripButton)
                         ratingButton.visibility=View.INVISIBLE
                         val params: ViewGroup.LayoutParams = ratingButton.layoutParams
                         params.height = 0
@@ -179,6 +177,8 @@ class TripDetailsFragment : Fragment() {
                     // I dont want to see the status of my Request
                     statusMessageView.visibility = View.GONE
 
+                    // I dont show the profile button
+                    driverProfileButton.visibility = View.GONE
 
                     if (selectedTrip.arrivalDateTime < Timestamp.now()) {
                         selectedTrip.status = Trip.ENDED
@@ -200,6 +200,15 @@ class TripDetailsFragment : Fragment() {
                     if (selectedTrip.status == Trip.BLOCKED || selectedTrip.status == Trip.FULL || selectedTrip.avaSeats == 0) {
                         requestFabView.visibility = View.GONE
                     }
+
+                    // I show a button for going to the profile view of the driver
+                    driverProfileButton.visibility = View.VISIBLE
+                    driverProfileButton.setOnClickListener {
+                        val action = TripDetailsFragmentDirections.actionNavTripToNavProfile(selectedTrip.owner, false)
+                        findNavController().navigate(action)
+                    }
+
+
                     // I can't see owners messages
                     requestTitleView.visibility = View.GONE
                     requestListRV.visibility = View.GONE
@@ -222,6 +231,13 @@ class TripDetailsFragment : Fragment() {
                             var status = tripRequestDB.status
                             if (selectedTrip.arrivalDateTime < Timestamp.now()) {
                                 statusCopy = TripRequest.ENDED
+                                if (ratingDB == null) {
+                                    ratingButton.visibility = View.VISIBLE
+                                    ratingButton.setOnClickListener {
+                                        val action1 = TripDetailsFragmentDirections.actionNavTripToRating(tripRequestDB.id)
+                                        findNavController().navigate(action1)
+                                    }
+                                }
                             }
                             val message = when (statusCopy) {
                                 TripRequest.ACCEPTED -> "Your request was accepted"
